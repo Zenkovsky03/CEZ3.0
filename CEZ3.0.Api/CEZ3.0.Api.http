@@ -1,0 +1,6 @@
+@CEZ3._0.Api_HostAddress = http://localhost:5074
+
+GET {{CEZ3._0.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
