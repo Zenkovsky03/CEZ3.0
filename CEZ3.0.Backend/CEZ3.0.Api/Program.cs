@@ -1,6 +1,7 @@
 using CEZ3._0.Domain.Entities;
 using CEZ3._0.Infrastructure.Extentions;
 using CEZ3._0.Infrastructure.Presistance;
+using CEZ3._0.Application.Extensions;
 using DotNetEnv;
 using Scalar.AspNetCore;
 
@@ -22,6 +23,7 @@ var g = new MongoSettings
     DatabaseName = Environment.GetEnvironmentVariable("MongoDB_DbName") ?? "db",
 };
 
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(new MongoSettings
 {
     ConnectionString = Environment.GetEnvironmentVariable("MongoDB_URL") ?? "",
