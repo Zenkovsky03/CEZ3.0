@@ -9,12 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.10.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CEZ3.0.Application\CEZ3.0.Application.csproj" />
+    <ProjectReference Include="..\CEZ3.0.Infrastructure\CEZ3.0.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
