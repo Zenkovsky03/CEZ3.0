@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace CEZ3._0.Domain.Repositories
 {
-    internal interface IUserRepository
+    public interface IUserRepository
     {
+        Task<Domain.Entities.User?> GetUserByLoginAsync(string login);
+        Task<Domain.Entities.User?> GetUserByEmailAsync(string email);
+        Task AddUserAsync(Domain.Entities.User user);
     }
 }

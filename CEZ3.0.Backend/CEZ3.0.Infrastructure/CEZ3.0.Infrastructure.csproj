@@ -8,12 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
+    <PackageReference Include="MediatR" Version="13.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     <PackageReference Include="MongoDB.EntityFrameworkCore" Version="9.0.3" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CEZ3.0.Application\CEZ3.0.Application.csproj" />
     <ProjectReference Include="..\CEZ3.0.Domain\CEZ3.0.Domain.csproj" />
   </ItemGroup>
 
