@@ -5,13 +5,22 @@ using DotNetEnv;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-Env.Load();
+var envPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".env");
+envPath = Path.GetFullPath(envPath);
+
+Env.Load(envPath);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+var g = new MongoSettings
+{
+    ConnectionString = Environment.GetEnvironmentVariable("MongoDB_URL") ?? "",
+    DatabaseName = Environment.GetEnvironmentVariable("MongoDB_DbName") ?? "db",
+};
 
 builder.Services.AddInfrastructure(new MongoSettings
 {
