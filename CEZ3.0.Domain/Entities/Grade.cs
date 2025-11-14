@@ -2,15 +2,15 @@
 
 public class Grade
 {
-    public int id { get; set; }
-    public int task_id { get; set; }
+    public Guid Id { get; set; }
+    public Guid TaskId { get; set; }
     public Task Task { get; set; } = default!;
-    public int user_id { get; set; }
+    public Guid UserId { get; set; }
     public User User { get; set; } = default!;
-    public int points_recieved { get; set; }
-    public string? grade { get; set; }
-    public string feedback { get; set; } = default!;
-    public int graded_by_id { get; set; }
-    public User Graded_by { get; set; } = default!;
-    public long created_at { get; set; }
+    public int PointsRecieved { get; set; }
+    public string? Mark { get; set; }
+    public string Feedback { get; set; } = default!;
+    public Guid GradedById { get; set; }
+    public User GradedBy { get; set; } = default!;
+    public DateTime CreatedAt { get; set; }
 }

@@ -2,13 +2,13 @@
 
 public class Message
 {
-    public int id { get; set; }
-    public int sender_id { get; set; }
+    public Guid Id { get; set; }
+    public Guid SenderId { get; set; }
     public User Sender { get; set; } = default!;
-    public int recipient_id { get; set; }
+    public int RecipientId { get; set; }
     public User Recipient { get; set; } = default!;
-    public string subject { get; set; } = default!;
-    public string body { get; set; } = default!;
-    public bool is_read { get; set; } = false;
-    public long sent_at { get; set; }
+    public string Subject { get; set; } = default!;
+    public string Body { get; set; } = default!;
+    public bool IsRead { get; set; } = false;
+    public DateTime SentAt { get; set; }
 }

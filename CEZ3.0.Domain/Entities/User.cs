@@ -1,18 +1,33 @@
-﻿namespace CEZ3._0.Domain.Entities;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
+
+namespace CEZ3._0.Domain.Entities;
 
 public class User
 {
-    public int id { get; set; }
-    public string username { get; set; } = default!;
-    public string email { get; set; } = default!;
-    public string password_hash { get; set; } = default!;
-    public string role { get; set; } = default!;
-    public bool is_active { get; set; }
-    public long created_at { get; set; }
-    public Course course { get; set; } = default!;
-    public Course_Enrollment Course_Enrollment { get; set; } = default!;
-    public Grade Student { get; set; } = default!;
-    public Grade Grader { get; set; } = default!;
-    public Message Sender { get; set; } = default!;
-    public Message Recipient { get; set; } = default!;
+    [BsonId]
+    public ObjectId Id { get; set; }
+    [MaxLength(50)]
+    public string FirstName { get; set; } = default!;
+    [MaxLength(50)]
+    public string LastName { get; set; } = default!;
+    [Required]
+    [MaxLength(50)]
+    public string Username { get; set; } = default!;
+    [Required]
+    [EmailAddress]
+    [MaxLength(50)]
+    public string Email { get; set; } = default!;
+    [Required]
+    public string PasswordHash { get; set; } = default!;
+    public string Role { get; set; } = default!;
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    //public Course Course { get; set; } = default!;
+    //public CourseEnrollment CourseEnrollment { get; set; } = default!;
+    //public Grade Student { get; set; } = default!;
+    //public Grade Grader { get; set; } = default!;
+    //public Message Sender { get; set; } = default!;
+    //public Message Recipient { get; set; } = default!;
 }
