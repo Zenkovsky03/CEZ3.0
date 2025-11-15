@@ -27,7 +27,7 @@ namespace CEZ3._0.Application.Users.Query.LoginUser
             if (user == null)
             {
                 _logger.LogWarning("Login attempt failed: User with login {Login} not found.", request.Login);
-                throw new BadRequestException("User not found");
+                throw new BadRequestException("Invalid login or password");
             }
 
             string storedHashedString = user.PasswordHash;

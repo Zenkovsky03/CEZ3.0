@@ -1,4 +1,5 @@
-﻿using CEZ3._0.Application.Users.Command.CreateUser;
+﻿using CEZ3._0.Application.Contracts.Responses.Users;
+using CEZ3._0.Application.Users.Command.CreateUser;
 using CEZ3._0.Application.Users.Query.LoginUser;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -17,6 +18,9 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("login")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)] 
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)] 
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] LoginUserQuery request)
     {
         try
@@ -35,6 +39,8 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("register")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)] 
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] CreateUserCommand request)
     {
         try
