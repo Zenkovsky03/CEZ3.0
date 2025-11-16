@@ -1,6 +1,30 @@
+@CEZ3.0.Api_HostAddress = https://localhost:7115
 @CEZ3._0.Api_HostAddress = http://localhost:5074
 
 GET {{CEZ3._0.Api_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+POST {{CEZ3.0.Api_HostAddress}}/api/user/login
+Content-Type: application/json
+
+{
+  "Login": "adam.kowalska",
+  "Password": "Password123!"
+}
+
+###
+
+POST {{CEZ3.0.Api_HostAddress}}/api/user/register
+Content-Type: application/json
+
+{
+  "FirstName": "Adam",
+  "LastName": "Kowalska",
+  "Username": "adam.kowalska",
+  "Email": "adam@cos.pl",
+  "Password": "Password123!"
+}
 
 ###
