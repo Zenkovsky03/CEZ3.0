@@ -1,9 +1,6 @@
-﻿using BCrypt.Net;
-using CEZ3._0.Domain.Entities;
-using CEZ3._0.Infrastructure.Presistance; 
+﻿using CEZ3._0.Domain.Entities;
+using CEZ3._0.Infrastructure.Presistance;
 using MongoDB.Driver;
-using System.Text;
-using SystemTasks = System.Threading.Tasks;
 
 namespace CEZ3._0.Infrastructure.Seeder
 {
@@ -12,8 +9,10 @@ namespace CEZ3._0.Infrastructure.Seeder
     {
         private readonly CezDbContext _dbContext = dbContext;
 
-        public async SystemTasks.Task Seed()
+        public async Task Seed()
         {
+            dbContext.Database.EnsureCreated();
+
             if (!_dbContext.Users.Any())
             {
                 _dbContext.Users.AddRange(CreateUsers());

@@ -18,11 +18,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplication(builder.Configuration);
 
-builder.Services.AddInfrastructure(new MongoSettings
-{
-    ConnectionString = Environment.GetEnvironmentVariable("MongoDB_URL_Local") ?? "",
-    DatabaseName = Environment.GetEnvironmentVariable("MongoDB_DbName_Local") ?? "db",
-});
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
@@ -47,6 +43,7 @@ var app = builder.Build();
 //    }
 //}
 using var scope = app.Services.CreateScope();
+
 var seeder = scope.ServiceProvider.GetRequiredService<ICez3_0Seeder>();
 await seeder.Seed();
 
