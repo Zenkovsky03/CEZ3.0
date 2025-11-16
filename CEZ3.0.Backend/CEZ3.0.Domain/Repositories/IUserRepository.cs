@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CEZ3._0.Domain.Entities;
 
-namespace CEZ3._0.Domain.Repositories
+namespace CEZ3._0.Domain.Repositories;
+
+public interface IUserRepository
 {
-    public interface IUserRepository
-    {
-        Task<Domain.Entities.User?> GetUserByLoginAsync(string login);
-        Task<Domain.Entities.User?> GetUserByEmailAsync(string email);
-        Task AddUserAsync(Domain.Entities.User user);
-    }
+    Task<User?> GetUserByLoginAsync(string login);
+    Task<User?> GetUserByEmailAsync(string email);
+    Task AddUserAsync(User user);
+    Task SaveChangesAsync();
 }

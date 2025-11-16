@@ -9,5 +9,5 @@ public class CourseSection
     public int OrderIndex { get; set; }
     public DateTime CreatedAt { get; set; }
     public SectionMaterial SectionMaterial { get; set; } = default!;
-    public Task Task { get; set; } = default!;
+    public Assignment Assignment { get; set; } = default!;
 }

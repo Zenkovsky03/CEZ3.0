@@ -24,6 +24,8 @@ public class User
     public string Role { get; set; } = default!;
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? ResetToken { get; set; }
+    public DateTime? ResetTokenExpiry { get; set; }
     //public Course Course { get; set; } = default!;
     //public CourseEnrollment CourseEnrollment { get; set; } = default!;
     //public Grade Student { get; set; } = default!;

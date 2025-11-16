@@ -4,7 +4,7 @@ public class Grade
 {
     public Guid Id { get; set; }
     public Guid TaskId { get; set; }
-    public Task Task { get; set; } = default!;
+    public Assignment Assignment { get; set; } = default!;
     public Guid UserId { get; set; }
     public User User { get; set; } = default!;
     public int PointsRecieved { get; set; }
