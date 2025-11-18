@@ -1,0 +1,330 @@
+:root {
+    /* Light Theme */
+    --color-primary: #135bec;
+    --color-background: #f6f6f8;
+    --color-text-default: #111318;
+    --color-text-muted: #616f89;
+    --color-surface-light: #ffffff;
+    --color-border: #dbdfe6;
+    --border-radius-default: 0.25rem;
+    --border-radius-lg: 0.5rem;
+}
+
+.dark {
+    /* Dark Theme */
+    --color-background: #101622;
+    --color-text-default: #e5e7eb; /* gray-200 */
+    --color-text-muted: #9ca3af; /* gray-400 */
+    --color-surface-light: rgba(17, 19, 24, 0.5); /* gray-900/50 */
+    --color-border: #1f2937; /* gray-800 */
+}
+
+/*
+    * =========================================================
+    * STYLE BAZOWE I LAYOUT
+    * =========================================================
+    */
+body {
+    font-family: 'Lexend', sans-serif;
+}
+
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 576px; /* max-w-lg */
+}
+
+/* Ikony Material Symbols */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/*
+    * =========================================================
+    * HEADER I KARTA GŁÓWNA
+    * =========================================================
+    */
+.top-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 1.5rem 2.5rem; /* px-10 py-6 */
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-text-default);
+}
+.logo-icon {
+    width: 1.5rem; /* size-6 */
+    height: 1.5rem;
+    color: var(--color-primary);
+}
+.logo-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 700;
+    line-height: 1.625rem; /* leading-tight */
+}
+
+.main-card-registration {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: var(--color-surface-light);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    border: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+      .main-card-registration {
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* md:grid-cols-2 */
+      }
+    }
+
+/* Sekcja nagłówka strony (wewnątrz karty) */
+.page-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1.5rem 2rem; /* p-6 md:p-8 */
+    border-bottom: 1px solid var(--color-border);
+}
+.page-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.page-title {
+    color: var(--color-text-default);
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 900; /* font-black */
+    line-height: 2.25rem; /* leading-tight */
+}
+.page-subtitle {
+    color: var(--color-text-muted);
+    font-size: 1rem; /* text-base */
+    font-weight: 400;
+}
+
+/*
+    * =========================================================
+    * FORMULARZ I POLA
+    * =========================================================
+    */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* gap-6 */
+    padding: 1.5rem 2rem; /* p-6 md:p-8 */
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem; /* gap-4 */
+}
+@media (min-width: 640px) { /* sm:flex-row */
+    .field-group {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+}
+
+.field-label {
+    display: flex;
+    flex-direction: column;
+    min-width: 10rem; /* min-w-40 */
+    flex: 1;
+}
+
+.field-label p {
+    color: var(--color-text-default);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500;
+    padding-bottom: 0.5rem;
+}
+
+.form-input {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1;
+    resize: none;
+    overflow: hidden;
+    border-radius: var(--border-radius-lg);
+    color: var(--color-text-default);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface-light);
+    height: 3rem; /* h-12 */
+    padding: 0.75rem; /* p-3 */
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    transition: all 0.2s;
+}
+.dark .form-input {
+    background-color: var(--color-background);
+}
+.form-input::placeholder {
+    color: var(--color-text-muted);
+}
+.form-input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 2px var(--color-primary); /* focus:ring-2 focus:ring-primary/50 */
+    border-color: var(--color-primary);
+}
+
+/* Pola Wyboru Typu Konta */
+.type-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem; /* gap-3 */
+}
+.type-option-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* Checkbox / Radio styling */
+.form-radio, .form-checkbox {
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface-light);
+    border-radius: var(--border-radius-default);
+    transition: all 0.2s;
+}
+.dark .form-radio, .dark .form-checkbox {
+    background-color: #1f2937; /* dark:bg-gray-800 */
+}
+.form-radio:checked, .form-checkbox:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+.form-radio:focus, .form-checkbox:focus {
+    box-shadow: 0 0 0 2px var(--color-primary); /* focus:ring-2 focus:ring-primary/50 */
+}
+
+.type-option-label.checked,
+.type-option-label:has(input:checked) {
+    background-color: rgba(19, 91, 236, 0.1); /* bg-primary/10 */
+    border-color: var(--color-primary);
+}
+.dark .type-option-label.checked,
+.dark .type-option-label:has(input:checked) {
+    background-color: rgba(19, 91, 236, 0.2); /* dark:bg-primary/20 */
+}
+
+/* Hasło - Show/Hide Button */
+.password-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+.password-input {
+    padding-right: 3rem; /* pr-12 */
+}
+.toggle-password {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 3rem; /* h-12 */
+    width: 3rem; /* w-12 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.toggle-password:hover {
+    color: var(--color-primary);
+}
+
+/* Warunki i Zgody */
+.terms-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+
+    input {
+        margin: 3px;
+    }
+}
+.terms-text {
+    font-size: 0.875rem; /* text-sm */
+    color: var(--color-text-muted);
+    margin-top: 0;
+}
+.terms-text a {
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.terms-text a:hover {
+    text-decoration: underline;
+}
+
+/* Przycisk Zarejestruj się */
+.submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    height: 3rem; /* h-12 */
+    padding: 0 1.5rem; /* px-6 */
+    border-radius: var(--border-radius-lg);
+    width: 100%;
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    border: none;
+}
+.submit-button:hover {
+    background-color: rgba(19, 91, 236, 0.9); /* hover:bg-primary/90 */
+}
+.submit-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary);
+}
+.submit-button:disabled {
+    background-color: #d1d5db; /* gray-300 */
+    color: #6b7280;
+    cursor: not-allowed;
+}
+.dark .submit-button:disabled {
+    background-color: #4b5563; /* dark:bg-gray-600 */
+}
+
+/* Link Alternatywny */
+.alt-action {
+    text-align: center;
+}
+.alt-action p {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+.alt-action a {
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.alt-action a:hover {
+    text-decoration: underline;
+}
