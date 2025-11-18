@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CEZ3.0.Application\CEZ3.0.Application.csproj" />
     <ProjectReference Include="..\CEZ3.0.Infrastructure\CEZ3.0.Infrastructure.csproj" />
   </ItemGroup>
