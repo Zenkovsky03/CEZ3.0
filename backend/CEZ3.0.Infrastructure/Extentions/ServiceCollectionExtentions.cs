@@ -9,10 +9,11 @@ namespace CEZ3._0.Infrastructure.Extentions;
 
 public static class ServiceCollectionExtentions
 {
-    public static void AddInfrastructure(this IServiceCollection services, MongoSettings settings)
+    public static void AddInfrastructure(this IServiceCollection services)
     {
         services.AddDbContext<CezDbContext>(options =>
-            options.UseMongoDB(settings.ConnectionString, settings.DatabaseName));
+            options.UseMongoDB(Environment.GetEnvironmentVariable("MongoDB_URL")!,
+            Environment.GetEnvironmentVariable("MongoDB_DbName")!));
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICez3_0Seeder, Cez3_0Seeder>();
