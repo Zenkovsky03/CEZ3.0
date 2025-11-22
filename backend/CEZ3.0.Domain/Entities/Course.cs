@@ -14,5 +14,5 @@ public class Course
     public CourseEnrollment CourseEnrollment { get; set; } = default!;
     public CourseSection CourseSection { get; set; } = default!;
     public ScheduleEntry ScheduleEntry { get; set; } = default!;
-    public Task Task { get; set; } = default!;
+    public Assignment Assignment { get; set; } = default!;
 }

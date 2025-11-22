@@ -48,5 +48,6 @@ public static class ServiceCollectionExtensions
        );
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
+        services.AddTransient<IEmailSender, EmailSender>();
     }
 }

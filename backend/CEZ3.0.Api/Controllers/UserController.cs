@@ -1,5 +1,7 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.Users.Command.CreateUser;
+using CEZ3._0.Application.Users.Command.GetResetToken;
+using CEZ3._0.Application.Users.Command.ResetPassword;
 using CEZ3._0.Application.Users.Query.LoginUser;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -16,10 +18,10 @@ public class UserController : ControllerBase
     {
         _sender = sender;
     }
-    
+
     [HttpPost("login")]
-    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)] 
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)] 
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] LoginUserQuery request)
     {
@@ -39,7 +41,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("register")]
-    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)] 
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] CreateUserCommand request)
     {
@@ -48,6 +50,38 @@ public class UserController : ControllerBase
             await _sender.Send(request);
 
             return StatusCode(201, new { Message = "User created successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
+
+    [HttpPost("getreset")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetResetToken([FromBody] GetResetTokenCommand request)
+    {
+        try
+        {
+            await _sender.Send(request);
+            return StatusCode(201, new { Message = "Reset token generated successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
+
+    [HttpPost("resetpassword")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand request)
+    {
+        try
+        {
+            await _sender.Send(request);
+            return Ok(new { Message = "Password reset successfully." });
         }
         catch (BadRequestException ex)
         {

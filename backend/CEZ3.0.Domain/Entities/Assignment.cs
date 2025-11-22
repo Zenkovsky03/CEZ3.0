@@ -1,6 +1,6 @@
 ﻿namespace CEZ3._0.Domain.Entities;
 
-public class Task
+public class Assignment
 {
     public Guid Id { get; set; }
     public Guid CourseId { get; set; }
