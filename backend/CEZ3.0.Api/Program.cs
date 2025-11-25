@@ -1,4 +1,5 @@
 using CEZ3._0.Application.Extensions;
+using CEZ3._0.Application.Helpers.Scalar;
 using CEZ3._0.Infrastructure.Extentions;
 using CEZ3._0.Infrastructure.Seeder;
 using DotNetEnv;
@@ -14,7 +15,10 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi("v1", opt =>
+{
+    opt.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure();

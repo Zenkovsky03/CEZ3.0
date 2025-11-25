@@ -20,7 +20,8 @@ public class BlockUserCommandHandler(ILogger<BlockUserCommandHandler> logger,
     {
         _logger.LogInformation("Handling BlockUserCommand for UserId: {UserId}", request.UserId);
 
-        var user = _userContext.GetCurrentUser();
+        var user = _userContext.GetCurrentUser()
+            ?? throw new UnauthorizedException("User must be logged in to block another user.");
 
         if (user == null)
         {
@@ -32,6 +33,12 @@ public class BlockUserCommandHandler(ILogger<BlockUserCommandHandler> logger,
         {
             _logger.LogWarning("User {UserId} with role {UserRole} attempted to block a user without sufficient permissions.", user.id, user.role);
             throw new ForbiddenException("Only admins can block users.");
+        }
+
+        if (user.id == request.UserId)
+        {
+            _logger.LogWarning("User {UserId} attempted to block themselves.", user.id);
+            throw new BadRequestException("Users cannot block themselves.");
         }
 
         ObjectId id = ObjectId.Empty;

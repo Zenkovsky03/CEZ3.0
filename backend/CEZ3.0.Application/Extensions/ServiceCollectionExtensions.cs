@@ -41,10 +41,20 @@ public static class ServiceCollectionExtensions
                 OnMessageReceived = context =>
                 {
                     var token = context.Request.Cookies["jwt_token"];
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                        {
+                            token = authHeader.Substring("Bearer ".Length).Trim();
+                        }
+                    }
+
                     if (!string.IsNullOrEmpty(token))
                     {
                         context.Token = token;
                     }
+
                     return Task.CompletedTask;
                 }
             };
