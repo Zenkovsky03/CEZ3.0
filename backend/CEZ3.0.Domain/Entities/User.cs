@@ -26,6 +26,7 @@ public class User
     public DateTime CreatedAt { get; set; }
     public string? ResetToken { get; set; }
     public DateTime? ResetTokenExpiry { get; set; }
+    public bool IsBlocked { get; set; } = false;
     //public Course Course { get; set; } = default!;
     //public CourseEnrollment CourseEnrollment { get; set; } = default!;
     //public Grade Student { get; set; } = default!;

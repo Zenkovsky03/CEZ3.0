@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     public static void AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserContext, UserContext>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
         {
