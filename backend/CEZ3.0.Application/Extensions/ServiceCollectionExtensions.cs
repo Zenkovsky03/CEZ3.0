@@ -15,7 +15,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserContext, UserContext>();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+        services.AddAuthentication(option =>
+        {
+            option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(opt =>
         {
             var tokenKey = Environment.GetEnvironmentVariable("TOKEN_KEY");
 
@@ -45,8 +49,14 @@ public static class ServiceCollectionExtensions
                 }
             };
 
+
+
         }
        );
+        services.AddAuthorization();
+
+        services.AddHttpClient();
+        services.AddHttpContextAccessor();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
         services.AddTransient<IEmailSender, EmailSender>();

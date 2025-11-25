@@ -12,20 +12,26 @@ public class UserRepository : IUserRepository
         _dbContext = dbContext;
     }
     private readonly CezDbContext _dbContext;
-    public Task<User?> GetUserByLoginAsync(string login)
+
+    public async Task<User?> GetUserByLoginAsync(string login)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.Username == login);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == login);
     }
 
-    public Task<User?> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task AddUserAsync(User user)
     {
         await _dbContext.Users.AddAsync(user);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<User?> GetByIdAsync(MongoDB.Bson.ObjectId userId)
+    {
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
     }
 
     public async Task SaveChangesAsync()
