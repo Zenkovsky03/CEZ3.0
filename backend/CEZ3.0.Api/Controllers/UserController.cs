@@ -1,7 +1,9 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
+using CEZ3._0.Application.Users.Command.BlockUser;
 using CEZ3._0.Application.Users.Command.CreateUser;
 using CEZ3._0.Application.Users.Command.GetResetToken;
 using CEZ3._0.Application.Users.Command.ResetPassword;
+using CEZ3._0.Application.Users.Command.UnblockUser;
 using CEZ3._0.Application.Users.Query.LoginUser;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -89,4 +91,57 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPatch("block/{userId}")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> BlockUser([FromRoute] string userId)
+    {
+        try
+        {
+            await _sender.Send(new BlockUserCommand(userId));
+
+            return Ok(new { Message = "User blocked successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
+
+    [HttpPatch("unblock/{userId}")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UnblockUser([FromRoute] string userId)
+    {
+        try
+        {
+            await _sender.Send(new UnblockUserCommand(userId));
+
+            return Ok(new { Message = "User unblocked successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
 }

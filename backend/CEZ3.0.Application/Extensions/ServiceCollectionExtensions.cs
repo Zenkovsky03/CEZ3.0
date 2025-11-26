@@ -13,8 +13,13 @@ public static class ServiceCollectionExtensions
     public static void AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserContext, UserContext>();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+        services.AddAuthentication(option =>
+        {
+            option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(opt =>
         {
             var tokenKey = Environment.GetEnvironmentVariable("TOKEN_KEY");
 
@@ -36,16 +41,32 @@ public static class ServiceCollectionExtensions
                 OnMessageReceived = context =>
                 {
                     var token = context.Request.Cookies["jwt_token"];
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                        {
+                            token = authHeader.Substring("Bearer ".Length).Trim();
+                        }
+                    }
+
                     if (!string.IsNullOrEmpty(token))
                     {
                         context.Token = token;
                     }
+
                     return Task.CompletedTask;
                 }
             };
 
+
+
         }
        );
+        services.AddAuthorization();
+
+        services.AddHttpClient();
+        services.AddHttpContextAccessor();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
         services.AddTransient<IEmailSender, EmailSender>();
