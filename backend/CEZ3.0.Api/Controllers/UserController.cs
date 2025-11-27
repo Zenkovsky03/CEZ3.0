@@ -1,6 +1,7 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.Users.Command.BlockUser;
 using CEZ3._0.Application.Users.Command.CreateUser;
+using CEZ3._0.Application.Users.Command.EditUser;
 using CEZ3._0.Application.Users.Command.GetResetToken;
 using CEZ3._0.Application.Users.Command.ResetPassword;
 using CEZ3._0.Application.Users.Command.UnblockUser;
@@ -138,6 +139,33 @@ public class UserController : ControllerBase
         catch (UnauthorizedException ex)
         {
             return Unauthorized(new { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateUser([FromRoute] string id, [FromBody] EditUserCommand request)
+    {
+        try
+        {
+            request.UserId = id;
+            await _sender.Send(request);
+            return Ok(new SuccessResponse { Message = "Profile updated successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
         catch (ForbiddenException ex)
         {

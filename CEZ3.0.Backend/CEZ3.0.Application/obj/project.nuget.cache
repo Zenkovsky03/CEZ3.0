@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "dgSpecHash": "sAaVTqaNimY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\DELL\\source\\repos\\CEZ3.0\\CEZ3.0.Backend\\CEZ3.0.Application\\CEZ3.0.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\DELL\\.nuget\\packages\\bcrypt.net-core\\1.6.0\\bcrypt.net-core.1.6.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\mediatr\\13.1.0\\mediatr.13.1.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\9.0.11\\microsoft.aspnetcore.authentication.jwtbearer.9.0.11.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.0\\microsoft.extensions.configuration.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.0\\microsoft.extensions.primitives.10.0.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.14.0\\microsoft.identitymodel.abstractions.8.14.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\8.14.0\\microsoft.identitymodel.jsonwebtokens.8.14.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.identitymodel.logging\\8.14.0\\microsoft.identitymodel.logging.8.14.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.identitymodel.protocols\\8.0.1\\microsoft.identitymodel.protocols.8.0.1.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\8.0.1\\microsoft.identitymodel.protocols.openidconnect.8.0.1.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.14.0\\microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\mongodb.bson\\3.5.0\\mongodb.bson.3.5.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\portable.bouncycastle\\1.9.0\\portable.bouncycastle.1.9.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.14.0\\system.identitymodel.tokens.jwt.8.14.0.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0\\system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
