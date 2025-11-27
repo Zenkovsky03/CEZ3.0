@@ -4,6 +4,7 @@ using CEZ3._0.Application.Users.Command.CreateUser;
 using CEZ3._0.Application.Users.Command.GetResetToken;
 using CEZ3._0.Application.Users.Command.ResetPassword;
 using CEZ3._0.Application.Users.Command.UnblockUser;
+using CEZ3._0.Application.Users.Query.GetUsersList;
 using CEZ3._0.Application.Users.Query.LoginUser;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -134,6 +135,27 @@ public class UserController : ControllerBase
         catch (BadRequestException ex)
         {
             return BadRequest(new { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
+
+    [HttpGet("GetUsers")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetUsers([FromQuery] GetUsersListQuery query)
+    {
+        try
+        {
+            var result = await _sender.Send(query);
+            return Ok(result);
         }
         catch (UnauthorizedException ex)
         {
