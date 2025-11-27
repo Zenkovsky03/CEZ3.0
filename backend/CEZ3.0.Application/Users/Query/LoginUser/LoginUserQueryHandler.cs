@@ -15,7 +15,7 @@ namespace CEZ3._0.Application.Users.Query.LoginUser
 {
     public class LoginUserQueryHandler(ILogger<LoginUserQueryHandler> logger,
         IUserRepository userRepository,
-        ITokenService tokenService) : IRequestHandler<LoginUserQuery,string>
+        ITokenService tokenService) : IRequestHandler<LoginUserQuery, string>
     {
         private readonly ILogger<LoginUserQueryHandler> _logger = logger;
         private readonly IUserRepository _userRepository = userRepository;
@@ -24,7 +24,7 @@ namespace CEZ3._0.Application.Users.Query.LoginUser
         public async Task<string> Handle(LoginUserQuery request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetUserByLoginAsync(request.Login);
-            if (user == null)
+            if (user == null || !user.IsActive)
             {
                 _logger.LogWarning("Login attempt failed: User with login {Login} not found.", request.Login);
                 throw new BadRequestException("Invalid login or password");

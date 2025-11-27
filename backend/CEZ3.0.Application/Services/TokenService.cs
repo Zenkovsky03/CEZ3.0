@@ -21,10 +21,10 @@ namespace CEZ3._0.Application.Services
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-            //foreach (var role in user.Role)
-            //{
-            //claims.Add(new Claim(ClaimTypes.Role, user.Role));
-            //}
+            foreach (var role in user.Role)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, user.Role));
+            }
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
