@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 var envPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".env");
 envPath = Path.GetFullPath(envPath);
 
-Env.Load(envPath);
+    Env.Load(envPath);
 builder.Configuration.AddEnvironmentVariables();
 // Add services to the container.
 
@@ -58,7 +58,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseAuthentication();
 
 app.UseAuthorization();
 

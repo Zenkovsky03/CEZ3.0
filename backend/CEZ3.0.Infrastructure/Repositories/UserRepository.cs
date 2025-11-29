@@ -16,12 +16,12 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetUserByLoginAsync(string login)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == login);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == login && u.IsActive);
     }
 
     public async Task<User?> GetUserByEmailAsync(string email)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
     }
 
     public async Task AddUserAsync(User user)
@@ -32,7 +32,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByIdAsync(ObjectId userId)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
     }
 
     public async Task SaveChangesAsync()

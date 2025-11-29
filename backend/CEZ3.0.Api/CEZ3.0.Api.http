@@ -28,3 +28,14 @@ Content-Type: application/json
 }
 
 ###
+
+PUT {{CEZ3.0.Api_HostAddress}}/api/user/{id}
+Content-Type: application/json
+
+{
+  "FirstName": "Adam",
+  "LastName": "Kowalska",
+  "Email": "adam@cos.pl",
+}
+
+###
