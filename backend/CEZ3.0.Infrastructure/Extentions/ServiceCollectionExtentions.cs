@@ -12,8 +12,8 @@ public static class ServiceCollectionExtentions
     public static void AddInfrastructure(this IServiceCollection services)
     {
         services.AddDbContext<CezDbContext>(options =>
-            options.UseMongoDB(Environment.GetEnvironmentVariable("MongoDB_URL_Local")!,
-            Environment.GetEnvironmentVariable("MongoDB_DbName_Local")!));
+            options.UseMongoDB(Environment.GetEnvironmentVariable("MongoDB_URL")!,
+            Environment.GetEnvironmentVariable("MongoDB_DbName")!));
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICez3_0Seeder, Cez3_0Seeder>();
