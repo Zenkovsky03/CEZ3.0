@@ -28,7 +28,7 @@ public class GetUsersListQueryHandler(ILogger<GetUsersListQueryHandler> logger,
         if (currentUser.role != UserRoles.Admin.ToString())
             throw new ForbiddenException("User does not have permission to access this resource.");
 
-        var users = await _userRepository.GetUsersAsync(request.PageNumber, request.PageSize);
+        var users = await _userRepository.GetUsersAsync(request.PageNumber, request.PageSize, request.OrderBy, request.IsActive, request.Role, request.Email);
 
         var totalUsers = await _userRepository.GetTotalUsersCountAsync();
 
@@ -45,7 +45,7 @@ public class GetUsersListQueryHandler(ILogger<GetUsersListQueryHandler> logger,
             IsBlocked = user.IsBlocked
         }).ToList();
 
-        var pagedResult = new PagedResult<UserDto>(userDto, totalUsers, request.PageSize, request.PageNumber);
+        var pagedResult = new PagedResult<UserDto>(userDto, totalUsers, request.PageNumber, request.PageSize);
 
         return pagedResult;
     }

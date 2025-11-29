@@ -2,7 +2,7 @@
 
 public class PagedResult<T>
 {
-    public PagedResult(List<T> items, int totalItemCount, int pageSize, int PageNumber)
+    public PagedResult(List<T> items, int totalItemCount, int PageNumber, int pageSize)
     {
         Items = items;
         TotalItemCount = totalItemCount;

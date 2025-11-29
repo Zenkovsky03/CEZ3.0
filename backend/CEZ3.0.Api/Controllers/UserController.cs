@@ -8,6 +8,7 @@ using CEZ3._0.Application.Users.Query.GetUsersList;
 using CEZ3._0.Application.Users.Query.LoginUser;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CEZ3._0.Api.Controllers;
@@ -146,7 +147,8 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpGet("GetUsers")]
+    [Authorize(Roles = "Admin")]
+    [HttpGet("users")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]

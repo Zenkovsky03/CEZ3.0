@@ -10,6 +10,6 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(ObjectId userId);
     Task AddUserAsync(User user);
     Task SaveChangesAsync();
-    Task<List<User>> GetUsersAsync(int pageNumber, int pageSize);
+    Task<List<User>> GetUsersAsync(int pageNumber, int pageSize, bool? orderBy, bool? isActive, string? role, string? email);
     Task<int> GetTotalUsersCountAsync();
 }

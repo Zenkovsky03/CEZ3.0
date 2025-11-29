@@ -40,17 +40,38 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<List<User>> GetUsersAsync(int pageNumber, int pageSize)
-    {
-        return await _dbContext.Users
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-    }
-
     public async Task<int> GetTotalUsersCountAsync()
     {
         return await _dbContext.Users.CountAsync();
     }
 
+    public async Task<List<User>> GetUsersAsync(int pageNumber, int pageSize, bool? orderBy, bool? isActive, string? role, string? email)
+    {
+        var query = _dbContext.Users
+                        .AsNoTracking()
+                        .AsQueryable();
+
+        if (isActive.HasValue && isActive != null)
+            query = query.Where(u => u.IsActive == isActive.Value);
+
+        if (!string.IsNullOrEmpty(role))
+            query = query.Where(u => u.Role == role);
+
+        if (!string.IsNullOrEmpty(email))
+            query = query.Where(u => u.Email.ToLower().Contains(email.ToLower()));
+
+
+        if (orderBy.HasValue)
+        {
+            if (orderBy.Value)
+                query = query.OrderBy(u => u.CreatedAt);
+            else
+                query = query.OrderByDescending(u => u.CreatedAt);
+        }
+
+        return await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }
