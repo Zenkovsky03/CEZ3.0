@@ -1,0 +1,21 @@
+header .logo-container {
+	width: 150px;
+}
+
+.logo-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	color: var(--color-text-default);
+
+	.logo-icon {
+		aspect-ratio: 1;
+		height: 1.5rem;
+		color: var(--color-primary);
+	}
+	.logo-title {
+		font-size: 1.25rem; /* text-xl */
+		font-weight: 700;
+		line-height: 1.625rem; /* leading-tight */
+	}
+}

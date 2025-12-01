@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import LandingPage from './pages/LandingPage';
-import Registration from './pages/Registration';
-import LoginPage from './pages/LoginPage';
+import LandingPage from './component/Landing';
+import RegistrationPage from './component/Registration';
+import LoginPage from './component/Login';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<Registration />} />
+          <Route path="/register" element={<RegistrationPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
