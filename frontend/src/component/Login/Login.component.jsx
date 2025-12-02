@@ -1,0 +1,53 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Login.scss';
+import UsosWebIcon from '../UsosWebIcon';
+import LoginForm from '../LoginForm';
+
+
+const Login = () => {
+    return (
+        <div className="page-wrapper-login">
+            <div className="page-container">
+                <main className="main-content">
+                    <div className="login-wrapper">
+                        <div className="login-header-text">
+                            <h1 className="login-title">Witaj z powrotem!</h1>
+                            <p className="login-subtitle">Zaloguj się na swoje konto, aby kontynuować naukę.</p>
+                        </div>
+
+                        <div className="login-card">
+                            <LoginForm />
+
+                            <div className="divider">
+                                <div className="divider-line" aria-hidden="true"></div>
+                                <div className="divider-text-container">
+                                    <span className="divider-text">Lub zaloguj się przez</span>
+                                </div>
+                            </div>
+
+                            <button type="button" className="button secondary-button">
+                                <UsosWebIcon />
+                                <span>USOSweb</span>
+                            </button>
+                        </div>
+
+                        <p className="register-link-text">
+                            Nie masz konta? <Link className="link" to="/register" style={{ color: 'rgb(58 124 165)' }}>Zarejestruj się</Link>
+                        </p>
+                    </div>
+                </main>
+
+                <footer className="page-footer">
+                    <div className="footer-links">
+                        <Link className="hover:underline" to="/status">Regulamin</Link>
+                        <span>·</span>
+                        <Link className="hover:underline" to="/privacy-policy">Polityka Prywatności</Link>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    );
+};
+
+export default Login;

@@ -1,0 +1,20 @@
+.feature-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+
+    .feature-icon {
+        color: var(--color-primary);
+        margin-top: 0.25rem;
+    }
+
+    .feature-title {
+        font-weight: 600;
+    }
+
+    .feature-description {
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+}

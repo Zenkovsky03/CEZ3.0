@@ -1,0 +1,116 @@
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 576px; /* max-w-lg */
+
+    .main-card-registration {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        background-color: var(--color-surface);
+        border-radius: var(--border-radius);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+        border: 1px solid var(--color-border);
+
+        .page-heading {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 1.5rem 2rem; /* p-6 md:p-8 */
+            border-bottom: 1px solid var(--color-border);
+
+            .page-title-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+
+                .page-title {
+                    color: var(--color-text);
+                    font-size: 1.875rem; /* text-3xl */
+                    font-weight: 900; /* font-black */
+                    line-height: 2.25rem; /* leading-tight */
+                }
+                .page-subtitle {
+                    color: var(--color-text-muted);
+                    font-size: 1rem; /* text-base */
+                    font-weight: 400;
+                }
+            }
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* gap-6 */
+            padding: 1.5rem 2rem; /* p-6 md:p-8 */
+
+            .field-group {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 1rem; /* gap-4 */
+            }
+            
+            .type-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.75rem; /* gap-3 */
+
+                .type-option-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.75rem;
+                    border: 1px solid var(--color-border);
+                    border-radius: var(--border-radius);
+                    cursor: pointer;
+                    transition: all 0.2s;
+
+                    .form-radio {
+                        color: var(--color-primary);
+                        border: 1px solid var(--color-border);
+                        background-color: var(--color-surface);
+                        border-radius: var(--border-radius);
+                        transition: all 0.2s;
+                    }
+
+                    .form-radio:checked {
+                        background-color: var(--color-primary);
+                        border-color: var(--color-primary);
+                    }
+                }
+
+                .type-option-label.checked,
+                .type-option-label:has(input:checked) {
+                    background-color: rgba(19, 91, 236, 0.1);
+                    border-color: var(--color-primary);
+                }
+            }
+
+            .checkbox-text a, .form-link {
+                text-decoration: none;
+                color: var(--color-primary);
+            }
+
+            .alt-action {
+                text-align: center;
+            }
+
+            @media (min-width: 640px) { /* sm:flex-row */
+                .field-group {
+                    flex-direction: row;
+                    align-items: flex-end;
+                }
+            }
+        }
+    }
+
+    @media (min-width: 768px) {
+        .main-card-registration {
+            grid-template-columns: repeat(2, minmax(0, 1fr)); /* md:grid-cols-2 */
+        }
+    }
+}
