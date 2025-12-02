@@ -9,7 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 var envPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".env");
 envPath = Path.GetFullPath(envPath);
 
+
+if (File.Exists(envPath))
+{
     Env.Load(envPath);
+}
+
 builder.Configuration.AddEnvironmentVariables();
 // Add services to the container.
 
