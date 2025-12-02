@@ -42,11 +42,6 @@ public class UserController : ControllerBase
         {
             return BadRequest(new { Message = ex.Message });
         }
-        //catch (Exception ex)
-        //{
-          //  Console.Write(ex.Message);
-           // return StatusCode(500, new { Message = "Internal server error" });
-        //}
     }
 
     [HttpPost("register")]
