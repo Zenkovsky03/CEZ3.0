@@ -8,6 +8,7 @@ using CEZ3._0.Application.Users.Command.SoftDeleteUser;
 using CEZ3._0.Application.Users.Command.UnblockUser;
 using CEZ3._0.Application.Users.Query.GetUsersList;
 using CEZ3._0.Application.Users.Query.LoginUser;
+using CEZ3._0.Application.Users.Command.ChangeUserRole;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -41,10 +42,11 @@ public class UserController : ControllerBase
         {
             return BadRequest(new { Message = ex.Message });
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = "Internal server error" });
-        }
+        //catch (Exception ex)
+        //{
+          //  Console.Write(ex.Message);
+           // return StatusCode(500, new { Message = "Internal server error" });
+        //}
     }
 
     [HttpPost("register")]
@@ -242,6 +244,36 @@ public class UserController : ControllerBase
         catch (ForbiddenException ex)
         {
             return Forbid(ex.Message);
+        }
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}/role")]
+    [EndpointDescription("Role: Admin. Change user role (Admin/Professor/Student).")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ChangeUserRole([FromRoute] string id, [FromBody] ChangeUserRoleCommand request)
+    {
+        try
+        {
+            request.UserId = id;
+            await _sender.Send(request);
+            return Ok(new SuccessResponse { Message = "User role updated successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
         }
     }
 }

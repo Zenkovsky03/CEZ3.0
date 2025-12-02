@@ -39,3 +39,24 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{CEZ3.0.Api_HostAddress}}/api/user/login
+Content-Type: application/json
+
+{
+  "Login": "Admin.Admin",
+  "Password": "Password123!"
+}
+
+###
+
+POST {{CEZ3.0.Api_HostAddress}}/api/user/register
+Content-Type: application/json
+
+{
+  "FirstName": "Admin",
+  "LastName": "Admin",
+  "Username": "Admin.Admin",
+  "Email": "Admin@cos.pl",
+  "Password": "Password123!"
+}
