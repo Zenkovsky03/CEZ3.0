@@ -16,7 +16,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: base
+      target: build
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     volumes:
