@@ -4,9 +4,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5001:8080"
+      - "${BACKEND_PORT:-5001}:8080"
     env_file:
-      - ./backend/.env
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:
@@ -16,13 +16,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: base # 👈 Uses the 'base' stage (Node.js) instead of Nginx
+      target: base
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     volumes:
-      - ./frontend:/app          # 👈 Syncs your code to container
-      - /app/node_modules        # 👈 Keeps container dependencies safe
-    command: npm run dev         # 👈 Runs the dev server
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
     depends_on:
       - backend
     networks:
@@ -31,17 +31,22 @@ services:
   show-urls:
     image: alpine:latest
     container_name: cez-info
+    # These variables are passed to the container from your host (or default values)
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT:-5001}
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+    # We use $$ to tell Docker Compose to pass the variable through to the shell
     command: >
       sh -c "
       sleep 2;
       echo '';
-      echo '=========================================================';
+      echo '========================================================================';
       echo '   🚀 CEZ3.0 IS READY (WITH HOT RELOAD)!';
-      echo '=========================================================';
-      echo '   🌐 Frontend:     http://localhost:3000';
-      echo '   🔌 Backend:      http://localhost:5001';
-      echo '   📄 API Docs:     http://localhost:5001/scalar/v1';
-      echo '=========================================================';
+      echo '========================================================================';
+      echo \"   🌐 Frontend:     http://localhost:$${FRONTEND_PORT}\";
+      echo \"   🔌 Backend:      http://localhost:$${BACKEND_PORT}\";
+      echo \"   📄 API Docs:     http://localhost:$${BACKEND_PORT}/scalar/v1\";
+      echo '========================================================================';
       echo '';
       "
     depends_on:
