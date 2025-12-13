@@ -11,6 +11,7 @@ public class CezDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Course> Courses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
