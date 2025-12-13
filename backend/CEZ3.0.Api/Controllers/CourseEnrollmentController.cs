@@ -1,5 +1,6 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.CourseEnrollments.Command.EnrolStudent;
+using CEZ3._0.Application.CourseEnrollments.Command.UnenrollStudent;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,24 @@ public class CourseEnrollmentController : ControllerBase
         {
             return StatusCode(StatusCodes.Status403Forbidden,
                 new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [HttpPost("{id}/unenroll")]
+    public async Task<IActionResult> UnenrollStudentFromCourse([FromRoute] ObjectId id)
+    {
+        try
+        {
+            await _sender.Send(new UnenrollStudentCommand(id));
+            return Ok();
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
     }
 }

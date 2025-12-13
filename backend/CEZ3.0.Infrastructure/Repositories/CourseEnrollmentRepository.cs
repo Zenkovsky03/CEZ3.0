@@ -20,6 +20,12 @@ public class CourseEnrollmentRepository : ICourseEnrollmentRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task<CourseEnrollment?> GetStudentEnrollmentAsync(ObjectId courseId, ObjectId userId)
+    {
+        return await _dbContext.CourseEnrollments
+            .FirstOrDefaultAsync(ce => ce.CourseId == courseId && ce.UserId == userId && ce.IsActive == true);
+    }
+
     public async Task<CourseEnrollment?> IsStudentEnrolledAsync(ObjectId courseId, ObjectId userId)
     {
         return await _dbContext.CourseEnrollments

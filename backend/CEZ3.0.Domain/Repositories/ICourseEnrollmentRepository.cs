@@ -7,6 +7,7 @@ public interface ICourseEnrollmentRepository
 {
     public Task EnrolStudentAsync(CourseEnrollment courseEnrollment);
     public Task<CourseEnrollment?> IsStudentEnrolledAsync(ObjectId courseId, ObjectId userId);
+    public Task<CourseEnrollment?> GetStudentEnrollmentAsync(ObjectId courseId, ObjectId userId);
     public Task SaveChangesAsync();
 
 }

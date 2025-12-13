@@ -32,15 +32,7 @@ public class EnrolStudentCommandHandler(ILogger<EnrolStudentCommandHandler> logg
             throw new ForbiddenException("Only students can enrol in courses.");
         }
         CourseEnrollment? existingEnrollment;
-        try
-        {
-            existingEnrollment = await _courseEnrollmentRepository.IsStudentEnrolledAsync(request.CourseId, new ObjectId(currentUser.id));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            existingEnrollment = null;
-        }
+        existingEnrollment = await _courseEnrollmentRepository.IsStudentEnrolledAsync(request.CourseId, new ObjectId(currentUser.id));
         if (existingEnrollment != null)
         {
             if (existingEnrollment.IsActive)
