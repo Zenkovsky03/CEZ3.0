@@ -4,6 +4,7 @@ using CEZ3._0.Infrastructure.Presistance;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
+
 namespace CEZ3._0.Infrastructure.Seeder
 {
 
@@ -28,6 +29,8 @@ namespace CEZ3._0.Infrastructure.Seeder
                     await _dbContext.SaveChangesAsync();
                 }
             }
+
+
 
         }
 

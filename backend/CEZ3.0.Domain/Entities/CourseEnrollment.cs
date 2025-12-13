@@ -1,11 +1,15 @@
-﻿namespace CEZ3._0.Domain.Entities;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace CEZ3._0.Domain.Entities;
+
 
 public class CourseEnrollment
 {
-    public Guid CourseId { get; set; }
-    public Course Course { get; set; } = default!;
-    public Guid UserId { get; set; }
-    public User User { get; set; } = default!;
+    [BsonId]
+    public ObjectId Id { get; set; }
+    public ObjectId CourseId { get; set; }
+    public ObjectId UserId { get; set; }
     public DateTime EnrollmentDate { get; set; }
     public bool IsActive { get; set; }
 }

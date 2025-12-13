@@ -1,0 +1,33 @@
+﻿using CEZ3._0.Domain.Entities;
+using CEZ3._0.Domain.Repositories;
+using CEZ3._0.Infrastructure.Presistance;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+
+namespace CEZ3._0.Infrastructure.Repositories;
+
+public class CourseEnrollmentRepository : ICourseEnrollmentRepository
+{
+    private readonly CezDbContext _dbContext;
+    public CourseEnrollmentRepository(CezDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task EnrolStudentAsync(CourseEnrollment courseEnrollment)
+    {
+        await _dbContext.CourseEnrollments.AddAsync(courseEnrollment);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<CourseEnrollment?> IsStudentEnrolledAsync(ObjectId courseId, ObjectId userId)
+    {
+        return await _dbContext.CourseEnrollments
+            .FirstOrDefaultAsync(ce => ce.CourseId == courseId && ce.UserId == userId);
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _dbContext.SaveChangesAsync();
+    }
+}
