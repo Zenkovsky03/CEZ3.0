@@ -34,7 +34,7 @@ public class GetUsersListQueryHandler(ILogger<GetUsersListQueryHandler> logger,
 
         var userDto = users.Select(user => new UserDto
         {
-            Id = user.Id,
+            Id = user.Id.ToString(),
             FirstName = user.FirstName,
             LastName = user.LastName,
             Username = user.Username,
