@@ -24,7 +24,7 @@ public class CourseController : ControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPost]
+    [HttpPost("create")]
     [EndpointDescription("Roles: Admin, Teacher")]
     [ProducesResponseType(typeof(CreateCourseResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]

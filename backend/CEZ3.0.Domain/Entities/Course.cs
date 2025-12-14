@@ -13,6 +13,8 @@ public class Course
     public ObjectId OwnerId { get; set; }
     public User Owner { get; set; } = default!;
     public DateTime CreatedAt { get; set; }
+    public bool IsPasswordProtected { get; set; }
+    public string? PasswordHash { get; set; }
     //public CourseEnrollment CourseEnrollment { get; set; } = default!;
     //public CourseSection CourseSection { get; set; } = default!;
     //public ScheduleEntry ScheduleEntry { get; set; } = default!;

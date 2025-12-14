@@ -32,6 +32,12 @@ public class CourseEnrollmentRepository : ICourseEnrollmentRepository
             .FirstOrDefaultAsync(ce => ce.CourseId == courseId && ce.UserId == userId);
     }
 
+    public async Task<bool> IfStudentEnrolledAsync(ObjectId courseId, ObjectId userId)
+    {
+        return await _dbContext.CourseEnrollments
+            .AnyAsync(ce => ce.CourseId == courseId && ce.UserId == userId && ce.IsActive == true);
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();

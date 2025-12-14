@@ -11,11 +11,13 @@ namespace CEZ3._0.Application.CourseEnrollments.Command.EnrolStudent;
 
 public class EnrolStudentCommandHandler(ILogger<EnrolStudentCommandHandler> logger,
     IUserContext userContext,
-    ICourseEnrollmentRepository courseEnrollmentRepository) : IRequestHandler<EnrolStudentCommand>
+    ICourseEnrollmentRepository courseEnrollmentRepository,
+    ICourseRepository courseRepository) : IRequestHandler<EnrolStudentCommand>
 {
     private readonly ILogger<EnrolStudentCommandHandler> _logger = logger;
     private readonly IUserContext _userContext = userContext;
     private readonly ICourseEnrollmentRepository _courseEnrollmentRepository = courseEnrollmentRepository;
+    private readonly ICourseRepository _courseRepository = courseRepository;
 
     public async Task Handle(EnrolStudentCommand request, CancellationToken cancellationToken)
     {
@@ -31,6 +33,32 @@ public class EnrolStudentCommandHandler(ILogger<EnrolStudentCommandHandler> logg
 
             throw new ForbiddenException("Only students can enrol in courses.");
         }
+
+        var course = await _courseRepository.GetByIdAsync(request.CourseId);
+        if (course == null)
+        {
+            _logger.LogWarning("User {UserId} attempted to enrol in non-existent course {CourseId}.",
+                currentUser.id, request.CourseId);
+            throw new BadRequestException("The specified course does not exist.");
+        }
+
+        if (course.IsPasswordProtected)
+        {
+            if (string.IsNullOrEmpty(request.Password))
+            {
+                _logger.LogWarning("User {UserId} attempted to enrol in password-protected course {CourseId} without providing a password.",
+                    currentUser.id, request.CourseId);
+                throw new BadRequestException("Password is required to enrol in this course.");
+            }
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, course.PasswordHash!);
+            if (!isPasswordValid)
+            {
+                _logger.LogWarning("User {UserId} provided an incorrect password when attempting to enrol in course {CourseId}.",
+                    currentUser.id, request.CourseId);
+                throw new BadRequestException("Incorrect password for the specified course.");
+            }
+        }
+
         CourseEnrollment? existingEnrollment;
         existingEnrollment = await _courseEnrollmentRepository.IsStudentEnrolledAsync(request.CourseId, new ObjectId(currentUser.id));
         if (existingEnrollment != null)
