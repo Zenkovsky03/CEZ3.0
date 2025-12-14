@@ -11,11 +11,15 @@ public class CezDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<CourseEnrollment> CourseEnrollments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>().ToCollection("Users");
+        modelBuilder.Entity<Course>().ToCollection("Courses");
+        modelBuilder.Entity<CourseEnrollment>().ToCollection("CourseEnrollments");
     }
 }

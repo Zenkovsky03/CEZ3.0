@@ -74,4 +74,12 @@ public class UserRepository : IUserRepository
             .Take(pageSize)
             .ToListAsync();
     }
+
+    public async Task<List<User>> GetUsersByRoleAsync(string role)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Role == role && u.IsActive)
+            .ToListAsync();
+    }
 }

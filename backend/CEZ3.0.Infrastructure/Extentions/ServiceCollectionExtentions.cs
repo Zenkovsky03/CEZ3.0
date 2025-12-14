@@ -15,7 +15,10 @@ public static class ServiceCollectionExtentions
             options.UseMongoDB(Environment.GetEnvironmentVariable("MongoDB_URL")!,
             Environment.GetEnvironmentVariable("MongoDB_DbName")!));
 
+        services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICourseEnrollmentRepository, CourseEnrollmentRepository>();
+
         services.AddScoped<ICez3_0Seeder, Cez3_0Seeder>();
     }
 }

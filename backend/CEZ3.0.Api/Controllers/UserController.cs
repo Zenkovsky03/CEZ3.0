@@ -1,19 +1,19 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.Users.Command.BlockUser;
+using CEZ3._0.Application.Users.Command.ChangeUserRole;
 using CEZ3._0.Application.Users.Command.CreateUser;
 using CEZ3._0.Application.Users.Command.EditUser;
 using CEZ3._0.Application.Users.Command.GetResetToken;
 using CEZ3._0.Application.Users.Command.ResetPassword;
 using CEZ3._0.Application.Users.Command.SoftDeleteUser;
 using CEZ3._0.Application.Users.Command.UnblockUser;
+using CEZ3._0.Application.Users.Query.GetUsersByRoleList;
 using CEZ3._0.Application.Users.Query.GetUsersList;
 using CEZ3._0.Application.Users.Query.LoginUser;
-using CEZ3._0.Application.Users.Command.ChangeUserRole;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OpenApi;
 
 namespace CEZ3._0.Api.Controllers;
 
@@ -241,7 +241,7 @@ public class UserController : ControllerBase
             return Forbid(ex.Message);
         }
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}/role")]
     [EndpointDescription("Role: Admin. Change user role (Admin/Professor/Student).")]
@@ -270,5 +270,13 @@ public class UserController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden,
                 new ErrorResponse { Message = ex.Message });
         }
+    }
+
+    [HttpGet("ByRole")]
+    public async Task<IActionResult> GetUsersByRole([FromQuery] string r)
+    {
+        var users = await _sender.Send(new GetUsersByRoleListQuery(r));
+
+        return Ok(users);
     }
 }

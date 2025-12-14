@@ -1,5 +1,8 @@
 @CEZ3.0.Api_HostAddress = https://localhost:7115
 @CEZ3._0.Api_HostAddress = http://localhost:5074
+@baseUrl = https://localhost:7115
+@token = eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2OTE3YjU5OTU5MmRhYTMwYWI2NTY4MDQiLCJlbWFpbCI6Imphbi5rb3dhbHNraUBleGFtcGxlLmNvbSIsInJvbGUiOlsiQWRtaW4iLCJBZG1pbiIsIkFkbWluIiwiQWRtaW4iLCJBZG1pbiIsIkFkbWluIl0sIm5iZiI6MTc2NTU2MDE4MSwiZXhwIjoxNzY2MTY0OTgxLCJpYXQiOjE3NjU1NjAxODF9.0lBbvpvtuwKC7qqiTkhvwl03ojwhJOjGKFfCUI5yAessP6ANlZAFA9lvFWde-3818GMK9A2m963L_aTt_60GlQ
+
 
 GET {{CEZ3._0.Api_HostAddress}}/weatherforecast/
 Accept: application/json
@@ -10,7 +13,7 @@ POST {{CEZ3.0.Api_HostAddress}}/api/user/login
 Content-Type: application/json
 
 {
-  "Login": "adam.kowalska",
+  "Login": "jan.kowalski",
   "Password": "Password123!"
 }
 
@@ -60,3 +63,31 @@ Content-Type: application/json
   "Email": "Admin@cos.pl",
   "Password": "Password123!"
 }
+
+### Tworzenie kursu
+POST {{baseUrl}}/api/courses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Programowanie w C# 2",
+    "description": "Kurs podstaw programowania w jêzyku C#",
+    "startDate": "2025-02-01T00:00:00Z",
+    "endDate": "2025-06-30T00:00:00Z"
+}
+
+### Edycja kursu
+PUT {{baseUrl}}/api/courses/693c4fc2557e2f289f61492d
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Programowanie w C# - Zaawansowany",
+    "description": "Zaktualizowany opis kursu",
+    "endDate" : "2017-07-21",
+    "startDate" : "2017-07-18"
+}
+
+### Usuwanie kursu (soft delete)
+DELETE {{baseUrl}}/api/courses/693c4fc2557e2f289f61492d
+Authorization: Bearer {{token}}
