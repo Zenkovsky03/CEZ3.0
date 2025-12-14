@@ -6,17 +6,12 @@ using CEZ3._0.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CEZ3._0.Application.Courses.Command.CreateCourse
 {
-    public class CreateCourseCommandHandler (ILogger<CreateCourseCommandHandler> logger,
+    public class CreateCourseCommandHandler(ILogger<CreateCourseCommandHandler> logger,
         ICourseRepository courseRepository,
-        IUserContext userContext) : IRequestHandler<CreateCourseCommand,string>
+        IUserContext userContext) : IRequestHandler<CreateCourseCommand, string>
     {
         private readonly ILogger<CreateCourseCommandHandler> _logger = logger;
         private readonly ICourseRepository _courseRepository = courseRepository;
@@ -49,6 +44,11 @@ namespace CEZ3._0.Application.Courses.Command.CreateCourse
                 throw new BadRequestException("Invalid user ID format.");
             }
 
+            if (request.IsPasswordProtected && string.IsNullOrEmpty(request.Password))
+            {
+                throw new BadRequestException("Password must be provided for password-protected courses.");
+            }
+
             var course = new Course
             {
                 Id = ObjectId.GenerateNewId(),
@@ -58,7 +58,11 @@ namespace CEZ3._0.Application.Courses.Command.CreateCourse
                 EndDate = request.EndDate,
                 Archived = false,
                 OwnerId = ownerId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                IsPasswordProtected = request.IsPasswordProtected,
+                PasswordHash = request.IsPasswordProtected && !string.IsNullOrEmpty(request.Password)
+                    ? BCrypt.Net.BCrypt.HashPassword(request.Password)
+                    : null
             };
 
             await _courseRepository.AddAsync(course);

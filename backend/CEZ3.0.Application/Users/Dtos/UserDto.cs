@@ -1,10 +1,8 @@
-﻿using MongoDB.Bson;
-
-namespace CEZ3._0.Application.Users.Dtos;
+﻿namespace CEZ3._0.Application.Users.Dtos;
 
 public class UserDto
 {
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string Username { get; set; } = default!;
