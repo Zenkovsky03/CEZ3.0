@@ -1,17 +1,25 @@
+// TextArea/TextArea.component.jsx
 import React from 'react';
+import './TextArea.scss';
 
 const TextArea = ({
-                      label, name, value, onChange, placeholder,
-                      rows = 3, required = false,
-                      error, disabled = false}) =>
-{
+                      label,
+                      name,
+                      value,
+                      onChange,
+                      placeholder,
+                      rows = 3,
+                      required = false,
+                      error,
+                      disabled = false
+                  }) => {
     return (
-        <div className="textarea-wrapper">
+        <label className="field-label">
             {label && (
-                <label htmlFor={name} className="textarea-label">
+                <p className="input-label-text">
                     {label}
                     {required && <span className="required">*</span>}
-                </label>
+                </p>
             )}
             <textarea
                 id={name}
@@ -22,10 +30,10 @@ const TextArea = ({
                 rows={rows}
                 required={required}
                 disabled={disabled}
-                className={`textarea-field ${error ? 'error' : ''}`}
+                className={`form-input ${error ? 'error' : ''}`}
             />
             {error && <span className="error-message">{error}</span>}
-        </div>
+        </label>
     );
 };
 

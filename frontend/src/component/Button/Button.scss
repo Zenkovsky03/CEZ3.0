@@ -1,0 +1,62 @@
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	border-radius: 0.5rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+	font-family: inherit;
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	.button-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.button-text {
+		line-height: 1;
+	}
+
+	// Sizes
+	&.button-small {
+		padding: 0.5rem 0.875rem;
+		font-size: 0.8125rem;
+	}
+
+	&.button-medium {
+		padding: 0.75rem 1rem;
+		font-size: 0.875rem;
+	}
+
+	&.button-large {
+		padding: 1rem 1.5rem;
+		font-size: 1rem;
+	}
+
+	// Width
+	&.button-full-width {
+		width: 100%;
+	}
+
+	// Variants
+	&.button-primary {
+		background: rgb(58 124 165);
+		color: white;
+
+		&:hover:not(:disabled) {
+			background: rgb(48 104 145);
+		}
+
+		&:active:not(:disabled) {
+			background: rgb(38 84 125);
+		}
+	}
+}

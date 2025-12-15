@@ -1,17 +1,24 @@
 import React from 'react';
+import './DateField.scss';
 
 const DateField = ({
-                       label, name, value, onChange,
-                       required = false, error,
-                       disabled = false, min, max}) =>
-{
+                       label,
+                       name,
+                       value,
+                       onChange,
+                       required = false,
+                       error,
+                       disabled = false,
+                       min,
+                       max
+                   }) => {
     return (
-        <div className="date-field-wrapper">
+        <label className="field-label">
             {label && (
-                <label htmlFor={name} className="date-field-label">
+                <p className="input-label-text">
                     {label}
                     {required && <span className="required">*</span>}
-                </label>
+                </p>
             )}
             <input
                 id={name}
@@ -23,10 +30,10 @@ const DateField = ({
                 disabled={disabled}
                 min={min}
                 max={max}
-                className={`date-field-input ${error ? 'error' : ''}`}
+                className={`form-input ${error ? 'error' : ''}`}
             />
             {error && <span className="error-message">{error}</span>}
-        </div>
+        </label>
     );
 };
 
