@@ -1,7 +1,42 @@
-// AddParticipantModal/AddParticipantModal.container.jsx
 import React, { useState, useEffect } from 'react';
 import AddParticipantModal from './AddParticipantModal.component';
-//import './AddParticipantModal.scss';
+import './AddParticipantModal.scss';
+
+// MOCK USERS FOR SEARCH
+const MOCK_USERS = [
+    {
+        id: 'user5',
+        firstName: 'Katarzyna',
+        lastName: 'Kamińska',
+        email: 'katarzyna.kaminska@example.com',
+        username: 'kkaminska',
+        role: 'Student'
+    },
+    {
+        id: 'user6',
+        firstName: 'Marek',
+        lastName: 'Kowalczyk',
+        email: 'marek.kowalczyk@example.com',
+        username: 'mkowalczyk',
+        role: 'Student'
+    },
+    {
+        id: 'user7',
+        firstName: 'Magdalena',
+        lastName: 'Mazur',
+        email: 'magdalena.mazur@example.com',
+        username: 'mmazur',
+        role: 'Student'
+    },
+    {
+        id: 'user8',
+        firstName: 'Paweł',
+        lastName: 'Krawczyk',
+        email: 'pawel.krawczyk@example.com',
+        username: 'pkrawczyk',
+        role: 'Teacher'
+    }
+];
 
 const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticipants }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +55,7 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         }, 500);
 
         return () => clearTimeout(timeoutId);
-    }, [searchQuery]);
+    }, [searchQuery, existingParticipants]);
 
     // Reset when modal closes
     useEffect(() => {
@@ -33,20 +68,26 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
     const searchUsers = async (query) => {
         try {
             setLoading(true);
-            const response = await fetch(
-                `${1}/users?search=${encodeURIComponent(query)}`
+
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            // Mock search: filter by name, email, or username
+            const lowerQuery = query.toLowerCase();
+            const filtered = MOCK_USERS.filter(user => {
+                const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+                const email = user.email.toLowerCase();
+                const username = user.username.toLowerCase();
+
+                return fullName.includes(lowerQuery) ||
+                    email.includes(lowerQuery) ||
+                    username.includes(lowerQuery);
+            }).filter(
+                // Exclude already existing participants
+                user => !existingParticipants.some(p => p.id === user.id)
             );
 
-            if (response.ok) {
-                const data = await response.json();
-                // Filter out users who are already participants
-                const filtered = data.filter(
-                    user => !existingParticipants.some(p => p.id === user.id)
-                );
-                setSearchResults(filtered);
-            } else {
-                setSearchResults([]);
-            }
+            setSearchResults(filtered);
         } catch (error) {
             console.error('Error searching users:', error);
             setSearchResults([]);

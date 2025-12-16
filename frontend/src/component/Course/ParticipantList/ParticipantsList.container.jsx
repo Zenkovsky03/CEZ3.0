@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ParticipantsList from './ParticipantsList.component';
 import AddParticipantModal from '../AddParticipantModal';
-//import './ParticipantsList.scss';
+import './ParticipantsList.scss';
 
 const ParticipantsListContainer = ({ participants, onRemove, onAdd }) => {
     const [searchQuery, setSearchQuery] = useState('');

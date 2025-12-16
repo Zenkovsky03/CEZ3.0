@@ -1,6 +1,6 @@
 import React from 'react';
 import CourseHeader from "./CourseHeader.component";
-//import './CourseCreate.scss';
+import './CourseHeader.scss';
 
 const CourseHeaderContainer = (props) => <CourseHeader {...props} />;
 

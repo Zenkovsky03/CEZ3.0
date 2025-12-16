@@ -1,6 +1,6 @@
 import React from 'react';
 import CourseInfo from './CourseInfo.component';
-//import './CourseInfo.scss';
+import './CourseInfo.scss';
 
 const CourseInfoContainer = ({ course, participantsCount }) => {
     const formatDate = (dateString) => {

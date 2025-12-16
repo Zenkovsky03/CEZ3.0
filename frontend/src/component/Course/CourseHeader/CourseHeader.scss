@@ -1,0 +1,44 @@
+.course-header {
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: rgb(58 124 165);
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    transition: color 0.2s;
+
+    &:hover {
+      text-decoration: underline;
+      color: rgb(48 104 145);
+    }
+  }
+
+  .course-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .course-description {
+    font-size: 1.125rem;
+    color: var(--text-slate-600);
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .course-title {
+      font-size: 2rem;
+    }
+
+    .course-description {
+      font-size: 1rem;
+    }
+  }
+}

@@ -1,0 +1,36 @@
+.add-participant-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .search-bar {
+    margin-bottom: 0;
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgb(249 250 251);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgb(209 213 219);
+      border-radius: 3px;
+
+      &:hover {
+        background: rgb(156 163 175);
+      }
+    }
+  }
+}

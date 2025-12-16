@@ -1,6 +1,6 @@
 import React from 'react';
 import ParticipantCard from './ParticipantCard.component';
-//import './ParticipantCard.scss';
+import './ParticipantCard.scss';
 
 const ParticipantCardContainer = ({ participant, onRemove }) => {
     const formatDate = (dateString) => {
