@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import CourseHeader from '../CourseHeader';
 import CourseInfo from '../CourseInfo';
-import ParticipantsList from '../ParticipantList';
+import ParticipantsList from '../ParticipantsList';
 
 const CourseDetails = ({
                            course,
@@ -16,7 +16,8 @@ const CourseDetails = ({
         return (
             <div className="page-wrapper-course-details">
                 <div className="loading-container">
-                    <p>Ładowanie...</p>
+                    <div className="loading-spinner"></div>
+                    <p>Ładowanie kursu...</p>
                 </div>
             </div>
         );

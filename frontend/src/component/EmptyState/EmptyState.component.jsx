@@ -1,5 +1,4 @@
 import React from 'react';
-import './EmptyState.scss';
 
 const EmptyState = ({ message, icon }) => {
     return (

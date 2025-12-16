@@ -1,5 +1,4 @@
 import React from 'react';
-import './Avatar.scss';
 
 const Avatar = ({ firstName, lastName, size = 'medium' }) => {
     const getInitials = () => {

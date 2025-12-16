@@ -1,0 +1,85 @@
+.participant-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: white;
+  transition: all 0.2s;
+  gap: 1rem;
+
+  &:hover {
+    box-shadow: 0 8px 16px -4px rgba(58, 124, 165, 0.15);
+    border-color: rgb(58 124 165 / 0.4);
+    transform: translateY(-4px);
+  }
+
+  .participant-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(244 247 246);
+
+    .participant-header-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .participant-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .participant-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+
+    .participant-detail {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+
+      .detail-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      .participant-email {
+        color: var(--text-slate-600);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .enrollment-date {
+        color: var(--text-slate-500);
+        font-size: 0.8125rem;
+      }
+    }
+  }
+
+  .participant-card-footer {
+    padding-top: 0.5rem;
+    border-top: 1px solid rgb(244 247 246);
+
+    button {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 1.25rem;
+  }
+}

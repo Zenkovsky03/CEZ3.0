@@ -6,30 +6,36 @@ import Button from '../../Button';
 const ParticipantCard = ({ participant, formattedDate, onRemove }) => {
     return (
         <div className="participant-card">
-            <Avatar
-                firstName={participant.firstName}
-                lastName={participant.lastName}
-                size="medium"
-            />
+            <div className="participant-card-header">
+                <Avatar
+                    firstName={participant.firstName}
+                    lastName={participant.lastName}
+                    size="medium"
+                />
 
-            <div className="participant-info">
-                <div className="participant-name">
-                    {participant.firstName} {participant.lastName}
-                </div>
-                <div className="participant-email">
-                    {participant.email}
-                </div>
-                <div className="participant-meta">
+                <div className="participant-header-info">
+                    <div className="participant-name">
+                        {participant.firstName} {participant.lastName}
+                    </div>
                     <RoleBadge role={participant.role} />
-                    {formattedDate && (
-                        <span className="enrollment-date">
-                            Dołączył {formattedDate}
-                        </span>
-                    )}
                 </div>
             </div>
 
-            <div className="participant-actions">
+            <div className="participant-card-body">
+                <div className="participant-detail">
+                    <span className="detail-icon">✉️</span>
+                    <span className="participant-email">{participant.email}</span>
+                </div>
+
+                {formattedDate && (
+                    <div className="participant-detail">
+                        <span className="detail-icon">📅</span>
+                        <span className="enrollment-date">Dołączył {formattedDate}</span>
+                    </div>
+                )}
+            </div>
+
+            <div className="participant-card-footer">
                 <Button
                     variant="secondary"
                     size="small"
