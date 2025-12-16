@@ -21,7 +21,6 @@ project.lock.json
 *.suo
 *.user
 *.sln.docstates
-.env
 *.vs
 client_secret.json
 google-service-account.json
@@ -52,7 +51,6 @@ google-service-account.json
 *.vssscc
 .builds
 *.pidb
-*.log
 *.svclog
 *.scc
 
@@ -139,9 +137,6 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
-# Mac desktop service store files
-.DS_Store
-
 _NCrunch*
 
 # Build results
@@ -160,14 +155,12 @@ msbuild.err
 msbuild.wrn
 
 # Visual Studio 2015
-.vs/
 
 
 #FRONTEND
 
 # Logs
 logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -182,9 +175,6 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
 *.ntvs*
 *.njsproj
 *.sln

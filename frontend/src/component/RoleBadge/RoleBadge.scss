@@ -1,0 +1,27 @@
+.role-badge {
+  display: inline-flex;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.role-student {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.role-teacher {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &.role-admin {
+    background-color: #fce7f3;
+    color: #9f1239;
+  }
+
+  &.role-default {
+    background-color: #f3f4f6;
+    color: #6b7280;
+  }
+}

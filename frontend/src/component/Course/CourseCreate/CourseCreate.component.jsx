@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CourseForm from '../CourseForm';
+import CourseForm from '../CourseForm/index.jsx';
 
 const CourseCreate = ({ isEditMode = false }) => {
     return (

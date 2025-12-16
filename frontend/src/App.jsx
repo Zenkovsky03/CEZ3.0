@@ -4,7 +4,8 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import LandingPage from './component/Landing';
 import RegistrationPage from './component/Registration';
 import LoginPage from './component/Login';
-import CourseCreate from './component/CourseCreate';
+import CourseCreate from './component/Course/CourseCreate';
+import CourseDetails from "./component/Course/CourseDetails/CourseDetails.component.jsx";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/courses/create" element={<CourseCreate/>}/>
                     <Route path="/courses/:id/edit" element={<CourseCreate isEditMode={true}/>}/>
+                    <Route path="/courses/:id" element={<CourseDetails/>}/>
                 </Routes>
             </div>
         </BrowserRouter>

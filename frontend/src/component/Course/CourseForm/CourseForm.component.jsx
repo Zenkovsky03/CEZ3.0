@@ -1,10 +1,10 @@
 import React from 'react';
-import InputField from '../InputField/InputField.component';
-import TextArea from '../TextArea/TextArea.component';
-import DateField from '../DateField/DateField.component';
-import PasswordField from '../PasswordField/PasswordField.component';
-import Button from '../Button/Button.component';
-import GeneralCheckbox from "../GeneralCheckbox/GeneralCheckbox.component.jsx";
+import InputField from '../../InputField/InputField.component.jsx';
+import TextArea from '../../TextArea/TextArea.component.jsx';
+import DateField from '../../DateField/DateField.component.jsx';
+import PasswordField from '../../PasswordField/PasswordField.component.jsx';
+import Button from '../../Button/Button.component.jsx';
+import GeneralCheckbox from "../../GeneralCheckbox/GeneralCheckbox.component.jsx";
 
 const CourseForm = ({
                         formData,
