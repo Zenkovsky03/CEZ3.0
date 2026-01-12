@@ -3,7 +3,7 @@
     flex-direction: column;
     flex-grow: 1;
     width: 100%;
-    max-width: 576px; /* max-w-lg */
+    max-width: 538px;
 
     .main-card-registration {
         display: flex;
@@ -53,7 +53,7 @@
                 width: 100%;
                 gap: 1rem; /* gap-4 */
             }
-            
+
             .type-grid {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -95,16 +95,17 @@
                 color: var(--color-primary);
             }
 
-            .alt-action {
-                text-align: center;
-            }
-
             @media (min-width: 640px) { /* sm:flex-row */
                 .field-group {
                     flex-direction: row;
                     align-items: flex-end;
                 }
             }
+        }
+
+        .alt-action {
+            text-align: center;
+            padding-bottom: 8px;
         }
     }
 
