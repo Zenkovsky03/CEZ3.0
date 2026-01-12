@@ -21,17 +21,29 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (credentials) => {
         const data = await authService.login(credentials);
-        // assume backend returns { token, user }
-        setUser({ ...data.user, token: data.token });
+        // Backend returns { token } - decode user info from JWT
+        if (data.token) {
+            try {
+                const payload = JSON.parse(atob(data.token.split('.')[1]));
+                setUser({
+                    id: payload.nameid || payload.sub || payload.id,
+                    email: payload.email,
+                    username: payload.unique_name || payload.username,
+                    firstName: payload.given_name || payload.firstName,
+                    lastName: payload.family_name || payload.lastName,
+                    role: payload.role,
+                    token: data.token
+                });
+            } catch {
+                setUser({ token: data.token });
+            }
+        }
         return data;
     };
 
     const register = async (payload) => {
         const data = await authService.register(payload);
-        // optionally auto-login after register if backend returns token
-        if (data.token) {
-            setUser({ ...data.user, token: data.token });
-        }
+        // Backend returns { message } - no auto-login after register
         return data;
     };
 

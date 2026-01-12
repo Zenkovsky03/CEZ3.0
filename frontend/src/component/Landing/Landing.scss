@@ -4,6 +4,11 @@
     width: 100%;
     max-width: 896px;
     padding: 1rem;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     .main-card-landing {
         background-color: rgba(255, 255, 255, 0.8);

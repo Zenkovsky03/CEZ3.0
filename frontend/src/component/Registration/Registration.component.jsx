@@ -1,17 +1,20 @@
 import React, { useContext, useState } from 'react';
 import './Registration.scss';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import InputField from '../InputField';
 import PasswordField from '../PasswordField';
 import Checkbox from '../Checkbox';
 import Header from '../Header';
 import AuthContext from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 const Registration = () => {
-    const { register } = useContext(AuthContext);
+    const { user, register } = useContext(AuthContext);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    if (user) {
+        return <Navigate to="/" replace />;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
