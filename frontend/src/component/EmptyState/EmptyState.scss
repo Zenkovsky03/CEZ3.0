@@ -1,0 +1,18 @@
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-slate-600);
+
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+    filter: grayscale(30%);
+  }
+
+  .empty-state-message {
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
