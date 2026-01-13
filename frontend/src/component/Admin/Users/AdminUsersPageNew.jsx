@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../Layout/AdminLayout';
 import { 
-    AdminLoginForm, 
     UserStatsCards, 
     UsersTable, 
     UsersPagination, 
@@ -25,7 +24,6 @@ const AdminUsersPage = () => {
         totalTeachers: 0,
         totalStudents: 0
     });
-    const [loginData, setLoginData] = useState({ username: 'admin', password: 'Password123!' });
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [deleting, setDeleting] = useState(false);
@@ -99,58 +97,6 @@ const AdminUsersPage = () => {
         fetchAllUsersForStats();
     }, [pageNumber, pageSize, token]);
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-            setError(null);
-            setLoading(true);
-
-            const response = await fetch('/api/user/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    login: loginData.username,
-                    password: loginData.password
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Nieprawidłowe dane logowania');
-            }
-
-            const data = await response.json();
-            
-            if (data.token) {
-
-                const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
-                
-
-                const userRole = tokenPayload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] 
-                    || tokenPayload['role'] 
-                    || tokenPayload['Role'];
-                
-
-                const isAdmin = Array.isArray(userRole) 
-                    ? userRole.includes('Admin') 
-                    : userRole === 'Admin';
-                
-                if (!isAdmin) {
-                    throw new Error('Brak uprawnień administratora. Tylko administratorzy mogą uzyskać dostęp do tego panelu.');
-                }
-
-                setToken(data.token);
-                localStorage.setItem('token', data.token);
-            }
-        } catch (err) {
-            console.error('Login error:', err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleLogout = () => {
         setToken('');
         localStorage.removeItem('token');
@@ -165,6 +111,7 @@ const AdminUsersPage = () => {
         setTotalPages(0);
         setTotalUsers(0);
         setError(null);
+        window.location.href = '/admin';
     };
 
     const handleDeleteClick = (user) => {
@@ -248,15 +195,7 @@ const AdminUsersPage = () => {
     };
 
     if (!token) {
-        return (
-            <AdminLoginForm 
-                loginData={loginData}
-                onInputChange={setLoginData}
-                loading={loading}
-                error={error}
-                onSubmit={handleLogin}
-            />
-        );
+        return null;
     }
 
     return (

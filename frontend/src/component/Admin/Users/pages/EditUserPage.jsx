@@ -26,7 +26,7 @@ const EditUserPage = () => {
 
     useEffect(() => {
         if (!token) {
-            navigate('/admin');
+            navigate('/admin/users');
             return;
         }
         
@@ -258,7 +258,7 @@ const EditUserPage = () => {
             }));
             
             setTimeout(() => {
-                navigate('/admin');
+                navigate('/admin/users');
             }, 2000);
         } catch (err) {
             setError(err.message);
@@ -276,7 +276,7 @@ const EditUserPage = () => {
     if (!token) return null;
 
     const breadcrumbItems = [
-        { label: 'Użytkownicy', onClick: () => navigate('/admin') },
+        { label: 'Użytkownicy', onClick: () => navigate('/admin/users') },
         { label: 'Edycja', isActive: false },
         { label: `${firstName} ${lastName}`, isActive: true }
     ];
@@ -292,7 +292,7 @@ const EditUserPage = () => {
                     <div className="admin-users__edit-user__error-page">
                         <span className="material-symbols-outlined">error</span>
                         <p>{error}</p>
-                        <button onClick={() => navigate('/admin')}>
+                        <button onClick={() => navigate('/admin/users')}>
                             Powrót do listy użytkowników
                         </button>
                     </div>
@@ -306,7 +306,7 @@ const EditUserPage = () => {
                                 <p>Zaktualizuj informacje o użytkowniku</p>
                             </div>
                             <button
-                                onClick={() => navigate('/admin')}
+                                onClick={() => navigate('/admin/users')}
                                 className="admin-users__edit-user__back-btn"
                             >
                                 <span className="material-symbols-outlined">arrow_back</span>
@@ -390,7 +390,7 @@ const EditUserPage = () => {
                                     <div className="admin-users__edit-user__actions">
                                         <button
                                             type="button"
-                                            onClick={() => navigate('/admin')}
+                                            onClick={() => navigate('/admin/users')}
                                             className="admin-users__edit-user__cancel-btn"
                                             disabled={saving}
                                         >

@@ -114,7 +114,7 @@ const UsersTable = ({ users, loading, onDeleteClick }) => {
                                                     : 'admin-users__action-btn--edit'
                                             }`}
                                             title={user.role === 'Admin' ? 'Nie można edytować admina' : 'Edytuj'}
-                                            onClick={() => user.role !== 'Admin' && navigate(`/admin/edit/${user.id}`)}
+                                            onClick={() => user.role !== 'Admin' && navigate(`/admin/users/edit/${user.id}`)}
                                             disabled={user.role === 'Admin'}
                                         >
                                             <span className="material-symbols-outlined">edit</span>

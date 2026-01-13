@@ -41,7 +41,7 @@ const LoginFormContainer = () => {
                 localStorage.setItem('token', data.token);
                 
                 if (data.role === 'Admin') {
-                    navigate('/admin/users');
+                    navigate('/admin');
                 } else {
                     navigate('/');
                 }
