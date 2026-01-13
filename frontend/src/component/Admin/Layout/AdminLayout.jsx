@@ -11,7 +11,7 @@ const AdminLayout = ({ children, onLogout }) => {
 
     const navItems = [
         { name: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard', active: false },
-        { name: 'Użytkownicy', icon: 'group', path: '/admin/users', active: true },
+        { name: 'Użytkownicy', icon: 'group', path: '/admin', active: true },
         { name: 'Kursy', icon: 'school', path: '/admin/courses', active: false },
         { name: 'Quizy i Oceny', icon: 'quiz', path: '/admin/quizzes', active: false },
         { name: 'Powiadomienia', icon: 'notifications', path: '/admin/notifications', active: false },
