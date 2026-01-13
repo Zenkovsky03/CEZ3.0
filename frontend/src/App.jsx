@@ -6,6 +6,8 @@ import RegistrationPage from './component/Registration';
 import LoginPage from './component/Login';
 import CourseCreate from './component/Course/CourseCreate';
 import CourseDetails from "./component/Course/CourseDetails";
+import AdminUsersPage from './component/Admin/Users/AdminUsersPageNew';
+import EditUserPage from './component/Admin/Users/pages/EditUserPage';
 
 function App() {
     return (
@@ -18,6 +20,8 @@ function App() {
                     <Route path="/courses/create" element={<CourseCreate/>}/>
                     <Route path="/courses/:id/edit" element={<CourseCreate isEditMode={true}/>}/>
                     <Route path="/courses/:id" element={<CourseDetails/>}/>
+                    <Route path="/admin/users" element={<AdminUsersPage/>}/>
+                    <Route path="/admin/users/edit/:id" element={<EditUserPage/>}/>
                 </Routes>
             </div>
         </BrowserRouter>

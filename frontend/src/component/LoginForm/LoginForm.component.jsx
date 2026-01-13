@@ -3,15 +3,30 @@ import { Link } from 'react-router-dom';
 import InputField from '../InputField/InputField.component';
 import PasswordField from '../PasswordField/PasswordField.component';
 
-const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
+const LoginForm = ({ showPassword, togglePasswordVisibility, onSubmit, loading, error }) => {
     return (
-        <form className="form-container">
+        <form className="form-container" onSubmit={onSubmit}>
+            {error && (
+                <div style={{ 
+                    padding: '0.75rem 1rem', 
+                    backgroundColor: '#fef2f2', 
+                    border: '1px solid #fecaca', 
+                    borderRadius: '0.5rem', 
+                    color: '#991b1b', 
+                    fontSize: '0.875rem',
+                    marginBottom: '1rem'
+                }}>
+                    {error}
+                </div>
+            )}
+            
             <div className="input-group">
                 <InputField
                     label="Adres e-mail / Nazwa użytkownika"
                     name="email"
-                    type="email"
+                    type="text"
                     placeholder="Wprowadź swój e-mail lub login"
+                    required
                 />
             </div>
 
@@ -26,9 +41,13 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
                     placeholder="Wprowadź swoje hasło"
                     showPassword={showPassword}
                     togglePassword={togglePasswordVisibility}
+                    required
                 />
             </div>
-            <button type="submit" className="button primary-button">Zaloguj się</button>
+            
+            <button type="submit" className="button primary-button" disabled={loading}>
+                {loading ? 'Logowanie...' : 'Zaloguj się'}
+            </button>
         </form>
     );
 };
