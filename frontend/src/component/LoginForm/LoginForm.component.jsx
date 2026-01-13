@@ -1,37 +1,31 @@
-import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import InputField from '../InputField/InputField.component';
 import PasswordField from '../PasswordField/PasswordField.component';
-import AuthContext from '../../context/AuthContext';
 
-const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
-    const { login } = useContext(AuthContext);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        const form = new FormData(e.target);
-        const login_value = form.get('login');
-        const password = form.get('password');
-
-        try {
-            await login({ login: login_value, password });
-            navigate('/');
-        } catch (err) {
-            setError(err.data?.message || err.message || 'Błąd logowania');
-        }
-    };
-
+const LoginForm = ({ showPassword, togglePasswordVisibility, onSubmit, loading, error }) => {
     return (
-        <form className="form-container" onSubmit={handleSubmit}>
+        <form className="form-container" onSubmit={onSubmit}>
+            {error && (
+                <div style={{
+                    padding: '0.75rem 1rem',
+                    backgroundColor: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '0.5rem',
+                    color: '#991b1b',
+                    fontSize: '0.875rem',
+                    marginBottom: '1rem'
+                }}>
+                    {error}
+                </div>
+            )}
+
             <div className="input-group">
                 <InputField
-                    label="Login"
-                    name="login"
+                    label="Adres e-mail / Nazwa użytkownika"
+                    name="email"
                     type="text"
-                    placeholder="E-mail/nazwa użytkownika"
+                    placeholder="Wprowadź swój e-mail lub login"
                     required
                 />
             </div>
@@ -42,7 +36,7 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
                     <Link className="link" to="/password-reset" style={{ fontSize: '0.875rem', color: 'rgb(58 124 165)', textDecoration: 'none' }}>Nie pamiętasz hasła?</Link>
                 </div>
                 <PasswordField
-                    label=""
+                    label={""}
                     name="password"
                     placeholder="Wprowadź swoje hasło"
                     showPassword={showPassword}
@@ -51,9 +45,12 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
                 />
             </div>
 
+            <button type="submit" className="button primary-button" disabled={loading}>
+                {loading ? 'Logowanie...' : 'Zaloguj się'}
+            </button>
+
             {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 
-            <button type="submit" className="button primary-button">Zaloguj się</button>
         </form>
     );
 };

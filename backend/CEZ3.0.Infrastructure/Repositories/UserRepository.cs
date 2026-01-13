@@ -42,7 +42,7 @@ public class UserRepository : IUserRepository
 
     public async Task<int> GetTotalUsersCountAsync()
     {
-        return await _dbContext.Users.CountAsync();
+        return await _dbContext.Users.Where(u => u.IsActive == true).CountAsync();
     }
 
     public async Task<List<User>> GetUsersAsync(int pageNumber, int pageSize, bool? orderBy, bool? isActive, string? role, string? email)
@@ -51,8 +51,11 @@ public class UserRepository : IUserRepository
                         .AsNoTracking()
                         .AsQueryable();
 
+        // By default, filter out soft-deleted users (IsActive = false)
         if (isActive.HasValue && isActive != null)
             query = query.Where(u => u.IsActive == isActive.Value);
+        else
+            query = query.Where(u => u.IsActive == true);
 
         if (!string.IsNullOrEmpty(role))
             query = query.Where(u => u.Role == role);
