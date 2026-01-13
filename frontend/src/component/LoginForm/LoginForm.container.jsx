@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from './LoginForm.component';
 import './LoginForm.scss';
+import AuthContext from '../../context/AuthContext';
 
 const LoginFormContainer = () => {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -19,28 +21,16 @@ const LoginFormContainer = () => {
         setError(null);
 
         const formData = new FormData(e.target);
-        const login = formData.get('email');
+        const loginValue = formData.get('email');
         const password = formData.get('password');
 
         try {
-            const response = await fetch('/api/user/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ login, password })
-            });
+            const data = await login({ login: loginValue, password });
 
-            if (!response.ok) {
-                throw new Error('Nieprawidłowy login lub hasło');
-            }
-
-            const data = await response.json();
-            
             if (data.token) {
-                localStorage.setItem('token', data.token);
-                
-                if (data.role === 'Admin') {
+                const payload = JSON.parse(atob(data.token.split('.')[1]));
+
+                if (payload.role === 'Admin') {
                     navigate('/admin');
                 } else {
                     navigate('/');
@@ -54,8 +44,8 @@ const LoginFormContainer = () => {
     };
 
     return (
-        <LoginForm 
-            showPassword={showPassword} 
+        <LoginForm
+            showPassword={showPassword}
             togglePasswordVisibility={togglePasswordVisibility}
             onSubmit={handleSubmit}
             loading={loading}
