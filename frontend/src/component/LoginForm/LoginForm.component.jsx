@@ -49,7 +49,6 @@ const LoginForm = ({ showPassword, togglePasswordVisibility, onSubmit, loading, 
                 {loading ? 'Logowanie...' : 'Zaloguj się'}
             </button>
 
-            {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 
         </form>
     );
