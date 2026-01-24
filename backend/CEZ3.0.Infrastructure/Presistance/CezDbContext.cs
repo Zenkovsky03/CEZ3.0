@@ -14,6 +14,7 @@ public class CezDbContext : DbContext
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseEnrollment> CourseEnrollments { get; set; }
     public DbSet<CourseSection> CourseSections { get; set; }
+    public DbSet<SectionMaterial> SectionMaterials { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,5 +24,6 @@ public class CezDbContext : DbContext
         modelBuilder.Entity<Course>().ToCollection("Courses");
         modelBuilder.Entity<CourseEnrollment>().ToCollection("CourseEnrollments");
         modelBuilder.Entity<CourseSection>().ToCollection("CourseSections");
+        modelBuilder.Entity<SectionMaterial>().ToCollection("SectionMaterials");
     }
 }
