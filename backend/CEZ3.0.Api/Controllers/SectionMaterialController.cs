@@ -25,6 +25,7 @@ public class SectionMaterialController : ControllerBase
     [EndpointDescription("Roles = (Admin,Teacher) Creates a new lesson in a module. Order is determined by creation time.")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateLesson([FromBody] CreateSectionMaterialCommand request)
     {
@@ -37,6 +38,10 @@ public class SectionMaterialController : ControllerBase
         {
             return BadRequest(new ErrorResponse { Message = ex.Message });
         }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
         catch (ForbiddenException ex)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
@@ -45,7 +50,11 @@ public class SectionMaterialController : ControllerBase
 
     [Authorize]
     [HttpPut("{id}")]
-    [EndpointDescription("Roles = (Admin) or be owner. Edits lesson title and content.")]
+    [EndpointDescription("Roles = (Admin) or teacher (owner). Edits lesson title and content.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> EditLesson([FromRoute] string id, [FromBody] EditSectionMaterialCommand request)
     {
         try
@@ -58,6 +67,10 @@ public class SectionMaterialController : ControllerBase
         {
             return BadRequest(new ErrorResponse { Message = ex.Message });
         }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
         catch (ForbiddenException ex)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
@@ -66,7 +79,11 @@ public class SectionMaterialController : ControllerBase
 
     [Authorize]
     [HttpDelete("{id}")]
-    [EndpointDescription("Roles = (Admin) or be owner.Deletes a lesson.")]
+    [EndpointDescription("Roles = (Admin) or teacher (owner). Deletes a lesson.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteLesson([FromRoute] string id)
     {
         try
@@ -77,6 +94,10 @@ public class SectionMaterialController : ControllerBase
         catch (BadRequestException ex)
         {
             return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
         catch (ForbiddenException ex)
         {

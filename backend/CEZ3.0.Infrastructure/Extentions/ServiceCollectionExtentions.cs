@@ -20,6 +20,7 @@ public static class ServiceCollectionExtentions
         services.AddScoped<ICourseEnrollmentRepository, CourseEnrollmentRepository>();
         services.AddScoped<ICourseSectionRepository, CourseSectionRepository>();
         services.AddScoped<ISectionMaterialRepository, SectionMaterialRepository>();
+        services.AddScoped<ILessonAttachmentRepository, LessonAttachmentRepository>();
 
         services.AddScoped<ICez3_0Seeder, Cez3_0Seeder>();
     }
