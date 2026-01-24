@@ -22,14 +22,20 @@ public class CourseSectionController : ControllerBase
     }
 
     [Authorize(Roles = "Teacher")]
-    [HttpPost("Create")]
+    [HttpPost("{courseId}/Create")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CreateCourseSection([FromBody] CreateCourseSectionCommand command)
+    public async Task<IActionResult> CreateCourseSection([FromRoute] string courseId, [FromBody] CreateCourseSectionRequest request)
     {
         try
         {
+            var command = new CreateCourseSectionCommand
+            {
+                CourseId = courseId,
+                Title = request.Title,
+                OrderIndex = request.OrderIndex
+            };
             var sectionId = await _sender.Send(command);
             return Ok(new CreateResponse()
             {
