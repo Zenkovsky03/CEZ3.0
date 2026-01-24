@@ -13,6 +13,7 @@ public class CezDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseEnrollment> CourseEnrollments { get; set; }
+    public DbSet<CourseSection> CourseSections { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,5 +22,6 @@ public class CezDbContext : DbContext
         modelBuilder.Entity<User>().ToCollection("Users");
         modelBuilder.Entity<Course>().ToCollection("Courses");
         modelBuilder.Entity<CourseEnrollment>().ToCollection("CourseEnrollments");
+        modelBuilder.Entity<CourseSection>().ToCollection("CourseSections");
     }
 }
