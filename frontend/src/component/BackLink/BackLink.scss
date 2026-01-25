@@ -1,0 +1,16 @@
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(58 124 165);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  &:hover {
+    color: rgb(48 104 145);
+    gap: 0.75rem;
+  }
+}

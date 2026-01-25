@@ -25,7 +25,7 @@ const CourseCard = ({ course }) => {
     const status = getCourseStatus();
 
     return (
-        <Link to={`/courses/${course.id}`} className="course-card">
+        <Link to={`/courses/${course.id}/structure`} className="course-card">
             <div className="card-header">
                 <div className="course-title-section">
                     <h3 className="course-title">{course.name}</h3>
