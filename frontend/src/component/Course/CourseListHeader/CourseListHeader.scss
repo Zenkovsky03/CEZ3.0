@@ -1,0 +1,75 @@
+// CourseListHeader/CourseListHeader.scss
+.course-list-header {
+  margin-bottom: 0;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    .header-text {
+      h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-slate-900);
+        margin: 0 0 0.5rem 0;
+        line-height: 1.2;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        color: var(--text-slate-600);
+        margin: 0;
+      }
+    }
+
+    .create-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgb(58 124 165);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+
+      .button-icon {
+        font-size: 1.25rem;
+        font-weight: 400;
+        line-height: 1;
+      }
+
+      &:hover {
+        background: rgb(48 104 145);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(58, 124, 165, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 1.5rem;
+
+    .header-content {
+      .header-text h1 {
+        font-size: 1.5rem;
+      }
+
+      .create-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
