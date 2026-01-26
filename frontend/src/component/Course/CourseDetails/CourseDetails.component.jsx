@@ -41,6 +41,7 @@ const CourseDetails = ({
                     <CourseHeader
                         name={course.name}
                         description={course.description}
+                        id={course.id}
                     />
 
                     <div className="course-info-section">

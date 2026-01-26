@@ -1,12 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import BackLink from "../../BackLink/index.jsx";
 
-const CourseHeader = ({ name, description }) => {
+const CourseHeader = ({ name, description , id }) => {
     return (
         <div className="course-header">
-            <Link to="/courses" className="back-link">
-                ← Powrót do listy kursów
-            </Link>
+            <BackLink to={`/courses/${id}/structure`} >
+                Powrót do kursu
+            </BackLink>
             <h1 className="course-title">{name}</h1>
             <p className="course-description">{description}</p>
         </div>
