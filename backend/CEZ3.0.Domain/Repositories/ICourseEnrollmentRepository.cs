@@ -9,6 +9,7 @@ public interface ICourseEnrollmentRepository
     public Task<CourseEnrollment?> IsStudentEnrolledAsync(ObjectId courseId, ObjectId userId);
     public Task<CourseEnrollment?> GetStudentEnrollmentAsync(ObjectId courseId, ObjectId userId);
     public Task<bool> IfStudentEnrolledAsync(ObjectId courseId, ObjectId userId);
+    public Task<List<ObjectId>> GetEnrolStudentIdAsync(List<ObjectId> courseIds);
     public Task SaveChangesAsync();
 
 }

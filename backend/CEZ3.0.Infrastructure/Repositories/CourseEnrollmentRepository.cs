@@ -3,6 +3,7 @@ using CEZ3._0.Domain.Repositories;
 using CEZ3._0.Infrastructure.Presistance;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CEZ3._0.Infrastructure.Repositories;
 
@@ -36,6 +37,16 @@ public class CourseEnrollmentRepository : ICourseEnrollmentRepository
     {
         return await _dbContext.CourseEnrollments
             .AnyAsync(ce => ce.CourseId == courseId && ce.UserId == userId && ce.IsActive == true);
+    }
+    public async Task<List<ObjectId>> GetEnrolStudentIdAsync(List<ObjectId> courseIds)
+    {
+        var enrolledStudentIds = await _dbContext.CourseEnrollments
+            .Where(ce => courseIds.Contains(ce.CourseId) && ce.IsActive == true)
+            .Select(ce => ce.UserId)
+            .Distinct()
+            .ToListAsync();
+
+        return enrolledStudentIds;
     }
 
     public async Task SaveChangesAsync()
