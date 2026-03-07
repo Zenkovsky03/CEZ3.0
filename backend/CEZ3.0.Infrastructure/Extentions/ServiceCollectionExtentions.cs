@@ -21,6 +21,8 @@ public static class ServiceCollectionExtentions
         services.AddScoped<ICourseSectionRepository, CourseSectionRepository>();
         services.AddScoped<ISectionMaterialRepository, SectionMaterialRepository>();
         services.AddScoped<ILessonAttachmentRepository, LessonAttachmentRepository>();
+        services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+        services.AddScoped<IEventRepository, EventRepository>();
 
         services.AddScoped<ICez3_0Seeder, Cez3_0Seeder>();
     }
