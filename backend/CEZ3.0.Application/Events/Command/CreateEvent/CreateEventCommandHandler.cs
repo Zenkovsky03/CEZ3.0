@@ -7,22 +7,21 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
-namespace CEZ3._0.Application.Announcements.Command.CreateAnnouncement;
+namespace CEZ3._0.Application.Events.Command.CreateEvent;
 
-public class CreateAnnouncementCommandHandler(ILogger<CreateAnnouncementCommandHandler> logger,
+public class CreateEventCommandHandler(ILogger<CreateEventCommandHandler> logger,
     IUserContext userContext,
     ICourseEnrollmentRepository courseEnrollmentRepository,
-    IAnnouncementRepository announcementRepository
-    ) : IRequestHandler<CreateAnnouncementCommand, string>
+    IEventRepository eventRepository) : IRequestHandler<CreateEventCommand, string>
 {
-    private readonly ILogger<CreateAnnouncementCommandHandler> _logger = logger;
+    private readonly ILogger<CreateEventCommandHandler> _logger = logger;
     private readonly IUserContext _userContext = userContext;
     private readonly ICourseEnrollmentRepository _courseEnrollmentRepository = courseEnrollmentRepository;
-    private readonly IAnnouncementRepository _announcementRepository = announcementRepository;
+    private readonly IEventRepository _eventRepository = eventRepository;
 
-    public async Task<string> Handle(CreateAnnouncementCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(CreateEventCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating new announcement");
+        _logger.LogInformation("Handling CreateEventCommand for user");
 
         var currentUser = _userContext.GetCurrentUser()
             ?? throw new UnauthorizedException("User must be logged in to enrol in a course.");
@@ -43,20 +42,35 @@ public class CreateAnnouncementCommandHandler(ILogger<CreateAnnouncementCommandH
             throw new BadRequestException("Announcement title cannot exceed 100 characters.");
         }
 
-        if (request.Content.Length > 1000)
+        if (request.Description.Length > 1000)
         {
             _logger.LogWarning("Announcement content exceeds maximum length. User: {UserId}, Content Length: {ContentLength}",
-                currentUser.id, request.Content.Length);
+                currentUser.id, request.Description.Length);
 
             throw new BadRequestException("Announcement content cannot exceed 1000 characters.");
         }
 
         if (request.Recivers == null || request.Recivers.Count == 0)
         {
-            _logger.LogWarning("Announcement creation failed due to missing recipients. User: {UserId}",
-                currentUser.id);
+            _logger.LogWarning("Announcement creation failed due to missing recipients.");
 
             throw new BadRequestException("Announcement must have at least one recipient.");
+        }
+
+        if (request.StartTime < DateTime.UtcNow)
+        {
+            _logger.LogWarning("Announcement creation failed due to invalid start time. StartTime: {StartTime}",
+                request.StartTime);
+
+            throw new BadRequestException("Announcement start time cannot be in the past.");
+        }
+
+        if (request.EndTime < request.StartTime)
+        {
+            _logger.LogWarning("Announcement creation failed due to invalid end time. StartTime: {StartTime}, EndTime: {EndTime}",
+                request.StartTime, request.EndTime);
+
+            throw new BadRequestException("Announcement end time cannot be before start time.");
         }
 
         var courseIds = request.Recivers
@@ -71,27 +85,29 @@ public class CreateAnnouncementCommandHandler(ILogger<CreateAnnouncementCommandH
             throw new BadRequestException("Announcement must have at least one recipient.");
         }
 
-        var announcement = new Announcement
+        var eventObject = new Event
         {
             Title = request.Title,
-            Content = request.Content,
-            CreatedById = ObjectId.Parse(currentUser.id),
+            Description = request.Description,
+            StartTime = request.StartTime,
+            EndTime = request.EndTime,
             CreatedAt = DateTime.UtcNow,
+            CreatedById = ObjectId.Parse(currentUser.id),
             IsActive = true
         };
 
-        var id = await _announcementRepository.CreateAnnouncementAsync(announcement);
+        var eventId = await _eventRepository.AddEventAsync(eventObject);
 
-        var recivers = reciversIds.Select(studentId => new UserAnnouncement
+        var recivers = reciversIds.Select(studentId => new UserEvent
         {
-            AnnouncementId = id,
+            EventId = eventId,
             UserId = studentId,
             IsActive = true,
-            CreatedAt = announcement.CreatedAt
+            CreatedAt = eventObject.CreatedAt
         }).ToList();
 
-        await _announcementRepository.AddAnnouncementReciversAsync(recivers);
+        await _eventRepository.AddEventReciversAsync(recivers);
 
-        return id.ToString();
+        return eventId.ToString();
     }
 }

@@ -11,5 +11,6 @@ public class Event
     public DateTime EndTime { get; set; }
     public DateTime CreatedAt { get; set; }
     public ObjectId CreatedById { get; set; }
+    public bool IsActive { get; set; }
     public virtual User CreatedBy { get; set; } = default!;
 }

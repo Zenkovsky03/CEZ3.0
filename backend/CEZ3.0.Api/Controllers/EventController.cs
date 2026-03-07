@@ -1,8 +1,8 @@
-﻿using CEZ3._0.Application.Announcements.Command.CreateAnnouncement;
-using CEZ3._0.Application.Announcements.Command.Query.GetAllAnnouncements;
-using CEZ3._0.Application.Announcements.Command.Query.GetAnnouncementById;
-using CEZ3._0.Application.Contracts.Responses.Announcement;
+﻿using CEZ3._0.Application.Contracts.Responses.Events;
 using CEZ3._0.Application.Contracts.Responses.Users;
+using CEZ3._0.Application.Events.Command.CreateEvent;
+using CEZ3._0.Application.Events.Query.GetEventById;
+using CEZ3._0.Application.Events.Query.GetEventsForUser;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,33 +11,32 @@ using Microsoft.AspNetCore.Mvc;
 namespace CEZ3._0.Api.Controllers;
 
 [ApiController]
-[Route("api/announcements")]
-public class AnnouncementController : ControllerBase
+[Route("api/events")]
+public class EventController : ControllerBase
 {
     private readonly ISender _sender;
 
-    public AnnouncementController(ISender sender)
+    public EventController(ISender sender)
     {
         _sender = sender;
     }
 
-    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("create")]
     [EndpointDescription("Roles: Admin, Teacher")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CreateAnnouncement([FromBody] CreateAnnouncementCommand request)
+    public async Task<IActionResult> CreateEvent([FromBody] CreateEventCommand command)
     {
         try
         {
-            var announcementId = await _sender.Send(request);
+            var eventId = await _sender.Send(command);
 
-            return StatusCode(StatusCodes.Status201Created, new CreateAnnouncementResponse
+            return StatusCode(StatusCodes.Status201Created, new CreateEventResponse
             {
-                Message = "Announcement created successfully.",
-                AnnouncementId = announcementId
+                Message = "Event created successfully.",
+                EventId = eventId
             });
         }
         catch (BadRequestException ex)
@@ -55,19 +54,19 @@ public class AnnouncementController : ControllerBase
         }
     }
 
-    [Authorize]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [EndpointDescription("Roles: Admin, Teacher, Student")]
-    public async Task<IActionResult> GetAnnouncementById(string id)
+    public async Task<IActionResult> GetEventById(string id)
     {
         try
         {
-            var announcement = await _sender.Send(new GetAnnouncementByIdQuery(id));
-            return Ok(announcement);
+            var eventDetails = await _sender.Send(new GetEventByIdQuery(id));
+
+            return Ok(eventDetails);
         }
         catch (BadRequestException ex)
         {
@@ -93,8 +92,8 @@ public class AnnouncementController : ControllerBase
     {
         try
         {
-            var announcements = await _sender.Send(new GetAllAnnouncementsQuery(pageNumber, pageSize));
-            return Ok(announcements);
+            var events = await _sender.Send(new GetEventsForUserQuery(pageNumber, pageSize));
+            return Ok(events);
         }
         catch (BadRequestException ex)
         {
@@ -105,5 +104,6 @@ public class AnnouncementController : ControllerBase
             return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
     }
+
 
 }

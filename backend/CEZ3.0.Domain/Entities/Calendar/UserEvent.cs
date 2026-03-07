@@ -11,4 +11,6 @@ public class UserEvent
     public virtual User User { get; set; } = default!;
     public ObjectId EventId { get; set; }
     public virtual Event Event { get; set; } = default!;
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
