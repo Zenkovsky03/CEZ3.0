@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
         const data = await authService.login(credentials);
         // Backend returns { token } - decode user info from JWT
         if (data.token) {
+            localStorage.setItem('token', data.token);
             try {
                 const payload = JSON.parse(atob(data.token.split('.')[1]));
                 setUser({
@@ -42,12 +43,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (payload) => {
-        const data = await authService.register(payload);
         // Backend returns { message } - no auto-login after register
-        return data;
+        return await authService.register(payload);;
     };
 
     const logout = () => setUser(null);
+    useEffect(() => {
+        if (!user) {
+            localStorage.removeItem('token');
+        }
+    }, [user]);
 
     return (
         <AuthContext.Provider value={{ user, login, register, logout }}>
