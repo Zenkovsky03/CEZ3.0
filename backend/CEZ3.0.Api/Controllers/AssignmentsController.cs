@@ -39,7 +39,7 @@ public class AssignmentsController(ISender mediator) : ControllerBase
     }
 
     [HttpPost("{assignmentId}/start")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Student")]  
     [EndpointDescription("Roles: Student. Starts a new assignment attempt.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
