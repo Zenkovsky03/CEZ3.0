@@ -44,7 +44,8 @@ public static class ServiceCollectionExtensions
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
                 ValidateIssuer = false,
-                ValidateAudience = false
+                ValidateAudience = false,
+                RoleClaimType = "role"
             };
 
             opt.Events = new JwtBearerEvents
@@ -69,11 +70,7 @@ public static class ServiceCollectionExtensions
                     return Task.CompletedTask;
                 }
             };
-
-
-
-        }
-       );
+        });
         services.AddAuthorization();
 
         services.AddHttpClient();
