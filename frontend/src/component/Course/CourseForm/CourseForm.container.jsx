@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import CourseForm from './CourseForm.component';
+import { createCourse, getCourseById, updateCourse } from '../../../services/courseService';
 import './CourseForm.scss';
 
 const CourseFormContainer = ({ isEditMode = false }) => {
@@ -27,8 +28,7 @@ const CourseFormContainer = ({ isEditMode = false }) => {
     const fetchCourseData = async (courseId) => {
         try {
             setLoading(true);
-            const response = await fetch( `/api/courses/${courseId}`);
-            const data = await response.json();
+            const data = await getCourseById(courseId);
 
             setFormData({
                 name: data.name,
@@ -64,35 +64,30 @@ const CourseFormContainer = ({ isEditMode = false }) => {
         try {
             setLoading(true);
 
-            const payload = {
-                name: formData.name,
-                description: formData.description,
-                startDate: new Date(formData.startDate).toISOString(),
-                endDate: new Date(formData.endDate).toISOString(),
-                archived: formData.archived,
-                isPasswordProtected: formData.isPasswordProtected,
-                password: formData.isPasswordProtected ? formData.password : null
-            };
-
-            const url = isEditMode ? `/api/courses/${id}` : '/api/courses';
-            const method = isEditMode ? 'PUT' : 'POST';
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                navigate('/courses');
+            if (isEditMode) {
+                const editPayload = {
+                    Name: formData.name,
+                    Description: formData.description,
+                    StartDate: new Date(formData.startDate).toISOString(),
+                    EndDate: new Date(formData.endDate).toISOString()
+                };
+                await updateCourse(id, editPayload);
             } else {
-                const error = await response.json();
-                console.error('Error saving course:', error);
+                const createPayload = {
+                    Name: formData.name,
+                    Description: formData.description,
+                    StartDate: new Date(formData.startDate).toISOString(),
+                    EndDate: new Date(formData.endDate).toISOString(),
+                    IsPasswordProtected: formData.isPasswordProtected,
+                    Password: formData.isPasswordProtected ? formData.password : null
+                };
+                await createCourse(createPayload);
             }
+
+            navigate('/courses');
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error saving course:', error);
+            alert(error?.payload?.title || error?.message || 'Nie udało się zapisać kursu');
         } finally {
             setLoading(false);
         }

@@ -1,42 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AddParticipantModal from './AddParticipantModal.component';
 import './AddParticipantModal.scss';
-
-// MOCK USERS FOR SEARCH
-const MOCK_USERS = [
-    {
-        id: 'user5',
-        firstName: 'Katarzyna',
-        lastName: 'Kamińska',
-        email: 'katarzyna.kaminska@example.com',
-        username: 'kkaminska',
-        role: 'Student'
-    },
-    {
-        id: 'user6',
-        firstName: 'Marek',
-        lastName: 'Kowalczyk',
-        email: 'marek.kowalczyk@example.com',
-        username: 'mkowalczyk',
-        role: 'Student'
-    },
-    {
-        id: 'user7',
-        firstName: 'Magdalena',
-        lastName: 'Mazur',
-        email: 'magdalena.mazur@example.com',
-        username: 'mmazur',
-        role: 'Student'
-    },
-    {
-        id: 'user8',
-        firstName: 'Paweł',
-        lastName: 'Krawczyk',
-        email: 'pawel.krawczyk@example.com',
-        username: 'pkrawczyk',
-        role: 'Teacher'
-    }
-];
 
 const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticipants }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -55,7 +19,7 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         }, 500);
 
         return () => clearTimeout(timeoutId);
-    }, [searchQuery, existingParticipants]);
+    }, [searchQuery, searchUsers]);
 
     // Reset when modal closes
     useEffect(() => {
@@ -65,16 +29,15 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         }
     }, [isOpen]);
 
-    const searchUsers = async (query) => {
+    const searchUsers = useCallback(async (query) => {
         try {
             setLoading(true);
 
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            // Mock search: filter by name, email, or username
+            // TODO: If backend exposes dedicated user search, replace this call.
+            const response = await fetch('/api/user/ByRole?r=Student');
+            const users = await response.json();
             const lowerQuery = query.toLowerCase();
-            const filtered = MOCK_USERS.filter(user => {
+            const filtered = (Array.isArray(users) ? users : []).filter(user => {
                 const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
                 const email = user.email.toLowerCase();
                 const username = user.username.toLowerCase();
@@ -94,7 +57,7 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         } finally {
             setLoading(false);
         }
-    };
+    }, [existingParticipants]);
 
     const existingParticipantIds = existingParticipants.map(p => p.id);
 
