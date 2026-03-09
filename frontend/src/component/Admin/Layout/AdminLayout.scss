@@ -166,6 +166,15 @@
         .material-symbols-outlined {
             font-size: 1.125rem;
         }
+
+        &--disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+
+            &:hover {
+                background: none;
+            }
+        }
     }
 
     &__main {

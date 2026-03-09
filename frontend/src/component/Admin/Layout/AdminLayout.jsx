@@ -67,9 +67,13 @@ const AdminLayout = ({ children, onLogout }) => {
                         </div>
                     </div>
                     <div className="admin-layout__user-actions">
-                        <button className="admin-layout__user-btn admin-layout__user-btn--settings">
+                        <button
+                            className="admin-layout__user-btn admin-layout__user-btn--settings admin-layout__user-btn--disabled"
+                            disabled
+                            title="W trakcie realizacji"
+                        >
                             <span className="material-symbols-outlined">settings</span>
-                            <span>Ustawienia</span>
+                            <span>Ustawienia (w trakcie realizacji)</span>
                         </button>
                         <button 
                             onClick={onLogout}
