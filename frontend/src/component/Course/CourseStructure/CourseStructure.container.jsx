@@ -2,7 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import CourseStructure from './CourseStructure.component';
+import AddModuleModal from './AddModuleModal.component';
 import {
+    createCourseSection,
     deleteCourseSection,
     getCourseById,
     getCourseSections
@@ -15,6 +17,10 @@ const CourseStructureContainer = () => {
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [addModuleLoading, setAddModuleLoading] = useState(false);
+    const [newModuleTitle, setNewModuleTitle] = useState('');
+    const [newModuleOrderIndex, setNewModuleOrderIndex] = useState(1);
 
     useEffect(() => {
         const loadData = async () => {
@@ -41,8 +47,9 @@ const CourseStructureContainer = () => {
     }, [id]);
 
     const handleAddModule = () => {
-        console.log('Add new module');
-        // TODO: Navigate to add module form or open modal
+        setNewModuleTitle('');
+        setNewModuleOrderIndex(sections.length + 1);
+        setIsAddModalOpen(true);
     };
 
     const handleEditModule = (moduleId) => {
@@ -64,16 +71,52 @@ const CourseStructureContainer = () => {
         }
     };
 
+    const handleCloseAddModal = () => {
+        setIsAddModalOpen(false);
+        setNewModuleTitle('');
+    };
+
+    const handleCreateModule = async () => {
+        try {
+            setAddModuleLoading(true);
+            await createCourseSection(id, {
+                Title: newModuleTitle.trim(),
+                OrderIndex: Number(newModuleOrderIndex) || 1
+            });
+            const sectionsData = await getCourseSections(id);
+            setSections(Array.isArray(sectionsData) ? sectionsData : []);
+            setIsAddModalOpen(false);
+            setNewModuleTitle('');
+        } catch (createError) {
+            console.error('Error creating module:', createError);
+            alert('Nie udało się utworzyć modułu');
+        } finally {
+            setAddModuleLoading(false);
+        }
+    };
+
     return (
-        <CourseStructure
-            course={course}
-            sections={sections}
-            loading={loading}
-            error={error}
-            onAddModule={handleAddModule}
-            onEditModule={handleEditModule}
-            onDeleteModule={handleDeleteModule}
-        />
+        <>
+            <CourseStructure
+                course={course}
+                sections={sections}
+                loading={loading}
+                error={error}
+                onAddModule={handleAddModule}
+                onEditModule={handleEditModule}
+                onDeleteModule={handleDeleteModule}
+            />
+            <AddModuleModal
+                isOpen={isAddModalOpen}
+                onClose={handleCloseAddModal}
+                onSubmit={handleCreateModule}
+                title={newModuleTitle}
+                orderIndex={newModuleOrderIndex}
+                onTitleChange={setNewModuleTitle}
+                onOrderIndexChange={setNewModuleOrderIndex}
+                loading={addModuleLoading}
+            />
+        </>
     );
 };
 

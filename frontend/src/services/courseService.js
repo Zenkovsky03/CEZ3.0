@@ -151,3 +151,9 @@ export const deleteCourseSection = (sectionId) =>
     request(`/api/CourseSection/Delete/${sectionId}`, {
         method: 'DELETE'
     });
+
+export const createCourseSection = (courseId, payload) =>
+    request(`/api/CourseSection/${courseId}/Create`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
