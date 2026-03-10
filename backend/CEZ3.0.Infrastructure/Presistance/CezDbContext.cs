@@ -17,6 +17,9 @@ public class CezDbContext : DbContext
     public DbSet<CourseSection> CourseSections { get; set; }
     public DbSet<SectionMaterial> SectionMaterials { get; set; }
     public DbSet<LessonAttachment> LessonAttachments { get; set; }
+    public DbSet<Assignment> Assignments { get; set; }
+    public DbSet<StudentAssignmentAttempt> Attempts { get; set; }
+    public DbSet<Grade> Grades { get; set; }
     public DbSet<Announcement> Announcements { get; set; }
     public DbSet<UserAnnouncement> UserAnnouncements { get; set; }
     public DbSet<Event> Events { get; set; }
@@ -32,6 +35,9 @@ public class CezDbContext : DbContext
         modelBuilder.Entity<CourseSection>().ToCollection("CourseSections");
         modelBuilder.Entity<SectionMaterial>().ToCollection("SectionMaterials");
         modelBuilder.Entity<LessonAttachment>().ToCollection("LessonAttachments");
+        modelBuilder.Entity<Assignment>().ToCollection("Assignments");
+        modelBuilder.Entity<StudentAssignmentAttempt>().ToCollection("StudentAssignmentAttempts");
+        modelBuilder.Entity<Grade>().ToCollection("Grades");
         modelBuilder.Entity<Announcement>().ToCollection("Announcements");
         modelBuilder.Entity<UserAnnouncement>().ToCollection("UserAnnouncements");
         modelBuilder.Entity<Event>().ToCollection("Events");
