@@ -1,4 +1,5 @@
 ﻿using CEZ3._0.Domain.Entities;
+using CEZ3._0.Domain.Entities.Calendar;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
 
@@ -19,6 +20,10 @@ public class CezDbContext : DbContext
     public DbSet<Assignment> Assignments { get; set; }
     public DbSet<StudentAssignmentAttempt> Attempts { get; set; }
     public DbSet<Grade> Grades { get; set; }
+    public DbSet<Announcement> Announcements { get; set; }
+    public DbSet<UserAnnouncement> UserAnnouncements { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<UserEvent> UserEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,5 +38,9 @@ public class CezDbContext : DbContext
         modelBuilder.Entity<Assignment>().ToCollection("Assignments");
         modelBuilder.Entity<StudentAssignmentAttempt>().ToCollection("StudentAssignmentAttempts");
         modelBuilder.Entity<Grade>().ToCollection("Grades");
+        modelBuilder.Entity<Announcement>().ToCollection("Announcements");
+        modelBuilder.Entity<UserAnnouncement>().ToCollection("UserAnnouncements");
+        modelBuilder.Entity<Event>().ToCollection("Events");
+        modelBuilder.Entity<UserEvent>().ToCollection("UserEvents");
     }
 }

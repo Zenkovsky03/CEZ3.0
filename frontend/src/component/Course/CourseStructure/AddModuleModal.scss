@@ -1,0 +1,12 @@
+.add-module-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .modal-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+}
