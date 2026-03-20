@@ -8,5 +8,6 @@ public interface ICourseSectionRepository
     Task AddSectionAsync(CourseSection courseSection);
     Task NormalizeOrderAsync();
     Task<CourseSection?> GetByIdAsync(ObjectId id);
+    Task<List<CourseSection>> GetCourseSectionsByCourseIdAsync(ObjectId courseId);
     Task SaveChangesAsync();
 }

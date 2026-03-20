@@ -3,6 +3,8 @@ using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.CourseSections.Command.CreateCourseSection;
 using CEZ3._0.Application.CourseSections.Command.DeleteCourseSection;
 using CEZ3._0.Application.CourseSections.Command.EditCourseSection;
+using CEZ3._0.Application.CourseSections.Query.GetCourseSectionById;
+using CEZ3._0.Application.CourseSections.Query.GetCourseSectionForCourse;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -120,5 +122,66 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCourseSectionById([FromRoute] string id)
+    {
+        try
+        {
+            var query = new GetCourseSectionByIdQuery(id);
+            var courseSection = await _sender.Send(query);
+            return Ok(courseSection);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ErrorResponse { Message = ex.Message });
+        }
+    }
 
+    [Authorize]
+    [HttpGet("{id}/sections")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCourseSectionsByCourseId([FromRoute] string id)
+    {
+        try
+        {
+            var query = new GetCourseSectionForCourseQuery(id);
+            var courseSections = await _sender.Send(query);
+            return Ok(courseSections);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
+        }
+    }
 }

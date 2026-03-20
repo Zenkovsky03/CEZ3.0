@@ -27,6 +27,14 @@ public class CourseSectionRepository : ICourseSectionRepository
             .FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
     }
 
+    public async Task<List<CourseSection>> GetCourseSectionsByCourseIdAsync(ObjectId courseId)
+    {
+        return await _cezDbContext.CourseSections
+            .Where(s => s.CourseId == courseId && s.IsActive)
+            .OrderBy(s => s.OrderIndex)
+            .ToListAsync();
+    }
+
     public async Task NormalizeOrderAsync()
     {
         var sections = await _cezDbContext.CourseSections
