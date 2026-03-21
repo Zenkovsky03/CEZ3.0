@@ -2,6 +2,8 @@
 using CEZ3._0.Application.SectionMaterials.Command.CreateSectionMaterial;
 using CEZ3._0.Application.SectionMaterials.Command.DeleteSectionMaterial;
 using CEZ3._0.Application.SectionMaterials.Command.EditSectionMaterial;
+using CEZ3._0.Application.SectionMaterials.Query.GetCurrentSectionMaterialByCourseSectionId;
+using CEZ3._0.Application.SectionMaterials.Query.GetSectionMaterialById;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -102,6 +104,72 @@ public class SectionMaterialController : ControllerBase
         catch (ForbiddenException ex)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize]
+    [HttpGet("current/{courseSectionId}")]
+    [EndpointDescription("Gets the most recent lesson for a course section. Roles = (Admin, Teacher, Student)")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCurrentLesson([FromRoute] string courseSectionId)
+    {
+        try
+        {
+            var lesson = await _sender.Send(new GetCurrentSectionMaterialByCourseSectionIdQuery(courseSectionId));
+            return Ok(lesson);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize]
+    [HttpGet("{id}")]
+    [EndpointDescription("Gets a lesson by its ID. Roles = (Admin, Teacher, Student)")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetLessonById([FromRoute] string id)
+    {
+        try
+        {
+            var lesson = await _sender.Send(new GetSectionMaterialByIdQuery(id));
+            return Ok(lesson);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ErrorResponse { Message = ex.Message });
         }
     }
 }

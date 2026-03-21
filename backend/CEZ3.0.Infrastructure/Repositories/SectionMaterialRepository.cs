@@ -3,11 +3,6 @@ using CEZ3._0.Domain.Repositories;
 using CEZ3._0.Infrastructure.Presistance;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CEZ3._0.Infrastructure.Repositories
 {
@@ -47,6 +42,14 @@ namespace CEZ3._0.Infrastructure.Repositories
         public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<SectionMaterial?> GetNewestByCourseSectionId(ObjectId courseSectionId)
+        {
+            return await _dbContext.SectionMaterials
+                .Where(sm => sm.SectionId == courseSectionId)
+                .OrderByDescending(sm => sm.CreatedAt)
+                .FirstOrDefaultAsync();
         }
     }
 }
