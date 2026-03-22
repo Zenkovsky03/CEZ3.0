@@ -45,7 +45,8 @@ public class GetCourseSectionByIdQueryHandler(ILogger<GetCourseSectionByIdQueryH
             Title = courseSection.Title,
             OrderIndex = courseSection.OrderIndex,
             CreatedAt = courseSection.CreatedAt,
-            IsActive = courseSection.IsActive
+            IsActive = courseSection.IsActive,
+            IsFinalized = courseSection.IsFinalized
         };
 
         return dto;

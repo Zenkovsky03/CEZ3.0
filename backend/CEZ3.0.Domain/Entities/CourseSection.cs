@@ -15,6 +15,7 @@ public class CourseSection
     public int OrderIndex { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; }
+    public bool IsFinalized { get; set; }
     //public SectionMaterial SectionMaterial { get; set; } = default!;
     //public Assignment Assignment { get; set; } = default!;
 }

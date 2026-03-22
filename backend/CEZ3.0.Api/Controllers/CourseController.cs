@@ -4,6 +4,7 @@ using CEZ3._0.Application.Courses.Command.AssignTeacher;
 using CEZ3._0.Application.Courses.Command.CreateCourse;
 using CEZ3._0.Application.Courses.Command.EditCourse;
 using CEZ3._0.Application.Courses.Command.SoftDeleteCourse;
+using CEZ3._0.Application.Courses.Query.GetProgressOfCourse;
 using CEZ3._0.Domain.Exceptions;
 using CEZ3._0.Infrastructure.Presistance;
 using MediatR;
@@ -283,4 +284,27 @@ public class CourseController : ControllerBase
                 new ErrorResponse { Message = ex.Message });
         }
     }
+
+    [HttpGet("{id}/progress")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetProgressOfCourse([FromRoute] string id)
+    {
+        try
+        {
+            var progress = await _sender.Send(new GetProgressOfCourseQuery(id));
+            return Ok(progress);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized,
+                new ErrorResponse { Message = ex.Message });
+        }
+    }
+
 }

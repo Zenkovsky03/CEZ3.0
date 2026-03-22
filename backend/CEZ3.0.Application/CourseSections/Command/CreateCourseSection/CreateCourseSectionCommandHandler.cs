@@ -63,7 +63,8 @@ public class CreateCourseSectionCommandHandler(ILogger<CreateCourseSectionComman
             CreatedAt = DateTime.UtcNow,
             CourseId = courseId,
             OrderIndex = request.OrderIndex,
-            IsActive = true
+            IsActive = true,
+            IsFinalized = false
         };
 
         await _courseSectionRepository.AddSectionAsync(section);

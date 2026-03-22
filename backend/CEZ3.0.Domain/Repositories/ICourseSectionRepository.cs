@@ -9,5 +9,7 @@ public interface ICourseSectionRepository
     Task NormalizeOrderAsync();
     Task<CourseSection?> GetByIdAsync(ObjectId id);
     Task<List<CourseSection>> GetCourseSectionsByCourseIdAsync(ObjectId courseId);
+    Task<int> GetNumberOfAllSectionsAsync(ObjectId courseId);
+    Task<int> GetNumberOfCompletedSectionsAsync(ObjectId courseId);
     Task SaveChangesAsync();
 }

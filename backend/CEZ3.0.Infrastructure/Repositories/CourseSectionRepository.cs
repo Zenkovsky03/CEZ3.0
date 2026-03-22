@@ -35,6 +35,18 @@ public class CourseSectionRepository : ICourseSectionRepository
             .ToListAsync();
     }
 
+    public async Task<int> GetNumberOfAllSectionsAsync(ObjectId courseId)
+    {
+        return await _cezDbContext.CourseSections
+            .CountAsync(s => s.CourseId == courseId && s.IsActive);
+    }
+
+    public async Task<int> GetNumberOfCompletedSectionsAsync(ObjectId courseId)
+    {
+        return await _cezDbContext.CourseSections
+            .CountAsync(s => s.CourseId == courseId && s.IsActive && s.IsFinalized);
+    }
+
     public async Task NormalizeOrderAsync()
     {
         var sections = await _cezDbContext.CourseSections

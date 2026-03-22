@@ -3,6 +3,8 @@ using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.CourseSections.Command.CreateCourseSection;
 using CEZ3._0.Application.CourseSections.Command.DeleteCourseSection;
 using CEZ3._0.Application.CourseSections.Command.EditCourseSection;
+using CEZ3._0.Application.CourseSections.Command.FinalizedCourse;
+using CEZ3._0.Application.CourseSections.Command.RollbackFinalizedCourseSection;
 using CEZ3._0.Application.CourseSections.Query.GetCourseSectionById;
 using CEZ3._0.Application.CourseSections.Query.GetCourseSectionForCourse;
 using CEZ3._0.Domain.Exceptions;
@@ -169,6 +171,66 @@ public class CourseSectionController : ControllerBase
             var query = new GetCourseSectionForCourseQuery(id);
             var courseSections = await _sender.Send(query);
             return Ok(courseSections);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize]
+    [HttpPost("RollbackFinalized/{id}")]
+    [EndpointDescription("Roles: Teacher, Admin. Owner of course finalized or unfinalized course.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> RollbackFinalizedCourseSection([FromRoute] string id)
+    {
+        try
+        {
+            var command = new RollbackFinalizedCourseSectionCommand(id);
+            var sectionId = await _sender.Send(command);
+            return Ok(sectionId);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize]
+    [HttpPost("Finalize/{id}")]
+    [EndpointDescription("Roles: Teacher, Admin. Owner of course finalized or unfinalized course.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> FinalizeCourseSection([FromRoute] string id)
+    {
+        try
+        {
+            var command = new FinalizedCourseSectionCommand(id);
+            var sectionId = await _sender.Send(command);
+            return Ok(sectionId);
         }
         catch (BadRequestException ex)
         {

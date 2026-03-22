@@ -10,4 +10,5 @@ public class CourseSectionDto
     public int OrderIndex { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; }
+    public bool IsFinalized { get; set; }
 }
