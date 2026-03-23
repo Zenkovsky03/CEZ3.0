@@ -1,5 +1,6 @@
-﻿﻿using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.OpenApi;
+ using Microsoft.OpenApi;
+ using Microsoft.OpenApi.Models;
 
 namespace CEZ3._0.Application.Helpers.Scalar;
 

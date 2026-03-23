@@ -11,7 +11,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:
       - cez-network
-
   frontend:
     build:
       context: ./frontend
@@ -27,15 +26,12 @@ services:
       - backend
     networks:
       - cez-network
-
   show-urls:
     image: alpine:latest
     container_name: cez-info
-    # These variables are passed to the container from your host (or default values)
     environment:
       - BACKEND_PORT=${BACKEND_PORT:-5001}
       - FRONTEND_PORT=${FRONTEND_PORT:-3000}
-    # We use $$ to tell Docker Compose to pass the variable through to the shell
     command: >
       sh -c "
       sleep 2;
@@ -45,7 +41,8 @@ services:
       echo '========================================================================';
       echo \"   🌐 Frontend:     http://localhost:$${FRONTEND_PORT}\";
       echo \"   🔌 Backend:      http://localhost:$${BACKEND_PORT}\";
-      echo \"   📄 API Docs:     http://localhost:$${BACKEND_PORT}/scalar/v1\";
+      echo \"   📄 Swagger:      http://localhost:$${BACKEND_PORT}/swagger\";
+      echo \"   📄 Scalar:       http://localhost:$${BACKEND_PORT}/scalar/v1\";
       echo '========================================================================';
       echo '';
       "
@@ -55,7 +52,6 @@ services:
     networks:
       - cez-network
     restart: "no"
-
 networks:
   cez-network:
     driver: bridge
