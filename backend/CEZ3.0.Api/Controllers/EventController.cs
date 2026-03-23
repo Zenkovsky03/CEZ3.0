@@ -21,6 +21,12 @@ public class EventController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Create a new event</summary>
+    /// <remarks>
+    /// Creates a new global or course-related event.
+    /// Roles: Admin, Teacher.
+    /// </remarks>
+    /// <param name="command">Event details including title, description, and date</param>
     [HttpPost("create")]
     [EndpointDescription("Roles: Admin, Teacher")]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -54,6 +60,12 @@ public class EventController : ControllerBase
         }
     }
 
+    /// <summary>Get event details by ID</summary>
+    /// <remarks>
+    /// Returns full details of a specific event.
+    /// Roles: Admin, Teacher, Student.
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the event</param>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -83,6 +95,10 @@ public class EventController : ControllerBase
         }
     }
 
+    /// <summary>Get list of events for current user</summary>
+    /// <remarks>Returns a paginated list of events for the authenticated user.</remarks>
+    /// <param name="pageNumber">Page number (default 1)</param>
+    /// <param name="pageSize">Number of items per page (default 5)</param>
     [Authorize]
     [HttpGet("list")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -104,6 +120,4 @@ public class EventController : ControllerBase
             return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
     }
-
-
 }

@@ -21,9 +21,21 @@ public class AnnouncementController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Create a new announcement</summary>
+    /// <remarks>
+    /// Creates a new announcement visible to all users in the system.
+    /// Only users with the **Admin** or **Teacher** role are authorized.
+    ///
+    ///     POST /api/announcements/create
+    ///     {
+    ///         "title": "Upcoming Exam Schedule",
+    ///         "content": "Please note that mid-term exams will begin on Monday.",
+    ///         "courseId": "64b1f0e2c3a4e512345abcde"
+    ///     }
+    ///
+    /// </remarks>
     [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("create")]
-    [EndpointDescription("Roles: Admin, Teacher")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -55,13 +67,21 @@ public class AnnouncementController : ControllerBase
         }
     }
 
+    /// <summary>Get an announcement by ID</summary>
+    /// <remarks>
+    /// Returns a single announcement matching the given ID.
+    /// All authenticated users (Admin, Teacher, Student) are authorized.
+    ///
+    ///     GET /api/announcements/64b1f0e2c3a4e512345abcde
+    ///
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the announcement (24-char hex string), e.g. `64b1f0e2c3a4e512345abcde`</param>
     [Authorize]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [EndpointDescription("Roles: Admin, Teacher, Student")]
     public async Task<IActionResult> GetAnnouncementById(string id)
     {
         try
@@ -84,6 +104,17 @@ public class AnnouncementController : ControllerBase
         }
     }
 
+    /// <summary>Get a paginated list of announcements</summary>
+    /// <remarks>
+    /// Returns a paginated list of all announcements, ordered by creation date descending.
+    /// All authenticated users (Admin, Teacher, Student) are authorized.
+    ///
+    ///     GET /api/announcements/list?pageNumber=1&amp;pageSize=5
+    ///
+    /// Default values: `pageNumber = 1`, `pageSize = 5`.
+    /// </remarks>
+    /// <param name="pageNumber">1-based index of the page to retrieve. Defaults to `1`.</param>
+    /// <param name="pageSize">Number of announcements per page. Defaults to `5`.</param>
     [Authorize]
     [HttpGet("list")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -105,5 +136,4 @@ public class AnnouncementController : ControllerBase
             return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
     }
-
 }

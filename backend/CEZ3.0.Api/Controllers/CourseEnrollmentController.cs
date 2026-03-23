@@ -21,6 +21,14 @@ public class CourseEnrollmentController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Check if current user is enrolled</summary>
+    /// <remarks>
+    /// Checks the enrollment status of the authenticated user for the specified course.
+    /// 
+    ///     GET /api/CourseEnrollment/64b1f0e2c3a4e512345abcde/enroll
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the course (24-char hex string), e.g. `64b1f0e2c3a4e512345abcde`</param>
     [HttpGet("{id}/enroll")]
     public async Task<IActionResult> IsUserEnrolledInCourse([FromRoute] ObjectId id)
     {
@@ -44,6 +52,20 @@ public class CourseEnrollmentController : ControllerBase
         }
     }
 
+    /// <summary>Enroll student in a course</summary>
+    /// <remarks>
+    /// Enrolls the authenticated student in the specified course. 
+    /// If the course is password protected, the correct password must be provided.
+    /// Only users with the **Student** role are authorized.
+    /// 
+    ///     POST /api/CourseEnrollment/64b1f0e2c3a4e512345abcde/enroll
+    ///     {
+    ///         "password": "optional_course_password"
+    ///     }
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the course to enroll in (24-char hex string)</param>
+    /// <param name="request">Enrollment request containing an optional password</param>
     [Authorize(Roles = "Student")]
     [HttpPost("{id}/enroll")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
@@ -71,6 +93,15 @@ public class CourseEnrollmentController : ControllerBase
         }
     }
 
+    /// <summary>Unenroll student from a course</summary>
+    /// <remarks>
+    /// Removes the authenticated student's enrollment from the specified course.
+    /// Only users with the **Student** role are authorized.
+    /// 
+    ///     POST /api/CourseEnrollment/64b1f0e2c3a4e512345abcde/unenroll
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the course to unenroll from (24-char hex string)</param>
     [Authorize(Roles = "Student")]
     [HttpPost("{id}/unenroll")]
     public async Task<IActionResult> UnenrollStudentFromCourse([FromRoute] ObjectId id)

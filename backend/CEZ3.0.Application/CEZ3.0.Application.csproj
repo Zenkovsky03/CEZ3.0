@@ -5,6 +5,7 @@
     <RootNamespace>CEZ3._0.Application</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <CopyDocumentationFilesToPublishDirectory>true</CopyDocumentationFilesToPublishDirectory>
   </PropertyGroup>
 
   <ItemGroup>

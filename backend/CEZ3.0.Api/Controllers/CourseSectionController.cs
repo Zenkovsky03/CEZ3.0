@@ -25,6 +25,20 @@ public class CourseSectionController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Create a new section for a course</summary>
+    /// <remarks>
+    /// Adds a new section to the specified course. 
+    /// Only users with the **Teacher** role who own the course can perform this action.
+    /// 
+    ///     POST /api/CourseSection/64b1f0e2c3a4e512345abcde/Create
+    ///     {
+    ///         "title": "Module 1: Getting Started",
+    ///         "orderIndex": 0
+    ///     }
+    /// 
+    /// </remarks>
+    /// <param name="courseId">MongoDB ObjectId of the course</param>
+    /// <param name="request">Section details (title and ordering)</param>
     [Authorize(Roles = "Teacher")]
     [HttpPost("{courseId}/Create")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
@@ -61,6 +75,20 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    /// <summary>Edit an existing course section</summary>
+    /// <remarks>
+    /// Updates the title or order of a specific section.
+    /// Only the **Teacher** who owns the course can edit its sections.
+    /// 
+    ///     POST /api/CourseSection/Edit/64b1f0e2c3a4e512345abcdf
+    ///     {
+    ///         "title": "Updated Module Title",
+    ///         "orderIndex": 1
+    ///     }
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the section to edit</param>
+    /// <param name="request">Updated section details</param>
     [Authorize(Roles = "Teacher")]
     [HttpPost("Edit/{id}")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
@@ -97,6 +125,15 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    /// <summary>Delete a course section</summary>
+    /// <remarks>
+    /// Permanently removes a section from the course.
+    /// Only the **Teacher** who owns the course can delete its sections.
+    /// 
+    ///     DELETE /api/CourseSection/Delete/64b1f0e2c3a4e512345abcdf
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the section to delete</param>
     [Authorize(Roles = "Teacher")]
     [HttpDelete("Delete/{id}")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
@@ -124,6 +161,14 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    /// <summary>Get section details by ID</summary>
+    /// <remarks>
+    /// Returns full details of a specific course section. Requires authentication.
+    /// 
+    ///     GET /api/CourseSection/64b1f0e2c3a4e512345abcdf
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the section</param>
     [Authorize]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
@@ -158,6 +203,14 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    /// <summary>Get all sections for a specific course</summary>
+    /// <remarks>
+    /// Returns a list of all sections belonging to the given course ID.
+    /// 
+    ///     GET /api/CourseSection/64b1f0e2c3a4e512345abcde/sections
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the course</param>
     [Authorize]
     [HttpGet("{id}/sections")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
@@ -187,6 +240,15 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    /// <summary>Rollback a finalized section</summary>
+    /// <remarks>
+    /// Reverts a section from 'Finalized' status to 'In Progress'. 
+    /// Authorized for **Admin** or the **Teacher** who owns the course.
+    /// 
+    ///     POST /api/CourseSection/RollbackFinalized/64b1f0e2c3a4e512345abcdf
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the section to rollback</param>
     [Authorize]
     [HttpPost("RollbackFinalized/{id}")]
     [EndpointDescription("Roles: Teacher, Admin. Owner of course finalized or unfinalized course.")]
@@ -217,6 +279,15 @@ public class CourseSectionController : ControllerBase
         }
     }
 
+    /// <summary>Finalize a course section</summary>
+    /// <remarks>
+    /// Marks a section as completed/finalized. 
+    /// Authorized for **Admin** or the **Teacher** who owns the course.
+    /// 
+    ///     POST /api/CourseSection/Finalize/64b1f0e2c3a4e512345abcdf
+    /// 
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the section to finalize</param>
     [Authorize]
     [HttpPost("Finalize/{id}")]
     [EndpointDescription("Roles: Teacher, Admin. Owner of course finalized or unfinalized course.")]

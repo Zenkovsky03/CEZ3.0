@@ -27,6 +27,8 @@ public class UserController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Authenticate user and return JWT token</summary>
+    /// <param name="request">Login credentials (email and password)</param>
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -44,6 +46,8 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Register a new user account</summary>
+    /// <param name="request">User registration details</param>
     [HttpPost("register")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -61,6 +65,8 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Generate a password reset token</summary>
+    /// <param name="request">User email for token generation</param>
     [HttpPost("getreset")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -77,6 +83,8 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Reset password using a valid token</summary>
+    /// <param name="request">Token and new password details</param>
     [HttpPost("resetpassword")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -93,7 +101,8 @@ public class UserController : ControllerBase
         }
     }
 
-
+    /// <summary>Block a user account (Admin only)</summary>
+    /// <param name="userId">ID of the user to block</param>
     [Authorize(Roles = "Admin")]
     [HttpPatch("block/{userId}")]
     [EndpointDescription("Role: Admin")]
@@ -124,6 +133,8 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Unblock a user account (Admin only)</summary>
+    /// <param name="userId">ID of the user to unblock</param>
     [Authorize(Roles = "Admin")]
     [HttpPatch("unblock/{userId}")]
     [EndpointDescription("Role: Admin")]
@@ -154,7 +165,10 @@ public class UserController : ControllerBase
         }
     }
 
-
+    /// <summary>Edit user profile data</summary>
+    /// <remarks>Users can edit their own profiles; Admins can edit anyone.</remarks>
+    /// <param name="id">ID of the user to edit</param>
+    /// <param name="request">Updated user information</param>
     [Authorize]
     [HttpPut("{id}")]
     [EndpointDescription("Users can change themselves, Admin can change everyone")]
@@ -185,7 +199,8 @@ public class UserController : ControllerBase
         }
     }
 
-
+    /// <summary>Perform a soft delete on a user (Admin only)</summary>
+    /// <param name="id">ID of the user to soft delete</param>
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     [EndpointDescription("Role: Admin")]
@@ -220,6 +235,8 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Get paginated list of all users (Admin only)</summary>
+    /// <param name="query">Pagination and filter parameters</param>
     [Authorize(Roles = "Admin")]
     [HttpGet("users")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
@@ -242,6 +259,9 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Change a user's role (Admin only)</summary>
+    /// <param name="id">ID of the user</param>
+    /// <param name="request">The new role to assign</param>
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}/role")]
     [EndpointDescription("Role: Admin. Change user role (Admin/Professor/Student).")]
@@ -272,6 +292,8 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>Get list of users filtered by specific role</summary>
+    /// <param name="r">Role name (e.g., Student, Teacher)</param>
     [HttpGet("ByRole")]
     public async Task<IActionResult> GetUsersByRole([FromQuery] string r)
     {
