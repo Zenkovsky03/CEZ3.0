@@ -24,6 +24,8 @@ public class CezDbContext : DbContext
     public DbSet<UserAnnouncement> UserAnnouncements { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<UserEvent> UserEvents { get; set; }
+    public DbSet<Conversation> Conversations { get; set; }
+    public DbSet<ChatMessage> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,5 +44,7 @@ public class CezDbContext : DbContext
         modelBuilder.Entity<UserAnnouncement>().ToCollection("UserAnnouncements");
         modelBuilder.Entity<Event>().ToCollection("Events");
         modelBuilder.Entity<UserEvent>().ToCollection("UserEvents");
+        modelBuilder.Entity<Conversation>().ToCollection("Conversations");
+        modelBuilder.Entity<ChatMessage>().ToCollection("ChatMessages");
     }
 }
