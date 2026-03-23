@@ -36,7 +36,7 @@ public class AnnouncementController : ControllerBase
     /// </remarks>
     [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("create")]
-    [ProducesResponseType(typeof(CreateAnnouncementResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
