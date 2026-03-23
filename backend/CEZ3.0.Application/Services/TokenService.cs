@@ -18,7 +18,7 @@ namespace CEZ3._0.Application.Services
             {
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim("role", user.Role) 
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
