@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace CEZ3._0.Application.Extensions;
@@ -45,7 +46,7 @@ public static class ServiceCollectionExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                RoleClaimType = "role"
+                RoleClaimType = ClaimTypes.Role
             };
 
             opt.Events = new JwtBearerEvents

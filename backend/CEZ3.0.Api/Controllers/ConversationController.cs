@@ -109,7 +109,7 @@ public class ConversationController : ControllerBase
     }
 
     [HttpPatch("{id}/close")]
-    //[Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher")]
     [EndpointDescription("Closes an inquiry conversation. Only accessible by teachers.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
