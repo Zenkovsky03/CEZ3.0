@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using CEZ3._0.Application.SectionMaterials.Dtos;
+using MongoDB.Bson;
 
 namespace CEZ3._0.Application.CourseSections.Dtos;
 
@@ -11,4 +12,5 @@ public class CourseSectionDto
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; }
     public bool IsFinalized { get; set; }
+    public List<SectionMaterialDto> Materials { get; set; } = [];
 }

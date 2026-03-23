@@ -1,5 +1,6 @@
-﻿using CEZ3._0.Application.CourseSections.Dtos;
+using CEZ3._0.Application.CourseSections.Dtos;
 using CEZ3._0.Application.Interfaces;
+using CEZ3._0.Application.SectionMaterials.Dtos;
 using CEZ3._0.Domain.Exceptions;
 using CEZ3._0.Domain.Repositories;
 using MediatR;
@@ -10,11 +11,13 @@ namespace CEZ3._0.Application.CourseSections.Query.GetCourseSectionForCourse;
 
 public class GetCourseSectionForCourseQueryHandler(ILogger<GetCourseSectionForCourseQueryHandler> logger,
     IUserContext userContext,
-    ICourseSectionRepository courseSectionRepository) : IRequestHandler<GetCourseSectionForCourseQuery, List<CourseSectionDto>>
+    ICourseSectionRepository courseSectionRepository,
+    ISectionMaterialRepository sectionMaterialRepository) : IRequestHandler<GetCourseSectionForCourseQuery, List<CourseSectionDto>>
 {
     private readonly ILogger<GetCourseSectionForCourseQueryHandler> _logger = logger;
     private readonly IUserContext _userContext = userContext;
     private readonly ICourseSectionRepository _courseSectionRepository = courseSectionRepository;
+    private readonly ISectionMaterialRepository _sectionMaterialRepository = sectionMaterialRepository;
 
     public async Task<List<CourseSectionDto>> Handle(GetCourseSectionForCourseQuery request, CancellationToken cancellationToken)
     {
@@ -28,11 +31,15 @@ public class GetCourseSectionForCourseQueryHandler(ILogger<GetCourseSectionForCo
             throw new UnauthorizedAccessException("User must be authenticated to access course section details.");
         }
 
-        var id = ObjectId.TryParse(request.CourseId, out var objectId) ? objectId : throw new BadRequestException("Invalid CourseSectionId format.");
+        var id = ObjectId.TryParse(request.CourseId, out var objectId)
+            ? objectId
+            : throw new BadRequestException("Invalid CourseSectionId format.");
 
         var courseSections = await _courseSectionRepository.GetCourseSectionsByCourseIdAsync(id);
+        var sectionIds = courseSections.Select(cs => cs.Id).ToList();
+        var materials = await _sectionMaterialRepository.GetBySectionIdsAsync(sectionIds);
 
-        var dtos = courseSections.Select(cs => new CourseSectionDto
+        return courseSections.Select(cs => new CourseSectionDto
         {
             Id = cs.Id,
             CourseId = cs.CourseId,
@@ -40,9 +47,18 @@ public class GetCourseSectionForCourseQueryHandler(ILogger<GetCourseSectionForCo
             OrderIndex = cs.OrderIndex,
             CreatedAt = cs.CreatedAt,
             IsActive = cs.IsActive,
-            IsFinalized = cs.IsFinalized
+            IsFinalized = cs.IsFinalized,
+            Materials = materials
+                .Where(m => m.SectionId == cs.Id)
+                .Select(m => new SectionMaterialDto
+                {
+                    Id = m.Id,
+                    SectionId = m.SectionId,
+                    Title = m.Title,
+                    Content = m.Content,
+                    MaterialType = m.MaterialType,
+                    CreatedAt = m.CreatedAt
+                }).ToList()
         }).ToList();
-
-        return dtos;
     }
 }

@@ -28,6 +28,8 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EndpointSummary("Zaloguj użytkownika")]
+    [EndpointDescription("Uwierzytelnia użytkownika i zwraca JWT token.\n\n**Przykład request body:**\n```json\n{\n  \"login\": \"jan.kowalski\",\n  \"password\": \"Haslo123!\"\n}\n```")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -45,6 +47,8 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("register")]
+    [EndpointSummary("Zarejestruj nowego użytkownika")]
+    [EndpointDescription("Tworzy konto użytkownika z rolą Student (domyślna).\n\n**Przykład request body:**\n```json\n{\n  \"firstName\": \"Jan\",\n  \"lastName\": \"Kowalski\",\n  \"username\": \"jan.kowalski\",\n  \"email\": \"jan@example.com\",\n  \"password\": \"Haslo123!\"\n}\n```")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] CreateUserCommand request)

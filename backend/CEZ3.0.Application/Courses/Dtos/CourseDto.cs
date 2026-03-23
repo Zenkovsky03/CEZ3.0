@@ -14,4 +14,5 @@ public class CourseDto
     public UserDto Owner { get; set; } = default!;
     public DateTime CreatedAt { get; set; }
     public bool IsPasswordProtected { get; set; }
+    public int ParticipantsCount { get; set; }
 }

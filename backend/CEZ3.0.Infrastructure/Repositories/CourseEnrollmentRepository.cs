@@ -49,6 +49,17 @@ public class CourseEnrollmentRepository : ICourseEnrollmentRepository
         return enrolledStudentIds;
     }
 
+    public async Task<Dictionary<ObjectId, int>> GetEnrollmentCountsAsync(List<ObjectId> courseIds)
+    {
+        var enrollments = await _dbContext.CourseEnrollments
+            .Where(e => courseIds.Contains(e.CourseId) && e.IsActive)
+            .ToListAsync();
+
+        return enrollments
+            .GroupBy(e => e.CourseId)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();

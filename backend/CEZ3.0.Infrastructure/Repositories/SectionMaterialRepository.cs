@@ -44,6 +44,13 @@ namespace CEZ3._0.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<List<SectionMaterial>> GetBySectionIdsAsync(List<ObjectId> sectionIds)
+        {
+            return await _dbContext.SectionMaterials
+                .Where(m => sectionIds.Contains(m.SectionId))
+                .ToListAsync();
+        }
+
         public async Task<SectionMaterial?> GetNewestByCourseSectionId(ObjectId courseSectionId)
         {
             return await _dbContext.SectionMaterials
