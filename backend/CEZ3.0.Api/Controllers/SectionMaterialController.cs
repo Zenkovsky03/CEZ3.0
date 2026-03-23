@@ -22,6 +22,12 @@ public class SectionMaterialController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Create a new lesson in a module</summary>
+    /// <remarks>
+    /// Adds a new lesson (material) to a course section. Order is determined by creation time.
+    /// Roles: Admin, Teacher.
+    /// </remarks>
+    /// <param name="request">Command containing section ID, title, and content</param>
     [Authorize(Roles = "Admin,Teacher")]
     [HttpPost]
     [EndpointDescription("Roles = (Admin,Teacher) Creates a new lesson in a module. Order is determined by creation time.")]
@@ -50,6 +56,13 @@ public class SectionMaterialController : ControllerBase
         }
     }
 
+    /// <summary>Edit lesson title and content</summary>
+    /// <remarks>
+    /// Updates an existing lesson's information.
+    /// Roles: Admin or Teacher (Course Owner).
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the lesson</param>
+    /// <param name="request">Updated lesson data</param>
     [Authorize]
     [HttpPut("{id}")]
     [EndpointDescription("Roles = (Admin) or teacher (owner). Edits lesson title and content.")]
@@ -79,6 +92,12 @@ public class SectionMaterialController : ControllerBase
         }
     }
 
+    /// <summary>Delete a lesson</summary>
+    /// <remarks>
+    /// Permanently removes a lesson material.
+    /// Roles: Admin or Teacher (Course Owner).
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the lesson to delete</param>
     [Authorize]
     [HttpDelete("{id}")]
     [EndpointDescription("Roles = (Admin) or teacher (owner). Deletes a lesson.")]
@@ -107,6 +126,12 @@ public class SectionMaterialController : ControllerBase
         }
     }
 
+    /// <summary>Get current lesson for a section</summary>
+    /// <remarks>
+    /// Retrieves the most recently added material for the specified course section.
+    /// Roles: Admin, Teacher, Student.
+    /// </remarks>
+    /// <param name="courseSectionId">MongoDB ObjectId of the course section</param>
     [Authorize]
     [HttpGet("current/{courseSectionId}")]
     [EndpointDescription("Gets the most recent lesson for a course section. Roles = (Admin, Teacher, Student)")]
@@ -140,6 +165,12 @@ public class SectionMaterialController : ControllerBase
         }
     }
 
+    /// <summary>Get lesson by ID</summary>
+    /// <remarks>
+    /// Retrieves specific lesson material details by its ID.
+    /// Roles: Admin, Teacher, Student.
+    /// </remarks>
+    /// <param name="id">MongoDB ObjectId of the lesson</param>
     [Authorize]
     [HttpGet("{id}")]
     [EndpointDescription("Gets a lesson by its ID. Roles = (Admin, Teacher, Student)")]
