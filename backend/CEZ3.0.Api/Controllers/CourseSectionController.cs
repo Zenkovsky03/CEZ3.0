@@ -41,10 +41,9 @@ public class CourseSectionController : ControllerBase
     /// <param name="request">Section details (title and ordering)</param>
     [Authorize(Roles = "Teacher")]
     [HttpPost("{courseId}/Create")]
-    [ProducesResponseType(typeof(CreateResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateCourseSection([FromRoute] string courseId, [FromBody] CreateCourseSectionRequest request)
     {
         try
@@ -292,10 +291,10 @@ public class CourseSectionController : ControllerBase
     [Authorize]
     [HttpPost("Finalize/{id}")]
     [EndpointDescription("Roles: Teacher, Admin. Owner of course finalized or unfinalized course.")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> FinalizeCourseSection([FromRoute] string id)
     {
         try
