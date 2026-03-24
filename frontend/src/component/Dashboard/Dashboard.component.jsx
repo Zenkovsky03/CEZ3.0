@@ -1,13 +1,108 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import AuthContext from '../../context/AuthContext';
 import Footer from '../Footer';
 import Header from '../Header';
+import { getAnnouncements } from '../../services/announcementService';
+import { getUserEvents } from '../../services/eventService';
 import './Dashboard.scss';
+
+const EVENT_ICONS = [
+    { icon: 'assignment', colorClass: 'primary' },
+    { icon: 'quiz', colorClass: 'orange' },
+    { icon: 'task', colorClass: 'purple' }
+];
+
+const formatEventDate = (startTime, endTime) => {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return 'Termin nieznany';
+    }
+
+    const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    const timeFormatter = new Intl.DateTimeFormat('pl-PL', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    return `Termin: ${dateFormatter.format(startDate)}, ${timeFormatter.format(startDate)}-${timeFormatter.format(endDate)}`;
+};
+
+const formatAnnouncementDate = (createdAt) => {
+    const date = new Date(createdAt);
+    if (Number.isNaN(date.getTime())) {
+        return 'Brak daty';
+    }
+
+    return new Intl.DateTimeFormat('pl-PL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).format(date);
+};
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
+    const [events, setEvents] = useState([]);
+    const [announcements, setAnnouncements] = useState([]);
+    const [eventsLoading, setEventsLoading] = useState(true);
+    const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+    const [eventsError, setEventsError] = useState('');
+    const [announcementsError, setAnnouncementsError] = useState('');
 
     const userName = user?.username || 'Użytkowniku';
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadDashboardData = async () => {
+            setEventsLoading(true);
+            setAnnouncementsLoading(true);
+            setEventsError('');
+            setAnnouncementsError('');
+
+            const [eventsResult, announcementsResult] = await Promise.allSettled([
+                getUserEvents(1, 3),
+                getAnnouncements(1, 2)
+            ]);
+
+            if (!isMounted) {
+                return;
+            }
+
+            if (eventsResult.status === 'fulfilled') {
+                setEvents(eventsResult.value?.items || eventsResult.value?.Items || []);
+            } else {
+                setEvents([]);
+                setEventsError(eventsResult.reason?.message || 'Nie udało się pobrać wydarzeń.');
+            }
+
+            if (announcementsResult.status === 'fulfilled') {
+                setAnnouncements(announcementsResult.value?.items || announcementsResult.value?.Items || []);
+            } else {
+                setAnnouncements([]);
+                setAnnouncementsError(announcementsResult.reason?.message || 'Nie udało się pobrać ogłoszeń.');
+            }
+
+            setEventsLoading(false);
+            setAnnouncementsLoading(false);
+        };
+
+        loadDashboardData();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const upcomingEvents = useMemo(() => events
+        .slice()
+        .sort((left, right) => new Date(left.startTime) - new Date(right.startTime)), [events]);
 
     return (
         <div className="dashboard-wrapper">
@@ -64,33 +159,29 @@ const Dashboard = () => {
                             <section className="dashboard-section">
                                 <h2 className="section-title">Nadchodzące wydarzenia</h2>
                                 <div className="events-card">
-                                    <div className="event-item">
-                                        <div className="event-icon primary">
-                                            <span className="material-symbols-outlined">assignment</span>
-                                        </div>
-                                        <div className="event-info">
-                                            <p className="event-title">Oddanie projektu końcowego</p>
-                                            <p className="event-details">UX/UI Design - Termin: 25.10.2024, 23:59</p>
-                                        </div>
-                                    </div>
-                                    <div className="event-item">
-                                        <div className="event-icon orange">
-                                            <span className="material-symbols-outlined">quiz</span>
-                                        </div>
-                                        <div className="event-info">
-                                            <p className="event-title">Egzamin końcowy</p>
-                                            <p className="event-details">Wprowadzenie do Pythona - Termin: 28.10.2024, 12:00</p>
-                                        </div>
-                                    </div>
-                                    <div className="event-item">
-                                        <div className="event-icon purple">
-                                            <span className="material-symbols-outlined">task</span>
-                                        </div>
-                                        <div className="event-info">
-                                            <p className="event-title">Zadanie domowe nr 5</p>
-                                            <p className="event-details">Wprowadzenie do Pythona - Termin: 02.11.2024, 23:59</p>
-                                        </div>
-                                    </div>
+                                    {eventsLoading ? <p className="dashboard-feedback">Ładowanie wydarzeń...</p> : null}
+                                    {!eventsLoading && eventsError ? <p className="dashboard-feedback dashboard-feedback--error">{eventsError}</p> : null}
+                                    {!eventsLoading && !eventsError && upcomingEvents.length === 0 ? (
+                                        <p className="dashboard-feedback">Brak nadchodzących wydarzeń.</p>
+                                    ) : null}
+                                    {!eventsLoading && !eventsError ? upcomingEvents.map((eventItem, index) => {
+                                        const eventVisual = EVENT_ICONS[index % EVENT_ICONS.length];
+
+                                        return (
+                                            <div key={eventItem.id} className="event-item">
+                                                <div className={`event-icon ${eventVisual.colorClass}`}>
+                                                    <span className="material-symbols-outlined">{eventVisual.icon}</span>
+                                                </div>
+                                                <div className="event-info">
+                                                    <p className="event-title">{eventItem.title}</p>
+                                                    <p className="event-details">
+                                                        {eventItem.description ? `${eventItem.description} • ` : ''}
+                                                        {formatEventDate(eventItem.startTime, eventItem.endTime)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    }) : null}
                                 </div>
                             </section>
 
@@ -98,16 +189,18 @@ const Dashboard = () => {
                             <section className="dashboard-section">
                                 <h2 className="section-title">Ostatnie ogłoszenia</h2>
                                 <div className="announcements-card">
-                                    <div className="announcement-item">
-                                        <p className="announcement-date">18.10.2024</p>
-                                        <p className="announcement-title">Zmiana terminu egzaminu z UX/UI Design</p>
-                                        <p className="announcement-text">Uwaga! Egzamin końcowy został przeniesiony na nowy termin...</p>
-                                    </div>
-                                    <div className="announcement-item">
-                                        <p className="announcement-date">15.10.2024</p>
-                                        <p className="announcement-title">Dodatkowe materiały do kursu Python</p>
-                                        <p className="announcement-text">W sekcji "Materiały" pojawiły się nowe zadania i przykłady...</p>
-                                    </div>
+                                    {announcementsLoading ? <p className="dashboard-feedback">Ładowanie ogłoszeń...</p> : null}
+                                    {!announcementsLoading && announcementsError ? <p className="dashboard-feedback dashboard-feedback--error">{announcementsError}</p> : null}
+                                    {!announcementsLoading && !announcementsError && announcements.length === 0 ? (
+                                        <p className="dashboard-feedback">Brak nowych ogłoszeń.</p>
+                                    ) : null}
+                                    {!announcementsLoading && !announcementsError ? announcements.map((announcement) => (
+                                        <div key={announcement.id} className="announcement-item">
+                                            <p className="announcement-date">{formatAnnouncementDate(announcement.createdAt)}</p>
+                                            <p className="announcement-title">{announcement.title}</p>
+                                            <p className="announcement-text">{announcement.content}</p>
+                                        </div>
+                                    )) : null}
                                     <button className="see-all-button">Zobacz wszystkie</button>
                                 </div>
                             </section>
