@@ -1,18 +1,11 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
 import AuthContext from '../../context/AuthContext';
-import Avatar from '../Avatar';
-import Logo from '../Logo';
+import Footer from '../Footer';
+import Header from '../Header';
 import './Dashboard.scss';
 
 const Dashboard = () => {
-    const { user, logout } = useContext(AuthContext);
-    //const navigate = useNavigate(); Produces error
-    const [activeTab, setActiveTab] = useState('dashboard');
-
-    const handleLogout = () => {
-        logout();
-    };
+    const { user } = useContext(AuthContext);
 
     const userName = user?.username || 'Użytkowniku';
 
@@ -20,89 +13,7 @@ const Dashboard = () => {
         <div className="dashboard-wrapper">
             <div className="dashboard-container">
                 <main className="dashboard-main">
-                    {/* Header */}
-                    <header className="dashboard-header">
-                        <div className="header-top">
-                            <Logo size="small" />
-                            <div className="header-actions">
-                                <div className="search-group">
-                                    <button className="icon-button">
-                                        <span className="material-symbols-outlined">search</span>
-                                    </button>
-                                    <input className="search-input" placeholder="Szukaj..." />
-                                </div>
-                                <button className="icon-button">
-                                    <span className="material-symbols-outlined">notifications</span>
-                                </button>
-                                <button className="icon-button">
-                                    <span className="material-symbols-outlined">chat_bubble</span>
-                                </button>
-                                <div className="user-dropdown">
-                                    <Avatar
-                                        firstName={user?.firstName}
-                                        lastName={user?.lastName}
-                                        username={user?.username}
-                                        size="small"
-                                    />
-                                    <div className="dropdown-content">
-                                        <Link to="/profile">Profil</Link>
-                                        <Link to="/settings">Ustawienia</Link>
-                                        <button onClick={handleLogout}>Wyloguj się</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <nav className="header-nav">
-                            <Link
-                                className={`nav-link ${activeTab === 'dashboard' ? 'active' : ''}`}
-                                to="/"
-                                onClick={() => setActiveTab('dashboard')}
-                            >
-                                <span className="material-symbols-outlined">dashboard</span>
-                                Pulpit
-                            </Link>
-                            <Link
-                                className={`nav-link ${activeTab === 'my-courses' ? 'active' : ''}`}
-                                to="/my-courses"
-                                onClick={() => setActiveTab('my-courses')}
-                            >
-                                <span className="material-symbols-outlined">book</span>
-                                Moje kursy
-                            </Link>
-                            <Link
-                                className={`nav-link ${activeTab === 'courses' ? 'active' : ''}`}
-                                to="/courses"
-                                onClick={() => setActiveTab('courses')}
-                            >
-                                <span className="material-symbols-outlined">library_books</span>
-                                Wszystkie kursy
-                            </Link>
-                            <Link
-                                className={`nav-link ${activeTab === 'calendar' ? 'active' : ''}`}
-                                to="/calendar"
-                                onClick={() => setActiveTab('calendar')}
-                            >
-                                <span className="material-symbols-outlined">calendar_today</span>
-                                Kalendarz
-                            </Link>
-                            <Link
-                                className={`nav-link ${activeTab === 'grades' ? 'active' : ''}`}
-                                to="/grades"
-                                onClick={() => setActiveTab('grades')}
-                            >
-                                <span className="material-symbols-outlined">school</span>
-                                Oceny
-                            </Link>
-                            <Link
-                                className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`}
-                                to="/settings"
-                                onClick={() => setActiveTab('settings')}
-                            >
-                                <span className="material-symbols-outlined">settings</span>
-                                Ustawienia
-                            </Link>
-                        </nav>
-                    </header>
+                    <Header variant="dashboard" />
 
                     {/* Content */}
                     <div className="dashboard-content">
@@ -222,13 +133,7 @@ const Dashboard = () => {
                     </div>
                 </main>
 
-                <footer className="dashboard-footer">
-                    <div className="footer-links">
-                        <Link to="/terms">Regulamin</Link>
-                        <span>·</span>
-                        <Link to="/privacy">Polityka Prywatności</Link>
-                    </div>
-                </footer>
+                <Footer />
             </div>
         </div>
     );

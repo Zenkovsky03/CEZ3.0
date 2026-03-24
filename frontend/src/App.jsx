@@ -11,6 +11,7 @@ import AdminUsersPage from './component/Admin/Users/AdminUsersPageNew';
 import EditUserPage from './component/Admin/Users/pages/EditUserPage';
 import CourseList from "./component/Course/CourseList";
 import CourseStructure from "./component/Course/CourseStructure";
+import CalendarPage from './component/Calendar';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                     <Route path="/courses/:id/edit" element={<CourseCreate isEditMode={true}/>}/>
                     <Route path="/courses/:id" element={<CourseDetails/>}/>
                     <Route path="/courses/:id/structure" element={<CourseStructure />} />
+                    <Route path="/calendar" element={<CalendarPage/>}/>
                     <Route path="/admin" element={<AdminLoginPage/>}/>
                     <Route path="/admin/users" element={<AdminUsersPage/>}/>
                     <Route path="/admin/users/edit/:id" element={<EditUserPage/>}/>
