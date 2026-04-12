@@ -2,7 +2,7 @@ using System.Reflection;
 using CEZ3._0.Application.Extensions;
 using CEZ3._0.Application.Helpers.Scalar;
 using CEZ3._0.Infrastructure.Extentions;
-using CEZ3._0.Infrastructure.Seeder;
+using CEZ3._0.Infrastructure.Persistence.Seeders;
 using DotNetEnv;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
@@ -49,10 +49,11 @@ builder.Services.AddInfrastructure();
 var app = builder.Build();
 
 // --- Seeder ---
-using (var scope = app.Services.CreateScope())
+if (app.Environment.IsDevelopment())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<ICez3_0Seeder>();
-    await seeder.Seed();
+    using var scope = app.Services.CreateScope();
+    var runner = scope.ServiceProvider.GetRequiredService<SeederRunner>();
+    await runner.RunAsync();
 }
 
 if (app.Environment.IsDevelopment())

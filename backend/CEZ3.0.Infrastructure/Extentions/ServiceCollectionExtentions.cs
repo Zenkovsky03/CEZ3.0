@@ -1,7 +1,7 @@
 ﻿using CEZ3._0.Domain.Repositories;
+using CEZ3._0.Infrastructure.Extensions;
 using CEZ3._0.Infrastructure.Presistance;
 using CEZ3._0.Infrastructure.Repositories;
-using CEZ3._0.Infrastructure.Seeder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,6 +28,6 @@ public static class ServiceCollectionExtentions
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IConversationRepository, ConversationRepository>();
 
-        services.AddScoped<ICez3_0Seeder, Cez3_0Seeder>();
+        services.AddSeeders();
     }
 }

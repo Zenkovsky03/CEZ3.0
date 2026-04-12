@@ -21,4 +21,8 @@
     <ProjectReference Include="..\CEZ3.0.Domain\CEZ3.0.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Presistance\Seeders\" />
+  </ItemGroup>
+
 </Project>
