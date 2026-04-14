@@ -5,13 +5,8 @@ namespace CEZ3._0.Infrastructure.Extensions;
 
 public static class SeederServiceCollectionExtensions
 {
-    /// <summary>
-    /// Registers all ISeeder implementations and the SeederRunner.
-    /// Call this from your Infrastructure DI registration method.
-    /// </summary>
     public static IServiceCollection AddSeeders(this IServiceCollection services)
     {
-        // Register every seeder as its interface
         services.AddScoped<ISeeder, UserSeeder>();
         services.AddScoped<ISeeder, CourseSeeder>();
         services.AddScoped<ISeeder, CourseEnrollmentSeeder>();

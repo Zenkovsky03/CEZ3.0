@@ -2,13 +2,10 @@ using CEZ3._0.Domain.Entities;
 using CEZ3._0.Infrastructure.Presistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 
 namespace CEZ3._0.Infrastructure.Persistence.Seeders;
 
-/// <summary>
-/// Enrols all 5 students into both courses.
-/// Order 3 — requires Users + Courses.
-/// </summary>
 public class CourseEnrollmentSeeder : ISeeder
 {
     private readonly CezDbContext _db;
@@ -31,24 +28,27 @@ public class CourseEnrollmentSeeder : ISeeder
             return;
         }
 
+        _db.ChangeTracker.Clear();
+
         var now = DateTime.UtcNow;
 
-        // Prevent EF change tracker conflicts from navigation properties tracked in earlier seeders.
-        _db.ChangeTracker.Clear();
-        var studentIds = new[]
+        // Course1 & Course2 → all 10 students
+        // Course3 → students 1-7
+        // Course4 → students 4-10
+        var enrollmentMap = new (ObjectId CourseId, ObjectId[] Students)[]
         {
-            SeedIds.Student1, SeedIds.Student2, SeedIds.Student3,
-            SeedIds.Student4, SeedIds.Student5
+            (SeedIds.Course1, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
+            (SeedIds.Course2, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
+            (SeedIds.Course3, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7 }),
+            (SeedIds.Course4, new[] { SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
         };
-        var courseIds = new[] { SeedIds.Course1, SeedIds.Course2 };
 
         var enrollments = new List<CourseEnrollment>();
-
-        foreach (var courseId in courseIds)
-            foreach (var studentId in studentIds)
+        foreach (var (courseId, students) in enrollmentMap)
+            foreach (var studentId in students)
                 enrollments.Add(new CourseEnrollment
                 {
-                    Id             = MongoDB.Bson.ObjectId.GenerateNewId(),
+                    Id             = ObjectId.GenerateNewId(),
                     CourseId       = courseId,
                     UserId         = studentId,
                     EnrollmentDate = now,

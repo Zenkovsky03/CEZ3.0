@@ -20,7 +20,6 @@ public class CourseSeeder : ISeeder
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        // Use AsNoTracking so the AnyAsync check doesn't leave anything in the tracker
         var anyExists = await _db.Courses.AsNoTracking().AnyAsync(cancellationToken);
         if (anyExists)
         {
@@ -28,39 +27,16 @@ public class CourseSeeder : ISeeder
             return;
         }
 
-        // Clear anything else that leaked into the tracker from UserSeeder
         _db.ChangeTracker.Clear();
 
         var now = DateTime.UtcNow;
 
         var courses = new List<Course>
         {
-            new()
-            {
-                Id                  = SeedIds.Course1,
-                Name                = "Introduction to Mathematics",
-                Description         = "Foundations of algebra, geometry and calculus for first-year students.",
-                StartDate           = now.AddDays(-30),
-                EndDate             = now.AddDays(150),
-                Archived            = false,
-                OwnerId             = SeedIds.Teacher1,
-                Owner               = null!,
-                CreatedAt           = now,
-                IsPasswordProtected = false,
-            },
-            new()
-            {
-                Id                  = SeedIds.Course2,
-                Name                = "Polish Literature & Composition",
-                Description         = "Survey of Polish prose and poetry from the Romantic era to the present.",
-                StartDate           = now.AddDays(-15),
-                EndDate             = now.AddDays(165),
-                Archived            = false,
-                OwnerId             = SeedIds.Teacher2,
-                Owner               = null!,
-                CreatedAt           = now,
-                IsPasswordProtected = false,
-            },
+            new() { Id = SeedIds.Course1, Name = "Introduction to Mathematics",      Description = "Foundations of algebra, geometry and calculus for first-year students.", StartDate = now.AddDays(-30),  EndDate = now.AddDays(150), Archived = false, OwnerId = SeedIds.Teacher1, Owner = null!, CreatedAt = now, IsPasswordProtected = false },
+            new() { Id = SeedIds.Course2, Name = "Polish Literature & Composition",  Description = "Survey of Polish prose and poetry from the Romantic era to the present.", StartDate = now.AddDays(-15), EndDate = now.AddDays(165), Archived = false, OwnerId = SeedIds.Teacher2, Owner = null!, CreatedAt = now, IsPasswordProtected = false },
+            new() { Id = SeedIds.Course3, Name = "Introduction to Computer Science", Description = "Core concepts of programming, algorithms and data structures using C#.",   StartDate = now.AddDays(-10), EndDate = now.AddDays(170), Archived = false, OwnerId = SeedIds.Teacher3, Owner = null!, CreatedAt = now, IsPasswordProtected = false },
+            new() { Id = SeedIds.Course4, Name = "English for Academic Purposes",    Description = "Academic writing, presentation skills and professional communication.",    StartDate = now.AddDays(-45), EndDate = now.AddDays(60),  Archived = false, OwnerId = SeedIds.Teacher1, Owner = null!, CreatedAt = now, IsPasswordProtected = false },
         };
 
         await _db.Courses.AddRangeAsync(courses, cancellationToken);

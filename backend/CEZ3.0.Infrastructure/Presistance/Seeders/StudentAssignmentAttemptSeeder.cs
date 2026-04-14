@@ -2,7 +2,6 @@ using CEZ3._0.Domain.Entities;
 using CEZ3._0.Infrastructure.Presistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 
 namespace CEZ3._0.Infrastructure.Persistence.Seeders;
 
@@ -11,7 +10,7 @@ public class StudentAssignmentAttemptSeeder : ISeeder
     private readonly CezDbContext _db;
     private readonly ILogger<StudentAssignmentAttemptSeeder> _logger;
 
-    public int Order => 7;
+    public int Order => 8;
 
     public StudentAssignmentAttemptSeeder(CezDbContext db, ILogger<StudentAssignmentAttemptSeeder> logger)
     {
@@ -32,49 +31,34 @@ public class StudentAssignmentAttemptSeeder : ISeeder
 
         var now = DateTime.UtcNow;
 
-        // Must match the stable answer IDs defined in AssignmentSeeder
-        var q1Id = new ObjectId("b1000000000000000000aa01");
-        var q2Id = new ObjectId("b1000000000000000000aa02");
-
-        var correctQ1  = new ObjectId("b2000000000000000000bb02"); // "4"
-        var wrongQ1    = new ObjectId("b2000000000000000000bb01"); // "2"
-        var correctQ2a = new ObjectId("b2000000000000000000bb05"); // "2"
-        var correctQ2b = new ObjectId("b2000000000000000000bb07"); // "7"
-
         var attempts = new List<StudentAssignmentAttempt>
         {
-            // Student1 — perfect score
-            new()
-            {
-                Id           = SeedIds.Attempt1,
-                AssignmentId = SeedIds.Assignment1,
-                StudentId    = SeedIds.Student1,
-                StartedAt    = now.AddHours(-2),
-                FinishedAt   = now.AddHours(-1),
-                IsCompleted  = true,
-                FinalScore   = 10,
-                Selections   = new List<StudentSelection>
-                {
-                    new() { QuestionId = q1Id, SelectedAnswerIds = new List<ObjectId> { correctQ1 } },
-                    new() { QuestionId = q2Id, SelectedAnswerIds = new List<ObjectId> { correctQ2a, correctQ2b } },
-                }
-            },
-            // Student2 — partial score
-            new()
-            {
-                Id           = SeedIds.Attempt2,
-                AssignmentId = SeedIds.Assignment1,
-                StudentId    = SeedIds.Student2,
-                StartedAt    = now.AddHours(-3),
-                FinishedAt   = now.AddHours(-2),
-                IsCompleted  = true,
-                FinalScore   = 5,
-                Selections   = new List<StudentSelection>
-                {
-                    new() { QuestionId = q1Id, SelectedAnswerIds = new List<ObjectId> { wrongQ1 } },
-                    new() { QuestionId = q2Id, SelectedAnswerIds = new List<ObjectId> { correctQ2a, correctQ2b } },
-                }
-            },
+            // ── Assignment 1 (Algebra Quiz, max 10) ───────────────────────────────────
+            new() { Id = SeedIds.Attempt1, AssignmentId = SeedIds.Assignment1, StudentId = SeedIds.Student1, StartedAt = now.AddHours(-10), FinishedAt = now.AddHours(-9),  IsCompleted = true, FinalScore = 10,
+                Selections = new() { new() { QuestionId = SeedIds.Q1_1, SelectedAnswerIds = new() { SeedIds.A1_Q1_2 } }, new() { QuestionId = SeedIds.Q1_2, SelectedAnswerIds = new() { SeedIds.A1_Q2_1, SeedIds.A1_Q2_3 } } } },
+
+            new() { Id = SeedIds.Attempt2, AssignmentId = SeedIds.Assignment1, StudentId = SeedIds.Student2, StartedAt = now.AddHours(-8),  FinishedAt = now.AddHours(-7),  IsCompleted = true, FinalScore = 5,
+                Selections = new() { new() { QuestionId = SeedIds.Q1_1, SelectedAnswerIds = new() { SeedIds.A1_Q1_1 } }, new() { QuestionId = SeedIds.Q1_2, SelectedAnswerIds = new() { SeedIds.A1_Q2_1, SeedIds.A1_Q2_3 } } } },
+
+            new() { Id = SeedIds.Attempt3, AssignmentId = SeedIds.Assignment1, StudentId = SeedIds.Student3, StartedAt = now.AddHours(-6),  FinishedAt = now.AddHours(-5),  IsCompleted = true, FinalScore = 10,
+                Selections = new() { new() { QuestionId = SeedIds.Q1_1, SelectedAnswerIds = new() { SeedIds.A1_Q1_2 } }, new() { QuestionId = SeedIds.Q1_2, SelectedAnswerIds = new() { SeedIds.A1_Q2_1, SeedIds.A1_Q2_3 } } } },
+
+            new() { Id = SeedIds.Attempt4, AssignmentId = SeedIds.Assignment1, StudentId = SeedIds.Student4, StartedAt = now.AddHours(-5),  FinishedAt = now.AddHours(-4),  IsCompleted = true, FinalScore = 0,
+                Selections = new() { new() { QuestionId = SeedIds.Q1_1, SelectedAnswerIds = new() { SeedIds.A1_Q1_3 } }, new() { QuestionId = SeedIds.Q1_2, SelectedAnswerIds = new() { SeedIds.A1_Q2_2, SeedIds.A1_Q2_4 } } } },
+
+            // ── Assignment 3 (CS Quiz, max 15) ────────────────────────────────────────
+            new() { Id = SeedIds.Attempt5, AssignmentId = SeedIds.Assignment3, StudentId = SeedIds.Student1, StartedAt = now.AddHours(-4),  FinishedAt = now.AddHours(-3),  IsCompleted = true, FinalScore = 15,
+                Selections = new() { new() { QuestionId = SeedIds.Q3_1, SelectedAnswerIds = new() { SeedIds.A3_Q2_2 } }, new() { QuestionId = SeedIds.Q3_2, SelectedAnswerIds = new() { SeedIds.A3_Q3_1, SeedIds.A3_Q3_3 } }, new() { QuestionId = SeedIds.Q3_3, SelectedAnswerIds = new() { SeedIds.A4_Q1_1 } } } },
+
+            new() { Id = SeedIds.Attempt6, AssignmentId = SeedIds.Assignment3, StudentId = SeedIds.Student5, StartedAt = now.AddHours(-3),  FinishedAt = now.AddHours(-2),  IsCompleted = true, FinalScore = 10,
+                Selections = new() { new() { QuestionId = SeedIds.Q3_1, SelectedAnswerIds = new() { SeedIds.A3_Q2_2 } }, new() { QuestionId = SeedIds.Q3_2, SelectedAnswerIds = new() { SeedIds.A3_Q3_1 } }, new() { QuestionId = SeedIds.Q3_3, SelectedAnswerIds = new() { SeedIds.A4_Q1_2 } } } },
+
+            // ── Assignment 4 (English Quiz, max 10) ───────────────────────────────────
+            new() { Id = SeedIds.Attempt7, AssignmentId = SeedIds.Assignment4, StudentId = SeedIds.Student6, StartedAt = now.AddHours(-2),  FinishedAt = now.AddHours(-1),  IsCompleted = true, FinalScore = 10,
+                Selections = new() { new() { QuestionId = SeedIds.Q4_1, SelectedAnswerIds = new() { SeedIds.A4_Q2_2 } }, new() { QuestionId = SeedIds.Q4_2, SelectedAnswerIds = new() { SeedIds.A4_Q2_2 } } } },
+
+            new() { Id = SeedIds.Attempt8, AssignmentId = SeedIds.Assignment4, StudentId = SeedIds.Student7, StartedAt = now.AddMinutes(-90), FinishedAt = now.AddMinutes(-30), IsCompleted = true, FinalScore = 5,
+                Selections = new() { new() { QuestionId = SeedIds.Q4_1, SelectedAnswerIds = new() { SeedIds.A4_Q2_1 } }, new() { QuestionId = SeedIds.Q4_2, SelectedAnswerIds = new() { SeedIds.A4_Q2_2 } } } },
         };
 
         await _db.Attempts.AddRangeAsync(attempts, cancellationToken);
