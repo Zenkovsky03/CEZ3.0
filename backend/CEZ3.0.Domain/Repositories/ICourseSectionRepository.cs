@@ -11,5 +11,6 @@ public interface ICourseSectionRepository
     Task<List<CourseSection>> GetCourseSectionsByCourseIdAsync(ObjectId courseId);
     Task<int> GetNumberOfAllSectionsAsync(ObjectId courseId);
     Task<int> GetNumberOfCompletedSectionsAsync(ObjectId courseId);
+    Task<List<CourseSection>> GetCourseSectionsByIdsAsync(List<ObjectId> id);
     Task SaveChangesAsync();
 }

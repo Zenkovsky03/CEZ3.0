@@ -69,8 +69,8 @@ public class CourseEnrollmentController : ControllerBase
     [Authorize(Roles = "Student")]
     [HttpPost("{id}/enroll")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> EnrollStudentInCourse([FromRoute] ObjectId id, [FromBody] EnrollStudentRequest request)
     {
         try

@@ -35,6 +35,14 @@ public class CourseSectionRepository : ICourseSectionRepository
             .ToListAsync();
     }
 
+    public async Task<List<CourseSection>> GetCourseSectionsByIdsAsync(List<ObjectId> id)
+    {
+        return await _cezDbContext.CourseSections
+            .Where(s => id.Contains(s.Id) && s.IsActive)
+            .OrderBy(s => s.OrderIndex)
+            .ToListAsync();
+    }
+
     public async Task<int> GetNumberOfAllSectionsAsync(ObjectId courseId)
     {
         return await _cezDbContext.CourseSections
