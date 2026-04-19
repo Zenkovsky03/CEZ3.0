@@ -1,11 +1,14 @@
 ﻿using CEZ3._0.Application.Assignments.Command.CreateAssignment;
 using CEZ3._0.Application.Assignments.Command.FinishQuiz;
+using CEZ3._0.Application.Assignments.Command.GradeHomework;
 using CEZ3._0.Application.Assignments.Command.SaveSelection;
 using CEZ3._0.Application.Assignments.Command.StartAssignment;
+using CEZ3._0.Application.Assignments.Command.SubmitHomework;
 using CEZ3._0.Application.Assignments.Dtos;
 using CEZ3._0.Application.Assignments.Query.GetAssignmentResults;
 using CEZ3._0.Application.Assignments.Query.GetNearestAssignments;
 using CEZ3._0.Application.Assignments.Query.GetQuiz;
+using CEZ3._0.Application.Assignments.Query.GetUngradedHomework;
 using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -22,7 +25,8 @@ public class AssignmentsController(ISender mediator) : ControllerBase
 {
     /// <summary>Create a new assignment</summary>
     /// <remarks>
-    /// Creates a new assignment of type Quiz or Test for a given course.
+    /// Creates a new assignment of type Quiz or Test or Homework for a given course.
+    /// Homework doesn't need any question. All exercises are set in description.
     /// Only users with the **Teacher** role are authorized.
     ///
     ///     POST /api/assignments
@@ -189,6 +193,82 @@ public class AssignmentsController(ISender mediator) : ControllerBase
         catch (ForbiddenException ex) { return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message }); }
     }
 
+    /// <summary>Submit a homework assignment</summary>
+    /// <remarks>
+    /// Submits text or an external link for a homework-type assignment.
+    /// Only users with the **Student** role are authorized.
+    ///
+    ///     POST /api/assignments/64b1f0e2c3a4e512345abcde/submit-homework
+    ///     {
+    ///         "submissionText": "My thoughts on chapter 3...",
+    ///         "attachmentUrl": "https://drive.google.com/..."
+    ///     }
+    /// </remarks>
+    /// <param name="assignmentId">MongoDB ObjectId of the assignment</param>
+    [HttpPost("{assignmentId}/submit-homework")]
+    [Authorize(Roles = "Student")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SubmitHomework(string assignmentId, [FromBody] SubmitHomeworkCommand command)
+    {
+        try
+        {
+            command.AssignmentId = assignmentId;
+            await mediator.Send(command);
+            return Ok(new { message = "Homework submitted successfully." });
+        }
+        catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+    }
+
+    /// <summary>Grade a submitted homework</summary>
+    /// <remarks>
+    /// Grades a student's completed homework attempt and saves feedback.
+    /// Requires AssignmentId and StudentId to locate the attempt.
+    /// Roles: Teacher or Admin.
+    ///
+    ///     POST /api/assignments/64b1f0e2c3a4e512345abcde/grade
+    ///     {
+    ///         "studentId": "64b1f0e2c3a4e512345abcf1",
+    ///         "points": 15,
+    ///         "mark": "A",
+    ///         "feedback": "Great job on explaining the core concepts!"
+    ///     }
+    /// </remarks>
+    /// <param name="assignmentId">MongoDB ObjectId of the assignment</param>
+    [HttpPost("{attemptId}/grade")]
+    [Authorize(Roles = "Teacher,Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GradeHomework(string attemptId, [FromBody] GradeHomeworkCommand command)
+    {
+        try
+        {
+            command.AttemptId = attemptId;
+            await mediator.Send(command);
+            return Ok(new { message = "Homework graded successfully." });
+        }
+        catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+        catch (ForbiddenException ex) { return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message }); }
+    }
+
+    /// <summary>Get all ungraded homework submissions for the teacher's courses</summary>
+    [HttpGet("ungraded")]
+    [Authorize(Roles = "Teacher")]
+    [ProducesResponseType(typeof(List<UngradedHomeworkDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUngradedHomework()
+    {
+        try
+        {
+            var result = await mediator.Send(new GetUngradedHomeworkQuery());
+            return Ok(result);
+        }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+        catch (ForbiddenException ex) { return StatusCode(403, new ErrorResponse { Message = ex.Message }); }
     [HttpGet("getNearestAssignments")]
     [EndpointDescription("Get nearest assignmets to dashboard calendar")]
     [Authorize]

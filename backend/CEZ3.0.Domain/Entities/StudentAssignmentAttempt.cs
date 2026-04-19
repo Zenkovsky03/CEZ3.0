@@ -19,5 +19,8 @@ namespace CEZ3._0.Domain.Entities
         public List<StudentSelection> Selections { get; set; } = new();
         public int FinalScore { get; set; }
         public bool IsCompleted { get; set; }
+
+        public string? SubmissionText { get; set; }
+        public string? AttachmentUrl { get; set; }
     }
 }
