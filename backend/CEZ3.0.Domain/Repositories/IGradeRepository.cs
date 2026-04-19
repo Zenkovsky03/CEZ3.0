@@ -14,5 +14,6 @@ namespace CEZ3._0.Domain.Repositories
         Task CreateAsync(Grade grade);
         Task<IEnumerable<Grade>> GetByUserIdAsync(ObjectId userId);
         Task<IEnumerable<Grade>> GetByAssignmentIdAsync(ObjectId assignmentId);
+        Task<bool> ExistsAsync(ObjectId assignmentId, ObjectId userId);
     }
 }

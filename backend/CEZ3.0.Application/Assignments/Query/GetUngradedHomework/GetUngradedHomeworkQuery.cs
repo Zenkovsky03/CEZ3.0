@@ -1,0 +1,12 @@
+﻿using CEZ3._0.Application.Assignments.Dtos;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CEZ3._0.Application.Assignments.Query.GetUngradedHomework
+{
+    public record GetUngradedHomeworkQuery() : IRequest<List<UngradedHomeworkDto>>;
+}

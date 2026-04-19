@@ -60,5 +60,11 @@ namespace CEZ3._0.Infrastructure.Repositories
                 .Where(a => a.AssignmentId == assignmentId)
                 .ToListAsync();
         }
+
+        public async Task<StudentAssignmentAttempt?> GetAnyAttemptAsync(ObjectId studentId, ObjectId assignmentId)
+        {
+            return await _dbContext.Attempts
+                .FirstOrDefaultAsync(a => a.StudentId == studentId && a.AssignmentId == assignmentId);
+        }
     }
 }

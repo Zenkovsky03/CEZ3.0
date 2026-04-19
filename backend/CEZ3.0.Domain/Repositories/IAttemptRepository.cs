@@ -16,5 +16,6 @@ namespace CEZ3._0.Domain.Repositories
         Task UpdateAsync(StudentAssignmentAttempt attempt);
         Task UpdateSelectionAsync(ObjectId attemptId, ObjectId questionId, List<ObjectId> selectedAnswerIds);
         Task<IEnumerable<StudentAssignmentAttempt>> GetResultsByAssignmentIdAsync(ObjectId assignmentId);
+        Task<StudentAssignmentAttempt?> GetAnyAttemptAsync(ObjectId studentId, ObjectId assignmentId);
     }
 }
