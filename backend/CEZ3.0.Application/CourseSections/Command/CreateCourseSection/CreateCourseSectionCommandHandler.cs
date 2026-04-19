@@ -68,7 +68,7 @@ public class CreateCourseSectionCommandHandler(ILogger<CreateCourseSectionComman
         };
 
         await _courseSectionRepository.AddSectionAsync(section);
-        await _courseSectionRepository.NormalizeOrderAsync();
+        await _courseSectionRepository.NormalizeOrderAsync(courseId);
 
         return section.Id.ToString();
     }
