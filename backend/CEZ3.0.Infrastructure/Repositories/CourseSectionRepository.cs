@@ -55,12 +55,13 @@ public class CourseSectionRepository : ICourseSectionRepository
             .CountAsync(s => s.CourseId == courseId && s.IsActive && s.IsFinalized);
     }
 
-    public async Task NormalizeOrderAsync()
+    public async Task NormalizeOrderAsync(ObjectId courseId)
     {
         var sections = await _cezDbContext.CourseSections
-            .Where(s => s.IsActive)
+            .Where(s => s.IsActive && s.CourseId == courseId)
             .OrderBy(s => s.OrderIndex)
             .ToListAsync();
+
 
         for (int i = 0; i < sections.Count; i++)
         {

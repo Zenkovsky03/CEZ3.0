@@ -49,7 +49,7 @@ public class AssignmentRepository(CezDbContext dbContext) : IAssignmentRepositor
     public async Task<List<Assignment>> GetNearestAssignmentsForUserAsync(ObjectId userId, List<ObjectId> enr)
     {
         var nearestAssignments = await _dbContext.Assignments
-            .Where(a => enr.Contains(a.CourseId))
+            .Where(a => enr.Contains(a.CourseId) && a.DueDate > DateTime.UtcNow)
             .OrderBy(a => a.DueDate)
             .Take(5)
             .ToListAsync();

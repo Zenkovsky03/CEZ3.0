@@ -54,7 +54,7 @@ public class EditCourseSectionCommandHandler(ILogger<EditCourseSectionCommandHan
         courseSection.OrderIndex = request.OrderIndex;
 
         await _courseSectionRepository.SaveChangesAsync();
-        await _courseSectionRepository.NormalizeOrderAsync();
+        await _courseSectionRepository.NormalizeOrderAsync(courseSection.CourseId);
 
         return courseSection.Id.ToString();
     }

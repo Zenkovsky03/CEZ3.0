@@ -190,6 +190,7 @@ public class AssignmentsController(ISender mediator) : ControllerBase
     }
 
     [HttpGet("getNearestAssignments")]
+    [EndpointDescription("Get nearest assignmets to dashboard calendar")]
     [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]

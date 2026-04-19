@@ -47,7 +47,8 @@ public class DeleteCourseSectionCommandHandler(ILogger<DeleteCourseSectionComman
         }
 
         courseSection.IsActive = false;
+        courseSection.OrderIndex = -1;
         await _courseSectionRepository.SaveChangesAsync();
-        await _courseSectionRepository.NormalizeOrderAsync();
+        await _courseSectionRepository.NormalizeOrderAsync(courseSection.CourseId);
     }
 }
