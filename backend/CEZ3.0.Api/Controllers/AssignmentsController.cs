@@ -6,6 +6,7 @@ using CEZ3._0.Application.Assignments.Command.StartAssignment;
 using CEZ3._0.Application.Assignments.Command.SubmitHomework;
 using CEZ3._0.Application.Assignments.Dtos;
 using CEZ3._0.Application.Assignments.Query.GetAssignmentResults;
+using CEZ3._0.Application.Assignments.Query.GetNearestAssignments;
 using CEZ3._0.Application.Assignments.Query.GetQuiz;
 using CEZ3._0.Application.Assignments.Query.GetUngradedHomework;
 using CEZ3._0.Application.Contracts.Responses.Users;
@@ -268,5 +269,20 @@ public class AssignmentsController(ISender mediator) : ControllerBase
         }
         catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
         catch (ForbiddenException ex) { return StatusCode(403, new ErrorResponse { Message = ex.Message }); }
+    [HttpGet("getNearestAssignments")]
+    [EndpointDescription("Get nearest assignmets to dashboard calendar")]
+    [Authorize]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetNearestAssignments()
+    {
+        try
+        {
+            var result = await mediator.Send(new GetNearestAssignmentsQuery());
+            return Ok(result);
+        }
+        catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
     }
 }
