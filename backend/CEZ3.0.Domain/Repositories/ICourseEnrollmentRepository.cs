@@ -11,5 +11,6 @@ public interface ICourseEnrollmentRepository
     Task<bool> IfStudentEnrolledAsync(ObjectId courseId, ObjectId userId);
     Task<List<ObjectId>> GetEnrolStudentIdAsync(List<ObjectId> courseIds);
     Task<List<CourseEnrollment>> GetEnrolledCoursesAsync(ObjectId userId);
+    Task<List<CourseEnrollment>> GetEnrolledStudentsAsync(ObjectId courseId);
     Task SaveChangesAsync();
 }

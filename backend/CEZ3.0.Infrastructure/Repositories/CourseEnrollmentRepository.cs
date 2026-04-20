@@ -61,4 +61,13 @@ public class CourseEnrollmentRepository : ICourseEnrollmentRepository
 
         return enrolledCourses;
     }
+
+    public async Task<List<CourseEnrollment>> GetEnrolledStudentsAsync(ObjectId courseId)
+    {
+        var enrolledStudents = await _dbContext.CourseEnrollments
+            .Where(ce => ce.CourseId == courseId && ce.IsActive == true)
+            .ToListAsync();
+
+        return enrolledStudents;
+    }
 }

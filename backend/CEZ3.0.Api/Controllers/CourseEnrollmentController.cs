@@ -1,6 +1,7 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.CourseEnrollments.Command.EnrolStudent;
 using CEZ3._0.Application.CourseEnrollments.Command.UnenrollStudent;
+using CEZ3._0.Application.CourseEnrollments.Query.GetEnrollStudents;
 using CEZ3._0.Application.Courses.Query.IsUserEnroll;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -36,6 +37,34 @@ public class CourseEnrollmentController : ControllerBase
         {
             var isEnrolled = await _sender.Send(new IsUserEnrollQuery(id));
             return Ok(new { IsEnrolled = isEnrolled });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize]
+    [HttpGet("{id}/GetEnrollStudents")]
+    [EndpointDescription("Get enrolled students for a course")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetEnrolledStudents([FromRoute] string id)
+    {
+        try
+        {
+            var students = await _sender.Send(new GetEnrollStudentsQuery(id));
+            return Ok(students);
         }
         catch (BadRequestException ex)
         {
