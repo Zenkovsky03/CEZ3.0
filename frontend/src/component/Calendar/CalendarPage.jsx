@@ -83,6 +83,8 @@ const normalizeEvents = (items) => items
     .filter((item) => !Number.isNaN(item.startDate.getTime()))
     .sort((left, right) => left.startDate - right.startDate);
 
+const isUpcomingEvent = (eventItem, now = new Date()) => eventItem.startDate >= now;
+
 const CalendarPage = () => {
     const { user } = useContext(AuthContext);
     const [currentMonth, setCurrentMonth] = useState(() => {
@@ -142,12 +144,12 @@ const CalendarPage = () => {
 
     const selectedDateKey = toDateKey(selectedDate);
     const selectedDayEvents = selectedDateKey ? (eventsByDate[selectedDateKey] || []) : [];
-    const upcomingEvents = useMemo(() => {
+    const plannedEvents = useMemo(() => {
         const now = new Date();
-        return events
-            .filter((eventItem) => eventItem.endDate >= now)
-            .slice(0, 6);
+        return events.filter((eventItem) => isUpcomingEvent(eventItem, now));
     }, [events]);
+
+    const upcomingEvents = useMemo(() => plannedEvents.slice(0, 6), [plannedEvents]);
 
     if (!user) {
         return <Navigate to="/login" replace />;
@@ -168,7 +170,7 @@ const CalendarPage = () => {
                                 </div>
                                 <div className="calendar-page__status">
                                     <span className="material-symbols-outlined">event</span>
-                                    {events.length} zaplanowanych wydarzeń
+                                    {plannedEvents.length} zaplanowanych wydarzeń
                                 </div>
                             </div>
 
