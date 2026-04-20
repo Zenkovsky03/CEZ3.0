@@ -3,6 +3,14 @@ import { Link } from 'react-router-dom';
 import './CourseCard.scss';
 
 const CourseCard = ({ course }) => {
+    const ownerName = course.owner
+        ? `${course.owner.firstName} ${course.owner.lastName}`
+        : 'Brak informacji o prowadzącym';
+
+    const participantsCount = Number.isFinite(course.participantsCount)
+        ? course.participantsCount
+        : 0;
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('pl-PL', {
@@ -45,15 +53,13 @@ const CourseCard = ({ course }) => {
             <div className="card-footer">
                 <div className="course-info-item">
                     <span className="info-icon">👤</span>
-                    <span className="info-text">
-                        {course.owner.firstName} {course.owner.lastName}
-                    </span>
+                    <span className="info-text">{ownerName}</span>
                 </div>
 
                 <div className="course-info-item">
                     <span className="info-icon">👥</span>
                     <span className="info-text">
-                        {course.participantsCount} {course.participantsCount === 1 ? 'uczestnik' : 'uczestników'}
+                        {participantsCount} {participantsCount === 1 ? 'uczestnik' : 'uczestników'}
                     </span>
                 </div>
 

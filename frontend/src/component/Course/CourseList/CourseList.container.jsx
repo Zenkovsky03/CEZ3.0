@@ -72,7 +72,7 @@ const CourseListContainer = () => {
                 case 'startDate':
                     return new Date(a.startDate) - new Date(b.startDate);
                 case 'participants':
-                    return b.participantsCount - a.participantsCount;
+                    return (b.participantsCount ?? 0) - (a.participantsCount ?? 0);
                 default:
                     return 0;
             }
