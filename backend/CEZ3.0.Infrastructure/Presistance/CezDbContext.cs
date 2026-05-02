@@ -1,5 +1,6 @@
 ﻿using CEZ3._0.Domain.Entities;
 using CEZ3._0.Domain.Entities.Calendar;
+using CEZ3._0.Domain.Entities.Forum;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
 
@@ -26,6 +27,8 @@ public class CezDbContext : DbContext
     public DbSet<UserEvent> UserEvents { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<ChatMessage> Messages { get; set; }
+    public DbSet<Domain.Entities.Forum.Thread> Threads { get; set; }
+    public DbSet<ThreadReplay> ThreadReplays { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,5 +49,7 @@ public class CezDbContext : DbContext
         modelBuilder.Entity<UserEvent>().ToCollection("UserEvents");
         modelBuilder.Entity<Conversation>().ToCollection("Conversations");
         modelBuilder.Entity<ChatMessage>().ToCollection("ChatMessages");
+        modelBuilder.Entity<Domain.Entities.Forum.Thread>().ToCollection("Threads");
+        modelBuilder.Entity<ThreadReplay>().ToCollection("ThreadReplays");
     }
 }

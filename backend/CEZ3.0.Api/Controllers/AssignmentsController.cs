@@ -275,25 +275,10 @@ public class AssignmentsController(ISender mediator) : ControllerBase
             var result = await mediator.Send(new GetUngradedHomeworkQuery());
             return Ok(result);
         }
-        catch (UnauthorizedException ex)
-        {
-            return Unauthorized(new ErrorResponse { Message = ex.Message });
-        }
-        catch (ForbiddenException ex)
-        {
-            return StatusCode(403, new ErrorResponse { Message = ex.Message });
-        }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+        catch (ForbiddenException ex) { return StatusCode(403, new ErrorResponse { Message = ex.Message }); }
     }
-    
-    /// <summary>Get upcoming assignments for the dashboard calendar</summary>
-    /// <remarks>
-    /// Returns a list of the nearest upcoming assignments relevant to the
-    /// currently authenticated user. Used to populate the calendar widget
-    /// on the dashboard. Both **Teacher** and **Student** roles are authorized.
-    ///
-    ///     GET /api/assignments/getNearestAssignments
-    ///
-    /// </remarks>
+
     [HttpGet("getNearestAssignments")]
     [EndpointDescription("Get nearest assignmets to dashboard calendar")]
     [Authorize]
