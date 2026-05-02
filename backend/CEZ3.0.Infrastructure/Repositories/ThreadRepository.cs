@@ -28,8 +28,19 @@ public class ThreadRepository(CezDbContext dbContext) : IThreadRepository
             .FirstOrDefaultAsync(t => t.Id == threadId && t.IsActive);
     }
 
+    public async Task<List<Domain.Entities.Forum.Thread>> GetThreadsHeaderAsync(int pageNumber, int pageSize)
+    {
+        return await _dbContext.Threads
+            .Where(t => t.IsActive)
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
     }
+
 }

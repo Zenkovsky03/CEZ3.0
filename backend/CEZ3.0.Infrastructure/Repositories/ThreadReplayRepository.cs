@@ -31,10 +31,21 @@ public class ThreadReplayRepository(CezDbContext dbContext) : IThreadReplayRepos
                      .ToListAsync();
     }
 
+    public async Task<ThreadReplay?> GetThreadReplayByIdAsync(ObjectId replayId)
+    {
+        return await _dbContext.ThreadReplays
+            .FirstOrDefaultAsync(r => r.Id == replayId && r.IsActive);
+    }
+
     public async Task<int> GetTotalReplaysByThreadIdAsync(ObjectId threadId)
     {
         return await _dbContext.ThreadReplays
             .Where(r => r.ThreadId == threadId && r.IsActive)
             .CountAsync();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _dbContext.SaveChangesAsync();
     }
 }
