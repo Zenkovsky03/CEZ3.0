@@ -85,4 +85,12 @@ public class UserRepository : IUserRepository
             .Where(u => u.Role == role && u.IsActive)
             .ToListAsync();
     }
+
+    public async Task<List<User>> GetUsersByIdsAsync(List<ObjectId> userIds)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => userIds.Contains(u.Id) && u.IsActive)
+            .ToListAsync();
+    }
 }

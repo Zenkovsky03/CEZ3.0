@@ -257,6 +257,14 @@ public class AssignmentsController(ISender mediator) : ControllerBase
     }
 
     /// <summary>Get all ungraded homework submissions for the teacher's courses</summary>
+    /// <remarks>
+    /// Returns a list of all homework submissions that have not yet been graded
+    /// across all courses belonging to the currently authenticated teacher.
+    /// Only users with the **Teacher** role are authorized.
+    ///
+    ///     GET /api/assignments/ungraded
+    ///
+    /// </remarks>
     [HttpGet("ungraded")]
     [Authorize(Roles = "Teacher")]
     [ProducesResponseType(typeof(List<UngradedHomeworkDto>), StatusCodes.Status200OK)]
