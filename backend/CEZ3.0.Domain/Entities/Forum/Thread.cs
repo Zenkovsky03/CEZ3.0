@@ -11,4 +11,5 @@ public class Thread
     public DateTime CreatedAt { get; set; }
     public bool IsOpen { get; set; }
     public bool IsActive { get; set; }
+    public int TotalReplies { get; set; }
 }

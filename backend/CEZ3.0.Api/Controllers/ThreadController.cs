@@ -1,4 +1,6 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
+using CEZ3._0.Application.Forums.Command.CreateThread;
+using CEZ3._0.Application.Forums.Query.GetFullThead;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +23,7 @@ public class ThreadController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CreateThread([FromBody] Application.Forums.Command.CreateThread.CreateThreadCommand command)
+    public async Task<IActionResult> CreateThread([FromBody] CreateThreadCommand command)
     {
         try
         {
@@ -36,6 +38,22 @@ public class ThreadController : ControllerBase
         {
             return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
+    }
 
+    [HttpGet("{threadId}")]
+    [EndpointDescription("Get thread details by thread ID.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetThreadById([FromRoute] string threadId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        try
+        {
+            var dto = await _sender.Send(new GetFullTheadQuery(threadId, pageNumber, pageSize));
+            return Ok(new { Thread = dto });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
     }
 }

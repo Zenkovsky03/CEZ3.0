@@ -15,6 +15,7 @@ public class CreateThreadCommandHandler(ILogger<CreateThreadCommandHandler> logg
     private readonly IUserContext _userContext = userContext;
     private readonly IThreadRepository _threadRepository = threadRepository;
 
+
     public async Task<string> Handle(CreateThreadCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling CreateThreadCommand for user");
@@ -47,7 +48,8 @@ public class CreateThreadCommandHandler(ILogger<CreateThreadCommandHandler> logg
             AuthorId = currentUserId,
             CreatedAt = DateTime.UtcNow,
             IsOpen = true,
-            IsActive = true
+            IsActive = true,
+            TotalReplies = 0
         };
 
         var id = await _threadRepository.AddThreadAsync(thread);

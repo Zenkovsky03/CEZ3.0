@@ -269,6 +269,8 @@ public class AssignmentsController(ISender mediator) : ControllerBase
         }
         catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
         catch (ForbiddenException ex) { return StatusCode(403, new ErrorResponse { Message = ex.Message }); }
+    }
+
     [HttpGet("getNearestAssignments")]
     [EndpointDescription("Get nearest assignmets to dashboard calendar")]
     [Authorize]
