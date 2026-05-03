@@ -2,6 +2,7 @@
 using CEZ3._0.Application.Forums.Command.CloseThread;
 using CEZ3._0.Application.Forums.Command.CreateThread;
 using CEZ3._0.Application.Forums.Command.DeleteThread;
+using CEZ3._0.Application.Forums.Command.EditThread;
 using CEZ3._0.Application.Forums.Query.GetFullThead;
 using CEZ3._0.Application.Forums.Query.GetThreadsHeader;
 using CEZ3._0.Domain.Exceptions;
@@ -113,5 +114,25 @@ public class ThreadController : ControllerBase
         {
             return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
+    }
+
+    [Authorize]
+    [HttpPut("{threadId}/edit")]
+    [EndpointDescription("Edit an existing thread.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> EditThread([FromRoute] string threadId, [FromBody] EditThreadCommand command)
+    {
+        try
+        {
+            command.ThreadId = threadId;
+            await _sender.Send(command);
+            return Ok(new { Message = "Thread edited successfully." });
+        }
+        catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+        catch (ForbiddenException ex) { return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message }); }
     }
 }
