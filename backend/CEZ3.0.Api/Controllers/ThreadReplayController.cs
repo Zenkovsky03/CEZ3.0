@@ -1,6 +1,7 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.Forums.Command.CreateThreadReplay;
 using CEZ3._0.Application.Forums.Command.DeleteThreadReplay;
+using CEZ3._0.Application.Forums.Command.EditThreadReplay;
 using CEZ3._0.Application.Forums.Query.GetThreadReplay;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -93,5 +94,25 @@ public class ThreadReplayController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden,
                 new ErrorResponse { Message = ex.Message });
         }
+    }
+
+    [Authorize]
+    [HttpPut("{threadReplayId}/edit")]
+    [EndpointDescription("Edit an existing thread replay.")]
+    [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> EditThreadReplay([FromRoute] string threadReplayId, [FromBody] EditThreadReplayCommand command)
+    {
+        try
+        {
+            command.ThreadReplayId = threadReplayId;
+            await _sender.Send(command);
+            return Ok(new { Message = "Thread replay edited successfully." });
+        }
+        catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+        catch (ForbiddenException ex) { return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message }); }
     }
 }
