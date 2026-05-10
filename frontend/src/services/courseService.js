@@ -98,6 +98,12 @@ export const createCourse = async (payload) => {
     });
 };
 
+export const assignTeacherToCourse = (courseId, teacherId) =>
+    request(`/api/courses/${courseId}/assign-teacher`, {
+        method: 'PATCH',
+        body: JSON.stringify({ TeacherId: teacherId })
+    });
+
 export const updateCourse = (id, payload) =>
     request(`/api/courses/${id}`, {
         method: 'PUT',

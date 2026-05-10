@@ -6,6 +6,8 @@ const formatDate = (value) => {
     return date.toLocaleDateString('pl-PL');
 };
 
+const formatParticipantLabel = (participants) => `${participants ?? 0} uczestników`;
+
 const statusClassMap = {
     Aktywny: 'admin-courses__status admin-courses__status--active',
     'W trakcie': 'admin-courses__status admin-courses__status--progress',
@@ -13,7 +15,17 @@ const statusClassMap = {
     Archiwalny: 'admin-courses__status admin-courses__status--archived'
 };
 
-const CoursesTable = ({ courses }) => {
+const CoursesTable = ({ courses, loading, onEditCourse, onDeleteCourse }) => {
+    if (loading) {
+        return (
+            <div className="admin-courses__table-card">
+                <div style={{ padding: '1.5rem', color: '#6b7280', fontWeight: 600 }}>
+                    Ładowanie kursów...
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="admin-courses__table-card">
             <table className="admin-courses__table">
@@ -29,6 +41,13 @@ const CoursesTable = ({ courses }) => {
                     </tr>
                 </thead>
                 <tbody>
+                    {!courses.length && (
+                        <tr>
+                            <td colSpan="7" style={{ textAlign: 'center', color: '#6b7280', padding: '1.5rem' }}>
+                                Brak kursów do wyświetlenia.
+                            </td>
+                        </tr>
+                    )}
                     {courses.map((course) => (
                         <tr key={course.id}>
                             <td>
@@ -42,8 +61,7 @@ const CoursesTable = ({ courses }) => {
                                 </div>
                             </td>
                             <td>
-                                <span className="admin-courses__participants-current">{course.participants}</span>
-                                <span className="admin-courses__participants-limit"> / {course.maxParticipants}</span>
+                                <span className="admin-courses__participants-current">{formatParticipantLabel(course.participants)}</span>
                             </td>
                             <td>
                                 <div className="admin-courses__progress-bar">
@@ -64,6 +82,22 @@ const CoursesTable = ({ courses }) => {
                                 </span>
                             </td>
                             <td className="admin-courses__actions-cell">
+                                <button
+                                    className="admin-courses__actions-btn"
+                                    type="button"
+                                    aria-label="Edytuj kurs"
+                                    onClick={() => onEditCourse?.(course.id)}
+                                >
+                                    <span className="material-symbols-outlined">edit</span>
+                                </button>
+                                <button
+                                    className="admin-courses__actions-btn"
+                                    type="button"
+                                    aria-label="Usuń kurs"
+                                    onClick={() => onDeleteCourse?.(course.id)}
+                                >
+                                    <span className="material-symbols-outlined">delete</span>
+                                </button>
                                 <button className="admin-courses__actions-btn" type="button" aria-label="Więcej akcji">
                                     <span className="material-symbols-outlined">more_vert</span>
                                 </button>

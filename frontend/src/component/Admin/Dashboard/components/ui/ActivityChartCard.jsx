@@ -1,12 +1,12 @@
 import React from 'react';
 
-function ActivityChartCard() {
+function ActivityChartCard({ summaryValue = 'Śr. 450/dzień', summaryLabel = 'Ostatnie 30 dni', summaryChange = '+12.5%' }) {
     return (
         <section className="admin-dashboard__panel admin-dashboard__panel--chart">
             <h2>Aktywność użytkowników w czasie</h2>
-            <p className="admin-dashboard__metric">Śr. 450/dzień</p>
+            <p className="admin-dashboard__metric">{summaryValue}</p>
             <p className="admin-dashboard__sub">
-                Ostatnie 30 dni <span>+12.5%</span>
+                {summaryLabel} <span>{summaryChange}</span>
             </p>
             <div className="admin-dashboard__chart" aria-hidden="true">
                 <svg viewBox="0 0 472 150" preserveAspectRatio="none">

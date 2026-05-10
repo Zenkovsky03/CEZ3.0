@@ -18,6 +18,7 @@ const QuizzesTable = ({ rows, onRowOpen }) => {
 						<tr>
 							<th>Tytul quizu</th>
 							<th>Nazwa kursu</th>
+							<th>Prowadzacy</th>
 							<th className="admin-quizzes__table-center">Pytania</th>
 							<th>Limit czasu</th>
 							<th>Status</th>
@@ -29,6 +30,7 @@ const QuizzesTable = ({ rows, onRowOpen }) => {
 							<tr key={row.id} onClick={() => onRowOpen(row.quizId)}>
 								<td className="admin-quizzes__title">{row.title}</td>
 								<td>{row.courseName}</td>
+								<td>{row.instructor}</td>
 								<td className="admin-quizzes__table-center">{row.questions}</td>
 								<td>{row.timeLimit} min</td>
 								<td>
@@ -38,9 +40,6 @@ const QuizzesTable = ({ rows, onRowOpen }) => {
 									<div className="admin-quizzes__actions">
 										<button type="button" className="admin-quizzes__icon-btn" aria-label="Edytuj">
 											<span className="material-symbols-outlined">edit</span>
-										</button>
-										<button type="button" className="admin-quizzes__icon-btn" aria-label="Podglad">
-											<span className="material-symbols-outlined">visibility</span>
 										</button>
 										<button type="button" className="admin-quizzes__icon-btn admin-quizzes__icon-btn--danger" aria-label="Usun">
 											<span className="material-symbols-outlined">delete</span>

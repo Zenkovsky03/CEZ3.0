@@ -1,185 +1,106 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../Layout/AdminLayout';
 import { CoursesFilters, CoursesHeader, CoursesPagination, CoursesSidebar, CoursesTable } from '../components/ui';
+import { deleteCourse, getCourses } from '../../../../services/adminApi';
 import '../AdminCoursesPage.scss';
 
-const initialCourses = [
-    {
-        id: '1',
-        name: 'Podstawy Cloud Computing',
-        description: 'Wstęp do rozwiązań chmurowych',
-        instructor: 'Jan Kowalski',
-        instructorInitials: 'JK',
-        participants: 45,
-        maxParticipants: 50,
-        progress: 85,
-        startDate: '2025-09-01',
-        endDate: '2025-11-30',
-        status: 'Aktywny'
-    },
-    {
-        id: '2',
-        name: 'Cyberbezpieczeństwo w firmie',
-        description: 'Zasady ochrony danych',
-        instructor: 'Anna Nowak',
-        instructorInitials: 'AN',
-        participants: 120,
-        maxParticipants: 150,
-        progress: 32,
-        startDate: '2025-10-15',
-        endDate: '2025-12-15',
-        status: 'W trakcie'
-    },
-    {
-        id: '3',
-        name: 'Analiza Danych w Pythonie',
-        description: 'Pandas, NumPy i Matplotlib',
-        instructor: 'Marek Lewandowski',
-        instructorInitials: 'ML',
-        participants: 28,
-        maxParticipants: 30,
-        progress: 0,
-        startDate: '2025-12-01',
-        endDate: '2026-02-28',
-        status: 'Planowany'
-    },
-    {
-        id: '4',
-        name: 'React Od Podstaw',
-        description: 'Komponenty, hooki i routing',
-        instructor: 'Karolina Wójcik',
-        instructorInitials: 'KW',
-        participants: 67,
-        maxParticipants: 80,
-        progress: 54,
-        startDate: '2025-08-10',
-        endDate: '2025-12-20',
-        status: 'W trakcie'
-    },
-    {
-        id: '5',
-        name: 'Node.js API Masterclass',
-        description: 'REST, auth i testy integracyjne',
-        instructor: 'Piotr Zieliński',
-        instructorInitials: 'PZ',
-        participants: 39,
-        maxParticipants: 40,
-        progress: 91,
-        startDate: '2025-07-01',
-        endDate: '2025-10-31',
-        status: 'Aktywny'
-    },
-    {
-        id: '6',
-        name: 'SQL i Modelowanie Danych',
-        description: 'Relacje, indeksy i optymalizacja zapytań',
-        instructor: 'Alicja Król',
-        instructorInitials: 'AK',
-        participants: 82,
-        maxParticipants: 120,
-        progress: 26,
-        startDate: '2025-11-03',
-        endDate: '2026-01-31',
-        status: 'W trakcie'
-    },
-    {
-        id: '7',
-        name: 'Docker i Kubernetes',
-        description: 'Konteneryzacja i orkiestracja aplikacji',
-        instructor: 'Damian Nowicki',
-        instructorInitials: 'DN',
-        participants: 24,
-        maxParticipants: 35,
-        progress: 0,
-        startDate: '2026-01-15',
-        endDate: '2026-04-30',
-        status: 'Planowany'
-    },
-    {
-        id: '8',
-        name: 'Podstawy UX/UI',
-        description: 'Research, prototypowanie i testy użyteczności',
-        instructor: 'Natalia Maj',
-        instructorInitials: 'NM',
-        participants: 56,
-        maxParticipants: 60,
-        progress: 72,
-        startDate: '2025-06-10',
-        endDate: '2025-09-15',
-        status: 'Aktywny'
-    },
-    {
-        id: '9',
-        name: 'TypeScript Advanced',
-        description: 'Typy generyczne i architektura frontendu',
-        instructor: 'Michał Bąk',
-        instructorInitials: 'MB',
-        participants: 46,
-        maxParticipants: 55,
-        progress: 40,
-        startDate: '2025-09-20',
-        endDate: '2025-12-28',
-        status: 'W trakcie'
-    },
-    {
-        id: '10',
-        name: 'C# i ASP.NET Core',
-        description: 'Warstwy aplikacji, CQRS i autoryzacja',
-        instructor: 'Rafał Gajda',
-        instructorInitials: 'RG',
-        participants: 98,
-        maxParticipants: 110,
-        progress: 65,
-        startDate: '2025-08-25',
-        endDate: '2025-12-05',
-        status: 'Aktywny'
-    },
-    {
-        id: '11',
-        name: 'AI w Produkcie',
-        description: 'Praktyczne wdrożenia modeli ML',
-        instructor: 'Olga Szymańska',
-        instructorInitials: 'OS',
-        participants: 18,
-        maxParticipants: 30,
-        progress: 0,
-        startDate: '2026-02-01',
-        endDate: '2026-05-20',
-        status: 'Planowany'
-    },
-    {
-        id: '12',
-        name: 'Testowanie Oprogramowania',
-        description: 'Unit, integration i e2e testing',
-        instructor: 'Joanna Kaczmarek',
-        instructorInitials: 'JK',
-        participants: 75,
-        maxParticipants: 90,
-        progress: 58,
-        startDate: '2025-09-05',
-        endDate: '2025-12-18',
-        status: 'W trakcie'
+const getInitials = (firstName = '', lastName = '') => `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+
+const getCourseStatus = (course) => {
+    const now = new Date();
+    const startDate = new Date(course.startDate);
+    const endDate = new Date(course.endDate);
+
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return 'Aktywny';
     }
-];
+
+    if (endDate < now) {
+        return 'Archiwalny';
+    }
+
+    if (startDate > now) {
+        return 'Planowany';
+    }
+
+    return 'W trakcie';
+};
+
+const getCourseProgress = (course) => {
+    const startDate = new Date(course.startDate);
+    const endDate = new Date(course.endDate);
+    const now = new Date();
+
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate <= startDate) {
+        return 0;
+    }
+
+    const progress = ((now.getTime() - startDate.getTime()) / (endDate.getTime() - startDate.getTime())) * 100;
+    return Math.max(0, Math.min(100, Math.round(progress)));
+};
+
+const normalizeCourse = (course) => {
+    const instructor = [course.owner?.firstName, course.owner?.lastName].filter(Boolean).join(' ').trim() || 'Brak przypisanego prowadzącego';
+
+    return {
+        id: course.id,
+        name: course.name,
+        description: course.description,
+        instructor,
+        instructorInitials: getInitials(course.owner?.firstName, course.owner?.lastName) || '??',
+        participants: course.participantsCount ?? 0,
+        progress: getCourseProgress(course),
+        startDate: course.startDate,
+        endDate: course.endDate,
+        status: getCourseStatus(course),
+        ownerEmail: course.owner?.email || ''
+    };
+};
 
 function AdminCoursesPage() {
     const navigate = useNavigate();
     const [token, setToken] = useState(localStorage.getItem('token') || '');
     const [query, setQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [importMessage, setImportMessage] = useState(null);
+    const importInputRef = React.useRef(null);
     const rowsPerPage = 9;
+
+    useEffect(() => {
+        if (!token) {
+            return;
+        }
+
+        const fetchCourses = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await getCourses();
+                setCourses((data || []).map(normalizeCourse));
+            } catch (fetchError) {
+                setError(fetchError.message || 'Nie udało się pobrać kursów');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, [token]);
 
     const filteredCourses = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return initialCourses;
+        if (!q) return courses;
 
-        return initialCourses.filter((course) =>
-            [course.name, course.description, course.instructor].some((field) =>
+        return courses.filter((course) =>
+            [course.name, course.description, course.instructor, course.ownerEmail].some((field) =>
                 field.toLowerCase().includes(q)
             )
         );
-    }, [query]);
+    }, [courses, query]);
 
     const totalPages = Math.max(1, Math.ceil(filteredCourses.length / rowsPerPage));
     const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -198,6 +119,68 @@ function AdminCoursesPage() {
         setCurrentPage(1);
     };
 
+    const handleDeleteCourse = async (courseId) => {
+        try {
+            await deleteCourse(courseId);
+            const data = await getCourses();
+            setCourses((data || []).map(normalizeCourse));
+        } catch (deleteError) {
+            setError(deleteError.message || 'Nie udało się usunąć kursu');
+        }
+    };
+
+    const handleEditCourse = (courseId) => {
+        navigate(`/courses/${courseId}/edit`);
+    };
+
+    const handleAddCourse = () => {
+        navigate('/courses/create');
+    };
+
+    const handleImportClick = () => {
+        importInputRef.current?.click();
+    };
+
+    const handleImportChange = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        setImportMessage(`Wybrano plik ${file.name}. Import CSV nie jest jeszcze podłączony do backendu.`);
+        event.target.value = '';
+    };
+
+    const handleExportCsv = () => {
+        if (!filteredCourses.length) {
+            setError('Brak kursów do eksportu.');
+            return;
+        }
+
+        const headers = ['id', 'name', 'description', 'instructor', 'participants', 'startDate', 'endDate', 'status'];
+        const csvRows = [
+            headers.join(','),
+            ...filteredCourses.map((course) => [
+                course.id,
+                course.name,
+                course.description,
+                course.instructor,
+                course.participants,
+                course.startDate,
+                course.endDate,
+                course.status
+            ].map((value) => `"${String(value ?? '').replaceAll('"', '""')}"`).join(','))
+        ];
+
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = 'courses-export.csv';
+        anchor.click();
+        URL.revokeObjectURL(url);
+    };
+
     if (!token) {
         return null;
     }
@@ -205,7 +188,20 @@ function AdminCoursesPage() {
     return (
         <AdminLayout onLogout={handleLogout}>
             <div className="admin-courses__container">
-                <CoursesHeader />
+                <input ref={importInputRef} type="file" accept=".csv" onChange={handleImportChange} hidden />
+                <CoursesHeader onImportClick={handleImportClick} onExportClick={handleExportCsv} onAddCourseClick={handleAddCourse} />
+
+                {error && (
+                    <div className="admin-users__error" style={{ marginBottom: '1rem' }}>
+                        {error}
+                    </div>
+                )}
+
+                {importMessage && (
+                    <div className="admin-users__success" style={{ marginBottom: '1rem' }}>
+                        {importMessage}
+                    </div>
+                )}
 
                 <div className="admin-courses__grid">
                     <section className="admin-courses__main">
@@ -215,7 +211,12 @@ function AdminCoursesPage() {
                             onClearFilters={handleClearFilters}
                         />
 
-                        <CoursesTable courses={visibleCourses} />
+                        <CoursesTable
+                            courses={visibleCourses}
+                            loading={loading}
+                            onEditCourse={handleEditCourse}
+                            onDeleteCourse={handleDeleteCourse}
+                        />
 
                         <CoursesPagination
                             currentPage={safeCurrentPage}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { StudentGradesTable } from '../ui';
+import { getStudentUsers } from '../../../../../services/adminApi';
 
 const StudentGradesSection = ({ token, onOpenStudent }) => {
 	const [studentNameQuery, setStudentNameQuery] = useState('');
@@ -19,19 +20,7 @@ const StudentGradesSection = ({ token, onOpenStudent }) => {
 				setStudentsLoading(true);
 				setStudentsError(null);
 
-				const response = await fetch('/api/user/users?PageNumber=1&PageSize=1000&Role=Student', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`
-					}
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}`);
-				}
-
-				const data = await response.json();
+				const data = await getStudentUsers();
 				setStudents(data.items || []);
 			} catch (error) {
 				setStudentsError(error.message || 'Nie udalo sie pobrac listy studentow');

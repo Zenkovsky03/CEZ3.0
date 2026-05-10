@@ -12,7 +12,10 @@ const CourseForm = ({
                         showPassword,
                         togglePasswordVisibility,
                         isEditMode = false,
-                        onSubmit
+                        onSubmit,
+                        teachers = [],
+                        assignedTeacherId = '',
+                        onTeacherChange
                     }) => {
     return (
         <div className="form-container" onSubmit={onSubmit}>
@@ -82,6 +85,28 @@ const CourseForm = ({
                         showPassword={showPassword}
                         togglePassword={togglePasswordVisibility}
                     />
+                </div>
+            )}
+
+            {!isEditMode && (
+                <div className="input-group">
+                    <label className="input-label" htmlFor="teacherId">
+                        Prowadzący
+                    </label>
+                    <select
+                        id="teacherId"
+                        className="input-field"
+                        name="teacherId"
+                        value={assignedTeacherId}
+                        onChange={onTeacherChange}
+                    >
+                        <option value="">Bez przypisanego prowadzącego</option>
+                        {teachers.map((teacher) => (
+                            <option key={teacher.id} value={teacher.id}>
+                                {[teacher.firstName, teacher.lastName].filter(Boolean).join(' ') || teacher.username}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             )}
 

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../Layout/AdminLayout';
 import { ErrorAlert, SuccessAlert, LoadingSpinner, Breadcrumb, ProfilePreview } from '../components/ui';
 import { FormField, RoleSelect, StatusRadioGroup } from '../components/forms';
+import { blockUser, getUsersPage, unblockUser, updateUser, updateUserRole } from '../../../../services/adminApi';
 import '../AdminUsersPageNew.scss';
 
 const EditUserPage = () => {
@@ -35,17 +36,7 @@ const EditUserPage = () => {
                 setLoading(true);
                 setError(null);
                 
-                const response = await fetch(`/api/user/users?PageNumber=1&PageSize=1000`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Nie udało się pobrać danych użytkownika');
-                }
-
-                const data = await response.json();
+                const data = await getUsersPage({ pageNumber: 1, pageSize: 1000 });
                 const foundUser = data.items?.find(u => u.id === id);
                 
                 if (!foundUser) {
@@ -149,99 +140,24 @@ const EditUserPage = () => {
             const updatedLastName = lastName.trim();
             const updatedEmail = email.trim();
             
-            const basicInfoResponse = await fetch(`/api/user/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    UserId: id,
-                    FirstName: updatedFirstName,
-                    LastName: updatedLastName,
-                    Email: updatedEmail
-                })
+            await updateUser(id, {
+                UserId: id,
+                FirstName: updatedFirstName,
+                LastName: updatedLastName,
+                Email: updatedEmail
             });
 
-            if (!basicInfoResponse.ok) {
-                let errorMessage = 'Nie udało się zaktualizować danych użytkownika';
-                try {
-                    const errorData = await basicInfoResponse.json();
-                    errorMessage = errorData.message || errorData.Message || errorMessage;
-                } catch {
-                    const errorText = await basicInfoResponse.text();
-                    errorMessage = errorText || errorMessage;
-                }
-                throw new Error(errorMessage);
-            }
-
             if (role !== user.role) {
-                const roleResponse = await fetch(`/api/user/${id}/role`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        UserId: id,
-                        Role: role
-                    })
-                });
-
-                if (!roleResponse.ok) {
-                    let errorMessage = 'Nie udało się zmienić roli użytkownika';
-                    try {
-                        const errorData = await roleResponse.json();
-                        errorMessage = errorData.message || errorData.Message || errorMessage;
-                    } catch {
-                        const errorText = await roleResponse.text();
-                        errorMessage = errorText || errorMessage;
-                    }
-                    throw new Error(errorMessage);
-                }
+                await updateUserRole(id, role);
             }
 
             const userWasBlocked = user.isBlocked;
             const shouldBeBlocked = status === 'Blocked';
 
             if (userWasBlocked && !shouldBeBlocked) {
-                const unblockResponse = await fetch(`/api/user/unblock/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!unblockResponse.ok) {
-                    let errorMessage = 'Nie udało się odblokować użytkownika';
-                    try {
-                        const errorData = await unblockResponse.json();
-                        errorMessage = errorData.message || errorData.Message || errorMessage;
-                    } catch {
-                        const errorText = await unblockResponse.text();
-                        errorMessage = errorText || errorMessage;
-                    }
-                    throw new Error(errorMessage);
-                }
+                await unblockUser(id);
             } else if (!userWasBlocked && shouldBeBlocked) {
-                const blockResponse = await fetch(`/api/user/block/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!blockResponse.ok) {
-                    let errorMessage = 'Nie udało się zablokować użytkownika';
-                    try {
-                        const errorData = await blockResponse.json();
-                        errorMessage = errorData.message || errorData.Message || errorMessage;
-                    } catch {
-                        const errorText = await blockResponse.text();
-                        errorMessage = errorText || errorMessage;
-                    }
-                    throw new Error(errorMessage);
-                }
+                await blockUser(id);
             }
 
             setSuccessMessage('Zmiany zostały zapisane pomyślnie!');

@@ -1,33 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import AdminLayout from '../Layout/AdminLayout';
-import { 
-    UserStatsCards, 
-    UsersTable, 
-    UsersPagination, 
-    DeleteUserModal, 
-    ErrorAlert 
-} from './components/ui';
+import { SearchContext } from '../../../context/SearchContext';
+import { UsersTable, UsersPagination, DeleteUserModal, ErrorAlert } from './components/ui';
+import CreateUserModal from './components/ui/CreateUserModal';
+import { createUser, deleteUser, getUsersPage } from '../../../services/adminApi';
 import './AdminUsersPageNew.scss';
 
 const AdminUsersPage = () => {
+    const { searchQuery, setSearchQuery } = useContext(SearchContext);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize] = useState(9);
-    const [totalPages, setTotalPages] = useState(0);
-    const [totalUsers, setTotalUsers] = useState(0);
     const [token, setToken] = useState(localStorage.getItem('token') || '');
-    const [stats, setStats] = useState({
-        totalActive: 0,
-        totalAdmins: 0,
-        totalTeachers: 0,
-        totalStudents: 0
-    });
+    const [roleFilter, setRoleFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [creatingUser, setCreatingUser] = useState(false);
+    const [createUserError, setCreateUserError] = useState(null);
+    const [createUserSuccess, setCreateUserSuccess] = useState(null);
 
     useEffect(() => {
         if (!token) return;
@@ -37,24 +33,8 @@ const AdminUsersPage = () => {
                 setLoading(true);
                 setError(null);
 
-                const url = `/api/user/users?PageNumber=${pageNumber}&PageSize=${pageSize}`;
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
+                const data = await getUsersPage({ pageNumber: 1, pageSize: 1000 });
                 setUsers(data.items || []);
-                setTotalPages(data.totalPage || 0);
-                setTotalUsers(data.totalItemCount || 0);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -62,56 +42,41 @@ const AdminUsersPage = () => {
             }
         };
 
-        const fetchAllUsersForStats = async () => {
-            try {
-                const url = `/api/user/users?PageNumber=1&PageSize=1000`;
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const data = await response.json();
-                const allUsers = data.items || [];
-                
-
-                setStats({
-                    totalActive: allUsers.filter(u => u.isActive && !u.isBlocked).length,
-                    totalAdmins: allUsers.filter(u => u.role === 'Admin').length,
-                    totalTeachers: allUsers.filter(u => u.role === 'Teacher').length,
-                    totalStudents: allUsers.filter(u => u.role === 'Student').length
-                });
-            } catch (err) {
-                console.error('Error fetching stats:', err);
-            }
-        };
-
         fetchUsers();
-        fetchAllUsersForStats();
-    }, [pageNumber, pageSize, token]);
+    }, [token]);
+
+    const filteredUsers = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+
+        return users.filter((user) => {
+            const matchesQuery = !query || [user.firstName, user.lastName, user.username, user.email].some((field) =>
+                String(field || '').toLowerCase().includes(query)
+            );
+            const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+            const statusValue = user.isBlocked ? 'blocked' : user.isActive ? 'active' : 'inactive';
+            const matchesStatus = statusFilter === 'all' || statusValue === statusFilter;
+
+            return matchesQuery && matchesRole && matchesStatus;
+        });
+    }, [roleFilter, searchQuery, statusFilter, users]);
+
+    const totalPagesFiltered = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
+    const safePageNumber = Math.min(pageNumber, totalPagesFiltered);
+    const pageUsers = filteredUsers.slice((safePageNumber - 1) * pageSize, safePageNumber * pageSize);
 
     const handleLogout = () => {
         setToken('');
         localStorage.removeItem('token');
         setUsers([]);
-        setStats({
-            totalActive: 0,
-            totalAdmins: 0,
-            totalTeachers: 0,
-            totalStudents: 0
-        });
         setPageNumber(1);
-        setTotalPages(0);
-        setTotalUsers(0);
         setError(null);
         window.location.href = '/admin';
+    };
+
+    const refreshUsers = async () => {
+        const data = await getUsersPage({ pageNumber: 1, pageSize: 1000 });
+        setUsers(data.items || []);
+        setPageNumber(1);
     };
 
     const handleDeleteClick = (user) => {
@@ -132,65 +97,32 @@ const AdminUsersPage = () => {
         setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/user/${userToDelete.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || `HTTP ${response.status}`);
-            }
+            await deleteUser(userToDelete.id);
 
             setShowDeleteModal(false);
             setUserToDelete(null);
 
-            const url = `/api/user/users?PageNumber=${pageNumber}&PageSize=${pageSize}`;
-            const refreshResponse = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (refreshResponse.ok) {
-                const data = await refreshResponse.json();
-                setUsers(data.items || []);
-                setTotalPages(data.totalPage || 0);
-                setTotalUsers(data.totalItemCount || 0);
-
-                if (data.items.length === 0 && pageNumber > 1) {
-                    setPageNumber(prev => prev - 1);
-                }
-            }
-
-            const statsUrl = `/api/user/users?PageNumber=1&PageSize=1000`;
-            const statsResponse = await fetch(statsUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (statsResponse.ok) {
-                const statsData = await statsResponse.json();
-                const allUsers = statsData.items || [];
-                
-                setStats({
-                    totalActive: allUsers.filter(u => u.isActive && !u.isBlocked).length,
-                    totalAdmins: allUsers.filter(u => u.role === 'Admin').length,
-                    totalTeachers: allUsers.filter(u => u.role === 'Teacher').length,
-                    totalStudents: allUsers.filter(u => u.role === 'Student').length
-                });
-            }
+            await refreshUsers();
         } catch (err) {
             setDeleteError(err.message || 'Nie udało się usunąć użytkownika');
         } finally {
             setDeleting(false);
+        }
+    };
+
+    const handleCreateUser = async (payload) => {
+        setCreatingUser(true);
+        setCreateUserError(null);
+
+        try {
+            await createUser(payload);
+            await refreshUsers();
+            setShowCreateModal(false);
+            setCreateUserSuccess('Użytkownik został utworzony.');
+        } catch (err) {
+            setCreateUserError(err.message || 'Nie udało się utworzyć użytkownika');
+        } finally {
+            setCreatingUser(false);
         }
     };
 
@@ -200,41 +132,95 @@ const AdminUsersPage = () => {
 
     return (
         <AdminLayout onLogout={handleLogout}>
-            {/* Page Header */}
             <div className="admin-users__header">
                 <div>
                     <h1>Użytkownicy</h1>
-                    <p>Zarządzaj wszystkimi użytkownikami platformy</p>
+                    <p>Zarządzaj wszystkimi użytkownikami platformy. Wyniki: {filteredUsers.length}</p>
                 </div>
-                <button className="admin-users__btn admin-users__btn--primary">
+                <button className="admin-users__btn admin-users__btn--primary" onClick={() => setShowCreateModal(true)}>
                     <span className="material-symbols-outlined">add_circle</span>
                     <span>Dodaj użytkownika</span>
                 </button>
             </div>
 
-            {/* Stats Cards */}
-            <UserStatsCards 
-                totalUsers={totalUsers}
-                stats={stats}
-            />
+            <div className="admin-users__filters">
+                <div className="admin-users__search-wrapper">
+                    <span className="material-symbols-outlined" style={{ color: '#6b7280' }}>search</span>
+                    <input
+                        value={searchQuery}
+                        onChange={(event) => {
+                            setSearchQuery(event.target.value);
+                            setPageNumber(1);
+                        }}
+                        placeholder="Szukaj po imieniu, nazwisku, loginie lub emailu"
+                    />
+                </div>
+
+                <div className="admin-users__filters-actions">
+                    <select
+                        className="admin-users__filter-select"
+                        value={roleFilter}
+                        onChange={(event) => {
+                            setRoleFilter(event.target.value);
+                            setPageNumber(1);
+                        }}
+                    >
+                        <option value="all">Wszystkie role</option>
+                        <option value="Admin">Administratorzy</option>
+                        <option value="Teacher">Nauczyciele</option>
+                        <option value="Student">Studenci</option>
+                    </select>
+
+                    <select
+                        className="admin-users__filter-select"
+                        value={statusFilter}
+                        onChange={(event) => {
+                            setStatusFilter(event.target.value);
+                            setPageNumber(1);
+                        }}
+                    >
+                        <option value="all">Wszystkie statusy</option>
+                        <option value="active">Aktywni</option>
+                        <option value="inactive">Nieaktywni</option>
+                        <option value="blocked">Zablokowani</option>
+                    </select>
+
+                    <button
+                        type="button"
+                        className="admin-users__clear-btn"
+                        onClick={() => {
+                            setSearchQuery('');
+                            setRoleFilter('all');
+                            setStatusFilter('all');
+                            setPageNumber(1);
+                        }}
+                    >
+                        Wyczyść filtry
+                    </button>
+                </div>
+            </div>
+
+            {createUserSuccess && (
+                <div className="admin-users__success" style={{ marginBottom: '1rem' }}>
+                    {createUserSuccess}
+                </div>
+            )}
 
             {/* Error Message */}
             <ErrorAlert error={error} onClose={() => setError(null)} />
 
-            {/* Users Table */}
             <UsersTable 
-                users={users}
+                users={pageUsers}
                 loading={loading}
                 onDeleteClick={handleDeleteClick}
             />
 
-            {/* Pagination */}
-            {totalPages > 1 && (
+            {totalPagesFiltered > 1 && (
                 <UsersPagination 
-                    currentPage={pageNumber}
-                    totalPages={totalPages}
+                    currentPage={safePageNumber}
+                    totalPages={totalPagesFiltered}
                     onPageChange={setPageNumber}
-                    totalItems={totalUsers}
+                    totalItems={filteredUsers.length}
                     itemsPerPage={pageSize}
                 />
             )}
@@ -247,6 +233,17 @@ const AdminUsersPage = () => {
                 error={deleteError}
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
+            />
+
+            <CreateUserModal
+                show={showCreateModal}
+                loading={creatingUser}
+                error={createUserError}
+                onSubmit={handleCreateUser}
+                onCancel={() => {
+                    setShowCreateModal(false);
+                    setCreateUserError(null);
+                }}
             />
         </AdminLayout>
     );

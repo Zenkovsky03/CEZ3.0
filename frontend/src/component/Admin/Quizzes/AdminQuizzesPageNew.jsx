@@ -24,6 +24,10 @@ function AdminQuizzesPageNew() {
 		navigate(`/admin/quizzes/students/${studentId}`);
 	};
 
+	const openCreateQuizPage = () => {
+		navigate('/admin/quizzes/create');
+	};
+
 	if (!token) {
 		return null;
 	}
@@ -37,7 +41,7 @@ function AdminQuizzesPageNew() {
 							<h1>Quizy i Oceny</h1>
 							<p>Zarzadzaj arkuszami egzaminacyjnymi i wynikami studentow</p>
 						</div>
-						<button type="button" className="admin-quizzes__add-btn">
+						<button type="button" className="admin-quizzes__add-btn" onClick={openCreateQuizPage}>
 							<span className="material-symbols-outlined">add</span>
 							<span>Dodaj nowy quiz</span>
 						</button>

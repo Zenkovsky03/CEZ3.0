@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { SearchContext } from '../../../context/SearchContext';
 import './AdminLayout.scss';
 
 const AdminLayout = ({ children, onLogout }) => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { searchQuery, setSearchQuery } = useContext(SearchContext);
     const [user] = useState({
         name: 'Admin',
         email: 'admin@cez.com'
     });
 
     const navItems = [
-        { name: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard', active: false },
         { name: 'Użytkownicy', icon: 'group', path: '/admin/users', active: true },
         { name: 'Kursy', icon: 'school', path: '/admin/courses', active: false },
         { name: 'Quizy i Oceny', icon: 'quiz', path: '/admin/quizzes', active: false },
         { name: 'Powiadomienia', icon: 'notifications', path: '/admin/notifications', active: false },
-        { name: 'Treści', icon: 'folder_open', path: '/admin/content', active: false },
         { name: 'Statystyki', icon: 'bar_chart', path: '/admin/stats', active: false },
     ];
 
@@ -68,12 +69,12 @@ const AdminLayout = ({ children, onLogout }) => {
                     </div>
                     <div className="admin-layout__user-actions">
                         <button
-                            className="admin-layout__user-btn admin-layout__user-btn--settings admin-layout__user-btn--disabled"
-                            disabled
-                            title="W trakcie realizacji"
+                            className="admin-layout__user-btn admin-layout__user-btn--settings"
+                            title="Ustawienia"
+                            onClick={() => navigate('/admin/settings')}
                         >
                             <span className="material-symbols-outlined">settings</span>
-                            <span>Ustawienia (w trakcie realizacji)</span>
+                            <span>Ustawienia</span>
                         </button>
                         <button 
                             onClick={onLogout}
@@ -93,24 +94,6 @@ const AdminLayout = ({ children, onLogout }) => {
                     <div className="admin-layout__header-content">
                         <h2>Panel Administracyjny</h2>
                         <div className="admin-layout__header-actions">
-                            {/* Search */}
-                            <div className="admin-layout__search">
-                                <input
-                                    type="text"
-                                    placeholder="Szukaj użytkownika, kursu..."
-                                />
-                                <span className="material-symbols-outlined">
-                                    search
-                                </span>
-                            </div>
-                            
-                            {/* Buttons */}
-                            <button className="admin-layout__header-btn">
-                                <span className="material-symbols-outlined">notifications</span>
-                            </button>
-                            <button className="admin-layout__header-btn">
-                                <span className="material-symbols-outlined">help</span>
-                            </button>
                         </div>
                     </div>
                 </header>

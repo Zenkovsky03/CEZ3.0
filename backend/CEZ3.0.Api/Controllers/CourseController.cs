@@ -261,7 +261,7 @@ public class CourseController : ControllerBase
         try
         {
             ObjectId teacherId;
-            if (ObjectId.TryParse(teacher.TeacherId, out teacherId))
+            if (!ObjectId.TryParse(teacher.TeacherId, out teacherId))
             {
                 return BadRequest(new ErrorResponse { Message = "Invalid TeacherId format." });
             }

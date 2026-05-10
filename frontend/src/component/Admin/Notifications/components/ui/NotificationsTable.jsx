@@ -32,15 +32,12 @@ function NotificationChannels({ channels }) {
     );
 }
 
-function NotificationsTable({ items, selectedId, onSelect }) {
+function NotificationsTable({ items, onEditNotification, onDeleteNotification }) {
     return (
         <div className="admin-notifications__table-card">
             <table className="admin-notifications__table">
                 <thead>
                     <tr>
-                        <th>
-                            <input type="checkbox" aria-label="Zaznacz wszystkie" />
-                        </th>
                         <th>Tytul</th>
                         <th>Typ</th>
                         <th className="admin-notifications__th-center">Kanal</th>
@@ -52,19 +49,7 @@ function NotificationsTable({ items, selectedId, onSelect }) {
 
                 <tbody>
                     {items.map((item) => (
-                        <tr
-                            key={item.id}
-                            className={item.id === selectedId ? 'admin-notifications__row--selected' : ''}
-                            onClick={() => onSelect(item.id)}
-                        >
-                            <td>
-                                <input
-                                    type="checkbox"
-                                    aria-label={`Zaznacz ${item.title}`}
-                                    onClick={(e) => e.stopPropagation()}
-                                />
-                            </td>
-
+                        <tr key={item.id}>
                             <td>
                                 <p className="admin-notifications__title">{item.title}</p>
                                 <p className="admin-notifications__subtitle">{item.audience}</p>
@@ -85,17 +70,20 @@ function NotificationsTable({ items, selectedId, onSelect }) {
                             <td className="admin-notifications__date">{item.dateLabel}</td>
 
                             <td className="admin-notifications__td-right">
-                                <div className="admin-notifications__actions" onClick={(e) => e.stopPropagation()}>
-                                    <button type="button" aria-label="Podglad">
-                                        <span className="material-symbols-outlined">visibility</span>
-                                    </button>
-                                    <button type="button" aria-label="Edytuj">
+                                <div className="admin-notifications__actions">
+                                    <button 
+                                        type="button" 
+                                        aria-label="Edytuj"
+                                        onClick={() => onEditNotification(item.id)}
+                                    >
                                         <span className="material-symbols-outlined">edit</span>
                                     </button>
-                                    <button type="button" aria-label="Duplikuj">
-                                        <span className="material-symbols-outlined">content_copy</span>
-                                    </button>
-                                    <button type="button" aria-label="Usun" className="is-danger">
+                                    <button 
+                                        type="button" 
+                                        aria-label="Usun" 
+                                        className="is-danger"
+                                        onClick={() => onDeleteNotification(item.id)}
+                                    >
                                         <span className="material-symbols-outlined">delete</span>
                                     </button>
                                 </div>

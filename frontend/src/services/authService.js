@@ -1,7 +1,10 @@
 const { VITE_BASE_API_URL: baseUrl } = import.meta.env;
 
+const normalizedBaseUrl = (baseUrl || '').replace(/\/$/, '');
+const apiBase = normalizedBaseUrl ? `${normalizedBaseUrl}/api` : '/api';
+
 async function request(path, body) {
-    const res = await fetch(`${baseUrl}/api${path}`, {
+    const res = await fetch(`${apiBase}${path}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

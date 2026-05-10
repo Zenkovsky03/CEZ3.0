@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import CourseForm from './CourseForm.component';
-import { createCourse, getCourseById, updateCourse } from '../../../services/courseService';
+import { assignTeacherToCourse, createCourse, getCourseById, updateCourse } from '../../../services/courseService';
+import { getUsersPage } from '../../../services/adminApi';
 import './CourseForm.scss';
 
 const CourseFormContainer = ({ isEditMode = false }) => {
@@ -9,6 +10,8 @@ const CourseFormContainer = ({ isEditMode = false }) => {
     const { id } = useParams();
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [teachers, setTeachers] = useState([]);
+    const [assignedTeacherId, setAssignedTeacherId] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -24,6 +27,21 @@ const CourseFormContainer = ({ isEditMode = false }) => {
             fetchCourseData(id);
         }
     }, [isEditMode, id]);
+
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const data = await getUsersPage({ pageNumber: 1, pageSize: 1000, role: 'Teacher' });
+                setTeachers(data.items || []);
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+            }
+        };
+
+        if (!isEditMode) {
+            fetchTeachers();
+        }
+    }, [isEditMode]);
 
     const fetchCourseData = async (courseId) => {
         try {
@@ -54,6 +72,10 @@ const CourseFormContainer = ({ isEditMode = false }) => {
         }));
     };
 
+    const handleTeacherChange = (e) => {
+        setAssignedTeacherId(e.target.value);
+    };
+
     const togglePasswordVisibility = () => {
         setShowPassword(prev => !prev);
     };
@@ -81,7 +103,12 @@ const CourseFormContainer = ({ isEditMode = false }) => {
                     IsPasswordProtected: formData.isPasswordProtected,
                     Password: formData.isPasswordProtected ? formData.password : null
                 };
-                await createCourse(createPayload);
+                const createdCourse = await createCourse(createPayload);
+                const createdCourseId = createdCourse?.CourseId || createdCourse?.courseId || createdCourse?.id;
+
+                if (createdCourseId && assignedTeacherId) {
+                    await assignTeacherToCourse(createdCourseId, assignedTeacherId);
+                }
             }
 
             navigate('/courses');
@@ -105,6 +132,9 @@ const CourseFormContainer = ({ isEditMode = false }) => {
                 showPassword={showPassword}
                 togglePasswordVisibility={togglePasswordVisibility}
                 isEditMode={isEditMode}
+                teachers={teachers}
+                assignedTeacherId={assignedTeacherId}
+                onTeacherChange={handleTeacherChange}
             />
         </form>
     );

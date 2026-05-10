@@ -1,7 +1,7 @@
 .admin-notifications {
     &__layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 22rem;
+        grid-template-columns: 1fr;
         gap: 1.25rem;
         align-items: start;
     }

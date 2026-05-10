@@ -1,6 +1,6 @@
 import React from 'react';
 
-function NotificationsHeader() {
+function NotificationsHeader({ onCreateClick }) {
     return (
         <div className="admin-notifications__header">
             <div>
@@ -8,7 +8,11 @@ function NotificationsHeader() {
                 <p>Zarzadzaj komunikatami, alertami i przypomnieniami</p>
             </div>
 
-            <button type="button" className="admin-notifications__create-btn">
+            <button 
+                type="button" 
+                className="admin-notifications__create-btn"
+                onClick={onCreateClick}
+            >
                 <span className="material-symbols-outlined">add</span>
                 <span>Utworz powiadomienie</span>
             </button>
