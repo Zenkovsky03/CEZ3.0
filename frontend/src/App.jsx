@@ -12,6 +12,18 @@ import EditUserPage from './component/Admin/Users/pages/EditUserPage';
 import CourseList from "./component/Course/CourseList";
 import CourseStructure from "./component/Course/CourseStructure";
 import CalendarPage from './component/Calendar';
+import AssignmentsList from './component/Assignments/AssignmentsList';
+import QuizSolve from './component/Assignments/QuizSolve';
+import HomeworkSubmit from './component/Assignments/HomeworkSubmit';
+import UngradedHomework from './component/Assignments/UngradedHomework';
+import MessagesPage from './component/Messages/MessagesPage';
+import ForumList from './component/Forum/ForumList';
+import ForumThread from './component/Forum/ForumThread';
+import LessonView from './component/Course/LessonView';
+import ResetPassword from './component/ResetPassword/ResetPassword';
+import CreateAnnouncement from './component/Announcements/CreateAnnouncement';
+import AnnouncementDetails from './component/Announcements/AnnouncementDetails';
+import CreateEvent from './component/Events/CreateEvent';
 
 function App() {
     return (
@@ -21,12 +33,24 @@ function App() {
                     <Route path="/" element={<Home/>}/>
                     <Route path="/register" element={<RegistrationPage/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
+                    <Route path="/reset-password" element={<ResetPassword/>}/>
                     <Route path="/courses" element={<CourseList/>}/>
                     <Route path="/courses/create" element={<CourseCreate/>}/>
                     <Route path="/courses/:id/edit" element={<CourseCreate isEditMode={true}/>}/>
-                    <Route path="/courses/:id" element={<CourseDetails/>}/>
                     <Route path="/courses/:id/structure" element={<CourseStructure />} />
+                    <Route path="/courses/:cId/lessons/:lId" element={<LessonView/>}/>
+                    <Route path="/courses/:id" element={<CourseDetails/>}/>
                     <Route path="/calendar" element={<CalendarPage/>}/>
+                    <Route path="/events/create" element={<CreateEvent/>}/>
+                    <Route path="/assignments" element={<AssignmentsList/>}/>
+                    <Route path="/assignments/ungraded" element={<UngradedHomework/>}/>
+                    <Route path="/assignments/:id/quiz" element={<QuizSolve/>}/>
+                    <Route path="/assignments/:id/homework" element={<HomeworkSubmit/>}/>
+                    <Route path="/messages" element={<MessagesPage/>}/>
+                    <Route path="/forum" element={<ForumList/>}/>
+                    <Route path="/forum/:id" element={<ForumThread/>}/>
+                    <Route path="/announcements/create" element={<CreateAnnouncement/>}/>
+                    <Route path="/announcements/:id" element={<AnnouncementDetails/>}/>
                     <Route path="/admin" element={<AdminLoginPage/>}/>
                     <Route path="/admin/users" element={<AdminUsersPage/>}/>
                     <Route path="/admin/users/edit/:id" element={<EditUserPage/>}/>
