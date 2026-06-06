@@ -1,5 +1,5 @@
-// CourseStructure/CourseStructure.component.jsx
 import React from 'react';
+import Header from '../../Header';
 import CourseStructureHeader from '../CourseStructureHeader';
 import ModuleList from '../ModuleList';
 import './CourseStructure.scss';
@@ -16,6 +16,7 @@ const CourseStructure = ({
     if (loading) {
         return (
             <div className="page-wrapper-course-structure">
+                <Header variant="dashboard" />
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
                     <p>Ładowanie struktury kursu...</p>
@@ -27,6 +28,7 @@ const CourseStructure = ({
     if (error) {
         return (
             <div className="page-wrapper-course-structure">
+                <Header variant="dashboard" />
                 <div className="error-container">
                     <p>{error}</p>
                     <button onClick={() => window.location.reload()} className="retry-button">
@@ -39,6 +41,7 @@ const CourseStructure = ({
 
     return (
         <div className="page-wrapper-course-structure">
+            <Header variant="dashboard" />
             <div className="main-content">
                 <CourseStructureHeader
                     courseName={course?.name}

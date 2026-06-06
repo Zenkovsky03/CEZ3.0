@@ -1,11 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import AddParticipantModal from './AddParticipantModal.component';
+import { getUsersByRole } from '../../../services/userService';
 import './AddParticipantModal.scss';
 
 const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticipants }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
+    const existingIdsRef = useRef([]);
+
+    useEffect(() => {
+        existingIdsRef.current = (existingParticipants || []).map(p => p.id);
+    }, [existingParticipants]);
 
     // Debounce search
     useEffect(() => {
@@ -33,21 +39,25 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         try {
             setLoading(true);
 
-            // TODO: If backend exposes dedicated user search, replace this call.
-            const response = await fetch('/api/user/ByRole?r=Student');
-            const users = await response.json();
+            const roles = ['Student', 'Teacher'];
+            const results = await Promise.allSettled(
+                roles.map(r => getUsersByRole(r))
+            );
+            const users = results
+                .filter(r => r.status === 'fulfilled')
+                .flatMap(r => r.value);
             const lowerQuery = query.toLowerCase();
+            const existingIds = existingIdsRef.current;
             const filtered = (Array.isArray(users) ? users : []).filter(user => {
                 const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-                const email = user.email.toLowerCase();
-                const username = user.username.toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                const username = (user.username || '').toLowerCase();
 
                 return fullName.includes(lowerQuery) ||
                     email.includes(lowerQuery) ||
                     username.includes(lowerQuery);
             }).filter(
-                // Exclude already existing participants
-                user => !existingParticipants.some(p => p.id === user.id)
+                user => !existingIds.includes(user.id)
             );
 
             setSearchResults(filtered);
@@ -57,7 +67,7 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         } finally {
             setLoading(false);
         }
-    }, [existingParticipants]);
+    }, []);
 
     const existingParticipantIds = existingParticipants.map(p => p.id);
 

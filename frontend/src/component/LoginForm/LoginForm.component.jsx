@@ -7,15 +7,7 @@ const LoginForm = ({ showPassword, togglePasswordVisibility, onSubmit, loading, 
     return (
         <form className="form-container" onSubmit={onSubmit}>
             {error && (
-                <div style={{
-                    padding: '0.75rem 1rem',
-                    backgroundColor: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    borderRadius: '0.5rem',
-                    color: '#991b1b',
-                    fontSize: '0.875rem',
-                    marginBottom: '1rem'
-                }}>
+                <div className="error-message">
                     {error}
                 </div>
             )}
@@ -31,9 +23,9 @@ const LoginForm = ({ showPassword, togglePasswordVisibility, onSubmit, loading, 
             </div>
 
             <div className="input-group">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="password-label-row">
                     <label className="input-label">Hasło</label>
-                    <Link className="link" to="/password-reset" style={{ fontSize: '0.875rem', color: 'rgb(58 124 165)', textDecoration: 'none' }}>Nie pamiętasz hasła?</Link>
+                    <Link className="forgot-password-link" to="/reset-password">Nie pamiętasz hasła?</Link>
                 </div>
                 <PasswordField
                     label={""}

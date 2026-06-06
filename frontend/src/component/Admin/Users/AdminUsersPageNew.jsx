@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../Layout/AdminLayout';
+import { getUsers, getAllUsers, deleteUser } from '../../../services/userService';
 import { 
     UserStatsCards, 
     UsersTable, 
@@ -10,6 +12,7 @@ import {
 import './AdminUsersPageNew.scss';
 
 const AdminUsersPage = () => {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -17,7 +20,6 @@ const AdminUsersPage = () => {
     const [pageSize] = useState(9);
     const [totalPages, setTotalPages] = useState(0);
     const [totalUsers, setTotalUsers] = useState(0);
-    const [token, setToken] = useState(localStorage.getItem('token') || '');
     const [stats, setStats] = useState({
         totalActive: 0,
         totalAdmins: 0,
@@ -30,76 +32,47 @@ const AdminUsersPage = () => {
     const [deleteError, setDeleteError] = useState(null);
 
     useEffect(() => {
-        if (!token) return;
+        const fetchData = async () => {
+            setLoading(true);
+            setError(null);
 
-        const fetchUsers = async () => {
             try {
-                setLoading(true);
-                setError(null);
+                const [usersData, allUsersData] = await Promise.allSettled([
+                    getUsers(pageNumber, pageSize),
+                    getAllUsers()
+                ]);
 
-                const url = `/api/user/users?PageNumber=${pageNumber}&PageSize=${pageSize}`;
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                if (usersData.status === 'fulfilled') {
+                    const data = usersData.value;
+                    setUsers(data.items || []);
+                    setTotalPages(data.totalPage || 0);
+                    setTotalUsers(data.totalItemCount || 0);
+                } else {
+                    setError(usersData.reason?.message || 'Nie udało się pobrać użytkowników');
                 }
 
-                const data = await response.json();
-                setUsers(data.items || []);
-                setTotalPages(data.totalPage || 0);
-                setTotalUsers(data.totalItemCount || 0);
-            } catch (err) {
-                setError(err.message);
+                if (allUsersData.status === 'fulfilled') {
+                    const allUsers = allUsersData.value.items || [];
+                    setStats({
+                        totalActive: allUsers.filter(u => u.isActive && !u.isBlocked).length,
+                        totalAdmins: allUsers.filter(u => u.role === 'Admin').length,
+                        totalTeachers: allUsers.filter(u => u.role === 'Teacher').length,
+                        totalStudents: allUsers.filter(u => u.role === 'Student').length
+                    });
+                }
+            } catch {
+                setError('Wystąpił błąd podczas ładowania danych');
             } finally {
                 setLoading(false);
             }
         };
 
-        const fetchAllUsersForStats = async () => {
-            try {
-                const url = `/api/user/users?PageNumber=1&PageSize=1000`;
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const data = await response.json();
-                const allUsers = data.items || [];
-                
-
-                setStats({
-                    totalActive: allUsers.filter(u => u.isActive && !u.isBlocked).length,
-                    totalAdmins: allUsers.filter(u => u.role === 'Admin').length,
-                    totalTeachers: allUsers.filter(u => u.role === 'Teacher').length,
-                    totalStudents: allUsers.filter(u => u.role === 'Student').length
-                });
-            } catch (err) {
-                console.error('Error fetching stats:', err);
-            }
-        };
-
-        fetchUsers();
-        fetchAllUsersForStats();
-    }, [pageNumber, pageSize, token]);
+        fetchData();
+    }, [pageNumber, pageSize]);
 
     const handleLogout = () => {
-        setToken('');
         localStorage.removeItem('token');
+        localStorage.removeItem('auth_user');
         setUsers([]);
         setStats({
             totalActive: 0,
@@ -132,32 +105,18 @@ const AdminUsersPage = () => {
         setDeleteError(null);
 
         try {
-            const response = await fetch(`/api/user/${userToDelete.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || `HTTP ${response.status}`);
-            }
+            await deleteUser(userToDelete.id);
 
             setShowDeleteModal(false);
             setUserToDelete(null);
 
-            const url = `/api/user/users?PageNumber=${pageNumber}&PageSize=${pageSize}`;
-            const refreshResponse = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const [usersData, allUsersData] = await Promise.allSettled([
+                getUsers(pageNumber, pageSize),
+                getAllUsers()
+            ]);
 
-            if (refreshResponse.ok) {
-                const data = await refreshResponse.json();
+            if (usersData.status === 'fulfilled') {
+                const data = usersData.value;
                 setUsers(data.items || []);
                 setTotalPages(data.totalPage || 0);
                 setTotalUsers(data.totalItemCount || 0);
@@ -167,19 +126,8 @@ const AdminUsersPage = () => {
                 }
             }
 
-            const statsUrl = `/api/user/users?PageNumber=1&PageSize=1000`;
-            const statsResponse = await fetch(statsUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (statsResponse.ok) {
-                const statsData = await statsResponse.json();
-                const allUsers = statsData.items || [];
-                
+            if (allUsersData.status === 'fulfilled') {
+                const allUsers = allUsersData.value.items || [];
                 setStats({
                     totalActive: allUsers.filter(u => u.isActive && !u.isBlocked).length,
                     totalAdmins: allUsers.filter(u => u.role === 'Admin').length,
@@ -194,10 +142,6 @@ const AdminUsersPage = () => {
         }
     };
 
-    if (!token) {
-        return null;
-    }
-
     return (
         <AdminLayout onLogout={handleLogout}>
             {/* Page Header */}
@@ -206,7 +150,10 @@ const AdminUsersPage = () => {
                     <h1>Użytkownicy</h1>
                     <p>Zarządzaj wszystkimi użytkownikami platformy</p>
                 </div>
-                <button className="admin-users__btn admin-users__btn--primary">
+                <button
+                    onClick={() => navigate('/admin/users/edit/new')}
+                    className="admin-users__btn admin-users__btn--primary"
+                >
                     <span className="material-symbols-outlined">add_circle</span>
                     <span>Dodaj użytkownika</span>
                 </button>

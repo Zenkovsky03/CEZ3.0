@@ -1,22 +1,19 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './AdminLayout.scss';
+import AuthContext from '../../../context/AuthContext';
 
 const AdminLayout = ({ children, onLogout }) => {
     const location = useLocation();
-    const [user] = useState({
-        name: 'Admin',
-        email: 'admin@cez.com'
-    });
+    const { user } = useContext(AuthContext);
+
+    const displayName = user
+        ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Admin'
+        : 'Admin';
+    const displayEmail = user?.email || '';
 
     const navItems = [
-        { name: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard', active: false },
-        { name: 'Użytkownicy', icon: 'group', path: '/admin/users', active: true },
-        { name: 'Kursy', icon: 'school', path: '/admin/courses', active: false },
-        { name: 'Quizy i Oceny', icon: 'quiz', path: '/admin/quizzes', active: false },
-        { name: 'Powiadomienia', icon: 'notifications', path: '/admin/notifications', active: false },
-        { name: 'Treści', icon: 'folder_open', path: '/admin/content', active: false },
-        { name: 'Statystyki', icon: 'bar_chart', path: '/admin/stats', active: false },
+        { name: 'Użytkownicy', icon: 'group', path: '/admin/users' },
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -59,11 +56,11 @@ const AdminLayout = ({ children, onLogout }) => {
                 <div className="admin-layout__user-section">
                     <div className="admin-layout__user-profile">
                         <div className="admin-layout__user-avatar">
-                            {user.name[0]}
+                            {displayName[0] || 'A'}
                         </div>
                         <div className="admin-layout__user-info">
-                            <p className="admin-layout__user-info-name">{user.name}</p>
-                            <p className="admin-layout__user-info-email">{user.email}</p>
+                            <p className="admin-layout__user-info-name">{displayName}</p>
+                            <p className="admin-layout__user-info-email">{displayEmail}</p>
                         </div>
                     </div>
                     <div className="admin-layout__user-actions">

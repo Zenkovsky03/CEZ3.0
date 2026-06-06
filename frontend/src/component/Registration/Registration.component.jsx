@@ -85,7 +85,7 @@ const Registration = () => {
                         </div>
 
                         {/* Submit Button */}
-                        {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+                        {error && <div className="error-message">{error}</div>}
                         <button className="submit-button" type="submit">Zarejestruj się</button>
                     </form>
                     {/* Alternative Action Link */}

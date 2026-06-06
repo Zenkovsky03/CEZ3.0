@@ -1,32 +1,99 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../Header';
+import { getNearestAssignments } from '../../services/assignmentService';
+import { getCourses } from '../../services/courseService';
 import './AssignmentsList.scss';
-
-const STATIC_ASSIGNMENTS = [
-    { id: '1', title: 'Quiz z Rozdziału 3: Kolory i typografia', type: 'Quiz', course: 'UX/UI Design', dueDate: '2026-05-25T23:59:00', status: 'active' },
-    { id: '2', title: 'Test końcowy: Podstawy Pythona', type: 'Test', course: 'Wprowadzenie do Pythona', dueDate: '2026-06-01T23:59:00', status: 'active' },
-    { id: '3', title: 'Praca domowa: Projekt makiety UX', type: 'Homework', course: 'UX/UI Design', dueDate: '2026-05-20T23:59:00', status: 'submitted' },
-    { id: '4', title: 'Quiz z Rozdziału 1: Hello World', type: 'Quiz', course: 'Wprowadzenie do Pythona', dueDate: '2026-05-10T23:59:00', status: 'done', score: '8/10' },
-    { id: '5', title: 'Praca domowa: Analiza przypadku biznesowego', type: 'Homework', course: 'UX/UI Design', dueDate: '2026-05-30T23:59:00', status: 'active' },
-    { id: '6', title: 'Test z modułu 2: Listy i słowniki', type: 'Test', course: 'Wprowadzenie do Pythona', dueDate: '2026-05-15T23:59:00', status: 'done', score: '18/20' },
-];
 
 const TYPE_ICONS = { Quiz: 'quiz', Test: 'assignment', Homework: 'edit_document' };
 const TYPE_LABELS = { Quiz: 'Quiz', Test: 'Test', Homework: 'Praca domowa' };
-const STATUS_LABELS = { active: 'Aktywne', submitted: 'Oddana', done: 'Ukończone' };
-const STATUS_CLASSES = { active: 'status-active', submitted: 'status-submitted', done: 'status-done' };
-
-const formatDate = (iso) =>
-    new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(iso));
-
 const FILTERS = ['Wszystkie', 'Quiz', 'Test', 'Praca domowa'];
 
+const formatDate = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+};
+
 const AssignmentsList = () => {
+    const [assignments, setAssignments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [activeFilter, setActiveFilter] = useState('Wszystkie');
 
-    const filtered = STATIC_ASSIGNMENTS.filter(a =>
+    useEffect(() => {
+        let mounted = true;
+
+        const load = async () => {
+            setLoading(true);
+            try {
+                const [nearest, courses] = await Promise.allSettled([
+                    getNearestAssignments(),
+                    getCourses()
+                ]);
+
+                if (!mounted) return;
+
+                const items = [];
+                if (nearest.status === 'fulfilled') {
+                    const data = nearest.value;
+                    const list = data?.items || data?.Items || (Array.isArray(data) ? data : []);
+                    items.push(...list.map(a => ({
+                        id: a.id || a.assignmentId,
+                        title: a.title || a.assignmentTitle,
+                        type: a.taskType || 'Quiz',
+                        course: a.courseName || '',
+                        dueDate: a.dueDate || a.deadline,
+                        status: a.status || 'active',
+                        score: a.score
+                    })));
+                }
+
+                if (items.length === 0 && courses.status === 'fulfilled') {
+                    const courseList = courses.value?.items || courses.value?.Items || (Array.isArray(courses.value) ? courses.value : []);
+                    courseList.forEach(c => {
+                        if (c.name) {
+                            items.push({
+                                id: `course-${c.id}`,
+                                title: c.name,
+                                type: 'Homework',
+                                course: c.name,
+                                dueDate: c.endDate,
+                                status: 'active'
+                            });
+                        }
+                    });
+                }
+
+                setAssignments(items);
+            } catch (err) {
+                if (!mounted) return;
+                setError(err.message || 'Nie udało się pobrać zadań');
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+
+        load();
+        return () => { mounted = false; };
+    }, []);
+
+    const filtered = assignments.filter(a =>
         activeFilter === 'Wszystkie' || TYPE_LABELS[a.type] === activeFilter
+    );
+
+    if (loading) return (
+        <div className="page-wrapper-assignments">
+            <Header variant="dashboard" />
+            <div className="main-content"><p>Ładowanie zadań...</p></div>
+        </div>
+    );
+
+    if (error) return (
+        <div className="page-wrapper-assignments">
+            <Header variant="dashboard" />
+            <div className="main-content"><p className="error-message">{error}</p></div>
+        </div>
     );
 
     return (
@@ -46,42 +113,33 @@ const AssignmentsList = () => {
 
                 <div className="filter-tabs">
                     {FILTERS.map(f => (
-                        <button
-                            key={f}
-                            className={`filter-tab ${activeFilter === f ? 'active' : ''}`}
-                            onClick={() => setActiveFilter(f)}
-                        >
+                        <button key={f} className={`filter-tab ${activeFilter === f ? 'active' : ''}`} onClick={() => setActiveFilter(f)}>
                             {f}
                         </button>
                     ))}
                 </div>
 
                 <div className="assignments-list">
+                    {filtered.length === 0 && <p>Brak zadań w tej kategorii.</p>}
                     {filtered.map(a => (
                         <div key={a.id} className="assignment-card">
-                            <div className={`assignment-icon type-${a.type.toLowerCase()}`}>
-                                <span className="material-symbols-outlined">{TYPE_ICONS[a.type]}</span>
+                            <div className={`assignment-icon type-${(a.type || 'quiz').toLowerCase()}`}>
+                                <span className="material-symbols-outlined">{TYPE_ICONS[a.type] || 'assignment'}</span>
                             </div>
                             <div className="assignment-info">
                                 <h3 className="assignment-title">{a.title}</h3>
                                 <div className="assignment-meta">
-                                    <span className="type-chip">{TYPE_LABELS[a.type]}</span>
-                                    <span>{a.course}</span>
-                                    <span>·</span>
-                                    <span>Termin: {formatDate(a.dueDate)}</span>
+                                    <span className="type-chip">{TYPE_LABELS[a.type] || a.type}</span>
+                                    {a.course && <><span>{a.course}</span><span>·</span></>}
+                                    {a.dueDate && <span>Termin: {formatDate(a.dueDate)}</span>}
                                 </div>
                             </div>
                             <div className="assignment-right">
-                                <span className={`status-badge ${STATUS_CLASSES[a.status]}`}>
-                                    {STATUS_LABELS[a.status]}{a.score ? ` · ${a.score}` : ''}
+                                <span className={`status-badge ${a.status === 'active' ? 'status-active' : 'status-done'}`}>
+                                    {a.status === 'active' ? 'Aktywne' : 'Ukończone'}{a.score ? ` · ${a.score}` : ''}
                                 </span>
                                 {a.status === 'active' && (
-                                    <Link
-                                        to={a.type === 'Homework' ? `/assignments/${a.id}/homework` : `/assignments/${a.id}/quiz`}
-                                        className="btn-start"
-                                    >
-                                        Rozpocznij
-                                    </Link>
+                                    <Link to={`/assignments/${a.id}/quiz`} className="btn-start">Rozpocznij</Link>
                                 )}
                             </div>
                         </div>

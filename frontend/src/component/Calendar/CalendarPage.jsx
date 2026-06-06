@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
 import { getUserEvents } from '../../services/eventService';
 import Footer from '../Footer';
@@ -155,6 +155,8 @@ const CalendarPage = () => {
         return <Navigate to="/login" replace />;
     }
 
+    const canCreateEvents = user?.role === 'Admin' || user?.role === 'Teacher';
+
     return (
         <div className="dashboard-wrapper">
             <div className="dashboard-container">
@@ -168,9 +170,17 @@ const CalendarPage = () => {
                                     <h1 className="calendar-page__title">Kalendarz</h1>
                                     <p className="calendar-page__subtitle">Przeglądaj swoje wydarzenia i terminy w jednym miejscu.</p>
                                 </div>
-                                <div className="calendar-page__status">
-                                    <span className="material-symbols-outlined">event</span>
-                                    {plannedEvents.length} zaplanowanych wydarzeń
+                                <div className="calendar-page__hero-actions">
+                                    <div className="calendar-page__status">
+                                        <span className="material-symbols-outlined">event</span>
+                                        {plannedEvents.length} zaplanowanych wydarzeń
+                                    </div>
+                                    {canCreateEvents && (
+                                        <Link to="/events/create" className="calendar-page__btn">
+                                            <span className="material-symbols-outlined">add</span>
+                                            Dodaj wydarzenie
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
 

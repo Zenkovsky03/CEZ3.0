@@ -1,39 +1,33 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Header from '../Header';
+import { submitHomework } from '../../services/assignmentService';
 import './HomeworkSubmit.scss';
-
-const STATIC_HOMEWORK = {
-    title: 'Praca domowa: Projekt makiety UX',
-    course: 'UX/UI Design',
-    dueDate: '2026-05-20T23:59:00',
-    description: `Stwórz makietę (wireframe) dla mobilnej aplikacji e-commerce. Projekt powinien zawierać:
-    
-1. Ekran listy produktów z filtrowaniem i sortowaniem
-2. Ekran szczegółów produktu z galerią zdjęć
-3. Koszyk zakupowy z podsumowaniem zamówienia
-4. Ekran finalizacji zakupu
-
-Wymagania techniczne:
-- Użyj narzędzia Figma lub Adobe XD
-- Zachowaj spójność systemu designu
-- Opisz kluczowe interakcje w komentarzach
-
-Oddaj link do projektu lub plik PDF z makietami.`,
-};
-
-const formatDate = (iso) =>
-    new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 
 const HomeworkSubmit = () => {
     const { id } = useParams();
     const [submissionText, setSubmissionText] = useState('');
     const [attachmentUrl, setAttachmentUrl] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
+    const [saving, setSaving] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
+        setSaving(true);
+        setError('');
+
+        try {
+            await submitHomework(id, {
+                SubmissionText: submissionText.trim() || null,
+                AttachmentUrl: attachmentUrl.trim()
+            });
+            setSubmitted(true);
+        } catch (err) {
+            setError(err.message || 'Nie udało się przesłać pracy');
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (submitted) {
@@ -67,36 +61,9 @@ const HomeworkSubmit = () => {
                 </Link>
 
                 <div className="homework-grid">
-                    {/* Left: assignment details */}
-                    <div className="homework-details-card">
-                        <div className="hw-card-header">
-                            <div className="hw-icon">
-                                <span className="material-symbols-outlined">edit_document</span>
-                            </div>
-                            <div>
-                                <span className="hw-type-chip">Praca domowa</span>
-                                <p className="hw-course">{STATIC_HOMEWORK.course}</p>
-                            </div>
-                        </div>
-
-                        <h2 className="hw-title">{STATIC_HOMEWORK.title}</h2>
-
-                        <div className="hw-due">
-                            <span className="material-symbols-outlined">schedule</span>
-                            <span>Termin: <strong>{formatDate(STATIC_HOMEWORK.dueDate)}</strong></span>
-                        </div>
-
-                        <div className="hw-description-label">Opis zadania</div>
-                        <div className="hw-description">
-                            {STATIC_HOMEWORK.description.split('\n').map((line, i) => (
-                                <p key={i}>{line}</p>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Right: submission form */}
-                    <div className="submission-card">
+                    <div className="submission-card" style={{ gridColumn: '1 / -1', maxWidth: 600, margin: '0 auto' }}>
                         <h3 className="submission-title">Oddaj pracę</h3>
+                        {error && <div className="error-message">{error}</div>}
                         <form onSubmit={handleSubmit} className="submission-form">
                             <div className="form-group">
                                 <label className="form-label">
@@ -111,7 +78,6 @@ const HomeworkSubmit = () => {
                                     rows={6}
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label className="form-label">
                                     Link do pracy
@@ -128,16 +94,10 @@ const HomeworkSubmit = () => {
                                         required
                                     />
                                 </div>
-                                <p className="form-hint">Podaj link do Figmy, Google Drive, GitHub lub innego serwisu</p>
                             </div>
-
-                            <button
-                                type="submit"
-                                className="btn-submit"
-                                disabled={!attachmentUrl.trim()}
-                            >
+                            <button type="submit" className="btn-submit" disabled={!attachmentUrl.trim() || saving}>
                                 <span className="material-symbols-outlined">send</span>
-                                Wyślij pracę
+                                {saving ? 'Wysyłanie...' : 'Wyślij pracę'}
                             </button>
                         </form>
                     </div>

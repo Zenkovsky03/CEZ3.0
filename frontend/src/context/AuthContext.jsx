@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (payload) => {
         // Backend returns { message } - no auto-login after register
-        return await authService.register(payload);;
+        return await authService.register(payload);
     };
 
     const logout = () => setUser(null);

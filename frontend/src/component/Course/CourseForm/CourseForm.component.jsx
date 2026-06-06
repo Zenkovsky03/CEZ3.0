@@ -11,11 +11,10 @@ const CourseForm = ({
                         onChange,
                         showPassword,
                         togglePasswordVisibility,
-                        isEditMode = false,
-                        onSubmit
+                        isEditMode = false
                     }) => {
     return (
-        <div className="form-container" onSubmit={onSubmit}>
+        <div className="form-container">
             <div className="input-group">
                 <InputField
                     label="Nazwa kursu"

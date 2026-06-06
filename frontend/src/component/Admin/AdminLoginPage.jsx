@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLoginForm } from './Users/components/ui';
+import AuthContext from '../../context/AuthContext';
 
 const AdminLoginPage = () => {
     const navigate = useNavigate();
+    const { login, logout } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [loginData, setLoginData] = useState({ username: 'admin', password: 'Password123!' });
+    const [loginData, setLoginData] = useState({ username: '', password: '' });
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -14,22 +16,7 @@ const AdminLoginPage = () => {
         setError(null);
 
         try {
-            const response = await fetch('/api/user/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    login: loginData.username,
-                    password: loginData.password
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Nieprawidłowe dane logowania');
-            }
-
-            const data = await response.json();
+            const data = await login({ login: loginData.username, password: loginData.password });
 
             if (data.token) {
                 const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
@@ -42,10 +29,10 @@ const AdminLoginPage = () => {
                     : userRole === 'Admin';
 
                 if (!isAdmin) {
+                    logout();
                     throw new Error('Brak uprawnień administratora');
                 }
 
-                localStorage.setItem('token', data.token);
                 navigate('/admin/users');
             }
         } catch (err) {

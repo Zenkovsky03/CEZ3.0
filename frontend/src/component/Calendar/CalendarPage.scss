@@ -35,6 +35,13 @@
     font-size: 1rem;
 }
 
+.calendar-page__hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
 .calendar-page__status {
     display: inline-flex;
     align-items: center;
@@ -45,6 +52,28 @@
     color: #135bec;
     font-weight: 600;
     font-size: 0.875rem;
+}
+
+.calendar-page__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    background: rgb(58 124 165);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: background 0.15s;
+
+    &:hover {
+        background: rgb(48 104 145);
+    }
+
+    .material-symbols-outlined {
+        font-size: 1.1rem;
+    }
 }
 
 .calendar-card,

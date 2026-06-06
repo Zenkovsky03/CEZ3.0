@@ -76,6 +76,13 @@
         padding: 0.5rem 0;
     }
 
+    .conv-empty {
+        padding: 2rem 1.25rem;
+        text-align: center;
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+
     .conv-item {
         display: flex;
         align-items: center;
@@ -251,6 +258,24 @@
         gap: 0.75rem;
     }
 
+    .messages-empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: #9ca3af;
+
+        .material-symbols-outlined {
+            font-size: 2.5rem;
+        }
+
+        p {
+            font-size: 0.875rem;
+        }
+    }
+
     .message-bubble {
         display: flex;
         flex-direction: column;
@@ -352,5 +377,23 @@
         font-style: italic;
 
         .material-symbols-outlined { font-size: 1rem; }
+    }
+
+    .no-conv-selected {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        color: #9ca3af;
+
+        .material-symbols-outlined {
+            font-size: 3rem;
+        }
+
+        p {
+            font-size: 0.9375rem;
+        }
     }
 }

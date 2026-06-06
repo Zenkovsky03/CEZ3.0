@@ -3,15 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../Layout/AdminLayout';
 import { ErrorAlert, SuccessAlert, LoadingSpinner, Breadcrumb, ProfilePreview } from '../components/ui';
 import { FormField, RoleSelect, StatusRadioGroup } from '../components/forms';
+import { getAllUsers, updateUser, updateUserRole, blockUser, unblockUser, registerUser } from '../../../../services/userService';
 import '../AdminUsersPageNew.scss';
 
 const EditUserPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [token] = useState(localStorage.getItem('token') || '');
+    const isNewUser = id === 'new';
     
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!isNewUser);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -19,33 +20,22 @@ const EditUserPage = () => {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [role, setRole] = useState('Student');
     const [status, setStatus] = useState('Active');
     const [fieldErrors, setFieldErrors] = useState({});
     const [hasChanges, setHasChanges] = useState(false);
 
     useEffect(() => {
-        if (!token) {
-            navigate('/admin/users');
-            return;
-        }
+        if (isNewUser) return;
         
         const fetchUser = async () => {
             try {
                 setLoading(true);
                 setError(null);
                 
-                const response = await fetch(`/api/user/users?PageNumber=1&PageSize=1000`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Nie udało się pobrać danych użytkownika');
-                }
-
-                const data = await response.json();
+                const data = await getAllUsers();
                 const foundUser = data.items?.find(u => u.id === id);
                 
                 if (!foundUser) {
@@ -65,14 +55,13 @@ const EditUserPage = () => {
                 setStatus(foundUser.isBlocked ? 'Blocked' : (foundUser.isActive ? 'Active' : 'Inactive'));
             } catch (err) {
                 setError(err.message);
-                console.error('Error fetching user:', err);
             } finally {
                 setLoading(false);
             }
         };
         
         fetchUser();
-    }, [id, token, navigate]);
+    }, [id, navigate, isNewUser]);
     
     useEffect(() => {
         if (!user) return;
@@ -85,7 +74,7 @@ const EditUserPage = () => {
             status !== (user.isBlocked ? 'Blocked' : (user.isActive ? 'Active' : 'Inactive'));
         
         setHasChanges(hasModifications);
-    }, [firstName, lastName, email, role, status, user]);
+    }, [firstName, lastName, email, role, status, user, isNewUser]);
     
     useEffect(() => {
         const handleBeforeUnload = (e) => {
@@ -123,6 +112,17 @@ const EditUserPage = () => {
         } else if (email.length > 100) {
             errors.email = 'Adres e-mail nie może przekraczać 100 znaków';
         }
+
+        if (isNewUser) {
+            if (!password || password.length < 6) {
+                errors.password = 'Hasło musi mieć co najmniej 6 znaków';
+            } else if (password.length > 100) {
+                errors.password = 'Hasło nie może przekraczać 100 znaków';
+            }
+            if (password !== confirmPassword) {
+                errors.confirmPassword = 'Hasła nie są zgodne';
+            }
+        }
         
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
@@ -148,100 +148,43 @@ const EditUserPage = () => {
             const updatedFirstName = firstName.trim();
             const updatedLastName = lastName.trim();
             const updatedEmail = email.trim();
-            
-            const basicInfoResponse = await fetch(`/api/user/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    UserId: id,
+
+            if (isNewUser) {
+                await registerUser({
                     FirstName: updatedFirstName,
                     LastName: updatedLastName,
-                    Email: updatedEmail
-                })
-            });
-
-            if (!basicInfoResponse.ok) {
-                let errorMessage = 'Nie udało się zaktualizować danych użytkownika';
-                try {
-                    const errorData = await basicInfoResponse.json();
-                    errorMessage = errorData.message || errorData.Message || errorMessage;
-                } catch {
-                    const errorText = await basicInfoResponse.text();
-                    errorMessage = errorText || errorMessage;
-                }
-                throw new Error(errorMessage);
-            }
-
-            if (role !== user.role) {
-                const roleResponse = await fetch(`/api/user/${id}/role`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        UserId: id,
-                        Role: role
-                    })
+                    Email: updatedEmail,
+                    Login: username || updatedEmail,
+                    Password: password,
+                    ConfirmPassword: confirmPassword,
+                    Role: role
                 });
 
-                if (!roleResponse.ok) {
-                    let errorMessage = 'Nie udało się zmienić roli użytkownika';
-                    try {
-                        const errorData = await roleResponse.json();
-                        errorMessage = errorData.message || errorData.Message || errorMessage;
-                    } catch {
-                        const errorText = await roleResponse.text();
-                        errorMessage = errorText || errorMessage;
-                    }
-                    throw new Error(errorMessage);
-                }
+                setSuccessMessage('Użytkownik został utworzony pomyślnie!');
+                setTimeout(() => {
+                    navigate('/admin/users');
+                }, 2000);
+                return;
+            }
+            
+            await updateUser(id, {
+                UserId: id,
+                FirstName: updatedFirstName,
+                LastName: updatedLastName,
+                Email: updatedEmail
+            });
+
+            if (role !== user.role) {
+                await updateUserRole(id, role);
             }
 
             const userWasBlocked = user.isBlocked;
             const shouldBeBlocked = status === 'Blocked';
 
             if (userWasBlocked && !shouldBeBlocked) {
-                const unblockResponse = await fetch(`/api/user/unblock/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!unblockResponse.ok) {
-                    let errorMessage = 'Nie udało się odblokować użytkownika';
-                    try {
-                        const errorData = await unblockResponse.json();
-                        errorMessage = errorData.message || errorData.Message || errorMessage;
-                    } catch {
-                        const errorText = await unblockResponse.text();
-                        errorMessage = errorText || errorMessage;
-                    }
-                    throw new Error(errorMessage);
-                }
+                await unblockUser(id);
             } else if (!userWasBlocked && shouldBeBlocked) {
-                const blockResponse = await fetch(`/api/user/block/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!blockResponse.ok) {
-                    let errorMessage = 'Nie udało się zablokować użytkownika';
-                    try {
-                        const errorData = await blockResponse.json();
-                        errorMessage = errorData.message || errorData.Message || errorMessage;
-                    } catch {
-                        const errorText = await blockResponse.text();
-                        errorMessage = errorText || errorMessage;
-                    }
-                    throw new Error(errorMessage);
-                }
+                await blockUser(id);
             }
 
             setSuccessMessage('Zmiany zostały zapisane pomyślnie!');
@@ -270,16 +213,20 @@ const EditUserPage = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('auth_user');
         navigate('/admin');
     };
 
-    if (!token) return null;
-
-    const breadcrumbItems = [
-        { label: 'Użytkownicy', onClick: () => navigate('/admin/users') },
-        { label: 'Edycja', isActive: false },
-        { label: `${firstName} ${lastName}`, isActive: true }
-    ];
+    const breadcrumbItems = isNewUser
+        ? [
+            { label: 'Użytkownicy', onClick: () => navigate('/admin/users') },
+            { label: 'Dodawanie', isActive: true }
+        ]
+        : [
+            { label: 'Użytkownicy', onClick: () => navigate('/admin/users') },
+            { label: 'Edycja', isActive: false },
+            { label: `${firstName} ${lastName}`, isActive: true }
+        ];
 
     return (
         <AdminLayout onLogout={handleLogout}>
@@ -302,8 +249,8 @@ const EditUserPage = () => {
 
                         <div className="admin-users__edit-user__header">
                             <div>
-                                <h1>Edycja użytkownika</h1>
-                                <p>Zaktualizuj informacje o użytkowniku</p>
+                                <h1>{isNewUser ? 'Dodawanie użytkownika' : 'Edycja użytkownika'}</h1>
+                                <p>{isNewUser ? 'Utwórz nowe konto użytkownika' : 'Zaktualizuj informacje o użytkowniku'}</p>
                             </div>
                             <button
                                 onClick={() => navigate('/admin/users')}
@@ -360,8 +307,9 @@ const EditUserPage = () => {
                                                 label="Nazwa użytkownika"
                                                 name="username"
                                                 value={username}
-                                                disabled={true}
-                                                helperText="Nie można edytować nazwy użytkownika"
+                                                onChange={(e) => setUsername(e.target.value)}
+                                                disabled={!isNewUser}
+                                                helperText={isNewUser ? 'Opcjonalnie, domyślnie email' : 'Nie można edytować nazwy użytkownika'}
                                             />
                                         </div>
                                     </div>
@@ -385,6 +333,35 @@ const EditUserPage = () => {
                                             />
                                         </div>
                                     </div>
+
+                                    {isNewUser && (
+                                        <div className="admin-users__edit-user__section">
+                                            <h2 className="admin-users__edit-user__section-title">
+                                                <span className="material-symbols-outlined">lock</span>
+                                                Hasło
+                                            </h2>
+                                            <div className="admin-users__edit-user__form-grid">
+                                                <FormField
+                                                    label="Hasło *"
+                                                    name="password"
+                                                    type="password"
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    error={fieldErrors.password}
+                                                    placeholder="Min. 6 znaków"
+                                                />
+                                                <FormField
+                                                    label="Potwierdź hasło *"
+                                                    name="confirmPassword"
+                                                    type="password"
+                                                    value={confirmPassword}
+                                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                                    error={fieldErrors.confirmPassword}
+                                                    placeholder="Powtórz hasło"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Action Buttons */}
                                     <div className="admin-users__edit-user__actions">
@@ -411,7 +388,7 @@ const EditUserPage = () => {
                                             ) : (
                                                 <>
                                                     <span className="material-symbols-outlined">save</span>
-                                                    <span>Zapisz zmiany</span>
+                                                    <span>{isNewUser ? 'Utwórz użytkownika' : 'Zapisz zmiany'}</span>
                                                 </>
                                             )}
                                         </button>
@@ -419,14 +396,16 @@ const EditUserPage = () => {
                                 </form>
                             </div>
 
-                            <ProfilePreview
-                                user={user}
-                                role={role}
-                                status={status}
-                                firstName={firstName}
-                                lastName={lastName}
-                                username={username}
-                            />
+                            {user && (
+                                <ProfilePreview
+                                    user={user}
+                                    role={role}
+                                    status={status}
+                                    firstName={firstName}
+                                    lastName={lastName}
+                                    username={username}
+                                />
+                            )}
                         </div>
                     </>
                 )}

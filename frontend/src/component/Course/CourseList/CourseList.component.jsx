@@ -1,5 +1,5 @@
-// CourseList/CourseList.component.jsx
 import React from 'react';
+import Header from '../../Header';
 import CourseListHeader from '../CourseListHeader';
 import CourseCard from '../CourseCard';
 import CourseListFilters from '../CourseListFilters';
@@ -15,6 +15,7 @@ const CourseList = ({
     if (loading) {
         return (
             <div className="page-wrapper-course-list">
+                <Header variant="dashboard" />
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
                     <p>Ładowanie kursów...</p>
@@ -26,6 +27,7 @@ const CourseList = ({
     if (error) {
         return (
             <div className="page-wrapper-course-list">
+                <Header variant="dashboard" />
                 <div className="error-container">
                     <p>{error}</p>
                     <button onClick={() => window.location.reload()} className="retry-button">
@@ -38,6 +40,7 @@ const CourseList = ({
 
     return (
         <div className="page-wrapper-course-list">
+            <Header variant="dashboard" />
             <div className="main-content">
                 <CourseListHeader
                     onCreateCourse={onCreateCourse}

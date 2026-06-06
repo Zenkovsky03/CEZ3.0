@@ -1,6 +1,7 @@
 // CourseStructure/CourseStructure.container.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import AuthContext from '../../../context/AuthContext';
 import CourseStructure from './CourseStructure.component';
 import AddModuleModal from './AddModuleModal.component';
 import {
@@ -12,6 +13,7 @@ import {
 import './CourseStructure.scss';
 
 const CourseStructureContainer = () => {
+    const { user } = useContext(AuthContext);
     const { id } = useParams();
     const [course, setCourse] = useState(null);
     const [sections, setSections] = useState([]);
@@ -52,9 +54,8 @@ const CourseStructureContainer = () => {
         setIsAddModalOpen(true);
     };
 
-    const handleEditModule = (moduleId) => {
-        console.log('Edit module:', moduleId);
-        // TODO: Navigate to edit module form or open modal
+    const handleEditModule = () => {
+        // Edit module functionality not yet implemented
     };
 
     const handleDeleteModule = async (moduleId) => {
@@ -95,6 +96,8 @@ const CourseStructureContainer = () => {
         }
     };
 
+    const canModify = user?.role === 'Teacher';
+
     return (
         <>
             <CourseStructure
@@ -102,9 +105,9 @@ const CourseStructureContainer = () => {
                 sections={sections}
                 loading={loading}
                 error={error}
-                onAddModule={handleAddModule}
-                onEditModule={handleEditModule}
-                onDeleteModule={handleDeleteModule}
+                onAddModule={canModify ? handleAddModule : undefined}
+                onEditModule={canModify ? handleEditModule : undefined}
+                onDeleteModule={canModify ? handleDeleteModule : undefined}
             />
             <AddModuleModal
                 isOpen={isAddModalOpen}

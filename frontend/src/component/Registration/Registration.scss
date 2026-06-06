@@ -47,6 +47,12 @@
             gap: 1.5rem; /* gap-6 */
             padding: 1.5rem 2rem; /* p-6 md:p-8 */
 
+            .error-message {
+                color: #dc2626;
+                margin-bottom: 0.5rem;
+                font-size: 0.875rem;
+            }
+
             .field-group {
                 display: flex;
                 flex-direction: column;

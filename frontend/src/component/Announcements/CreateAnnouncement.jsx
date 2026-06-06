@@ -1,28 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Header';
+import { createAnnouncement } from '../../services/announcementService';
+import { getCourses } from '../../services/courseService';
 import './Announcements.scss';
-
-const COURSES = [
-    { id: 'c1', name: 'UX/UI Design' },
-    { id: 'c2', name: 'Programowanie webowe – React' },
-    { id: 'c3', name: 'Podstawy baz danych' },
-    { id: 'c4', name: 'Algorytmy i struktury danych' },
-];
 
 const CreateAnnouncement = () => {
     const navigate = useNavigate();
+    const [courses, setCourses] = useState([]);
     const [form, setForm] = useState({ title: '', courseId: '', content: '' });
+    const [saving, setSaving] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        getCourses()
+            .then(data => {
+                const list = data?.items || data?.Items || (Array.isArray(data) ? data : []);
+                setCourses(list);
+            })
+            .catch(() => {});
+    }, []);
 
     const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
+        setSaving(true);
+        setError('');
+
+        try {
+            await createAnnouncement({
+                Title: form.title.trim(),
+                Content: form.content.trim(),
+                Recivers: form.courseId ? [form.courseId] : []
+            });
+            setSubmitted(true);
+        } catch (err) {
+            setError(err.message || 'Nie udało się utworzyć ogłoszenia');
+        } finally {
+            setSaving(false);
+        }
     };
 
-    const isValid = form.title.trim() && form.courseId && form.content.trim();
+    const isValid = form.title.trim() && form.content.trim();
 
     if (submitted) {
         return (
@@ -67,34 +88,20 @@ const CreateAnnouncement = () => {
                         </div>
                     </div>
 
+                    {error && <div className="error-message">{error}</div>}
+
                     <form className="ann-form" onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label className="form-label" htmlFor="title">Tytuł ogłoszenia</label>
-                            <input
-                                id="title"
-                                name="title"
-                                type="text"
-                                className="form-input"
-                                placeholder="np. Zmiana terminu wykładu"
-                                value={form.title}
-                                onChange={handleChange}
-                                required
-                            />
+                            <input id="title" name="title" type="text" className="form-input" placeholder="np. Zmiana terminu wykładu" value={form.title} onChange={handleChange} required />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="courseId">Kurs</label>
+                            <label className="form-label" htmlFor="courseId">Kurs (opcjonalnie)</label>
                             <div className="select-wrap">
-                                <select
-                                    id="courseId"
-                                    name="courseId"
-                                    className="form-select"
-                                    value={form.courseId}
-                                    onChange={handleChange}
-                                    required
-                                >
-                                    <option value="">-- Wybierz kurs --</option>
-                                    {COURSES.map(c => (
+                                <select id="courseId" name="courseId" className="form-select" value={form.courseId} onChange={handleChange}>
+                                    <option value="">-- Wszystkie kursy --</option>
+                                    {courses.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
                                 </select>
@@ -104,29 +111,14 @@ const CreateAnnouncement = () => {
 
                         <div className="form-group">
                             <label className="form-label" htmlFor="content">Treść ogłoszenia</label>
-                            <textarea
-                                id="content"
-                                name="content"
-                                className="form-textarea"
-                                placeholder="Napisz treść ogłoszenia..."
-                                rows={8}
-                                value={form.content}
-                                onChange={handleChange}
-                                required
-                            />
-                            <p className="form-hint">
-                                <span className="material-symbols-outlined">info</span>
-                                Wiadomość zostanie wysłana e-mailem do wszystkich zapisanych studentów.
-                            </p>
+                            <textarea id="content" name="content" className="form-textarea" placeholder="Napisz treść ogłoszenia..." rows={8} value={form.content} onChange={handleChange} required />
                         </div>
 
                         <div className="form-actions">
-                            <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
-                                Anuluj
-                            </button>
-                            <button type="submit" className="btn-primary" disabled={!isValid}>
+                            <button type="button" className="btn-secondary" onClick={() => navigate('/courses')}>Anuluj</button>
+                            <button type="submit" className="btn-primary" disabled={!isValid || saving}>
                                 <span className="material-symbols-outlined">send</span>
-                                Opublikuj ogłoszenie
+                                {saving ? 'Publikowanie...' : 'Opublikuj ogłoszenie'}
                             </button>
                         </div>
                     </form>

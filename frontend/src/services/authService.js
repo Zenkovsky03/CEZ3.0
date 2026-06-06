@@ -1,28 +1,25 @@
-const { VITE_BASE_API_URL: baseUrl } = import.meta.env;
+import request from './api';
 
-async function request(path, body) {
-    const res = await fetch(`${baseUrl}/api${path}`, {
+export const login = (payload) =>
+    request('/api/user/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload)
     });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-        const err = new Error(data.message || 'Request failed');
-        err.status = res.status;
-        err.data = data;
-        throw err;
-    }
-    return data;
-}
+export const register = (payload) =>
+    request('/api/user/register', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
 
-export async function login({ login, password }) {
-    return request('/user/login', { login, password });
-}
+export const getResetToken = (payload) =>
+    request('/api/user/getreset', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
 
-export async function register(payload) {
-    return request('/user/register', payload);
-}
-
-export default { login, register };
+export const resetPassword = (payload) =>
+    request('/api/user/resetpassword', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });

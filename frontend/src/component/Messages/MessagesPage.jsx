@@ -1,67 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import AuthContext from '../../context/AuthContext';
 import Header from '../Header';
+import { getConversations, getConversationById, sendMessage } from '../../services/conversationService';
 import './MessagesPage.scss';
-
-const STATIC_CONVERSATIONS = [
-    {
-        id: 'c1',
-        type: 'Inquiry',
-        status: 'AwaitingTeacherResponse',
-        other: { name: 'dr Anna Nowak', avatar: 'AN', role: 'Teacher' },
-        lastMessage: 'Dzień dobry, chciałam zapytać o termin oddania projektu...',
-        lastMessageAt: '2026-05-18T14:22:00',
-        unread: 1,
-    },
-    {
-        id: 'c2',
-        type: 'Direct',
-        status: 'Open',
-        other: { name: 'Marek Wiśniewski', avatar: 'MW', role: 'Student' },
-        lastMessage: 'Cześć! Zrobiłeś już zadanie na jutro?',
-        lastMessageAt: '2026-05-18T11:05:00',
-        unread: 0,
-    },
-    {
-        id: 'c3',
-        type: 'Inquiry',
-        status: 'Closed',
-        other: { name: 'dr hab. Piotr Zieliński', avatar: 'PZ', role: 'Teacher' },
-        lastMessage: 'Oczywiście, proszę oddać do piątku.',
-        lastMessageAt: '2026-05-15T09:30:00',
-        unread: 0,
-    },
-    {
-        id: 'c4',
-        type: 'Direct',
-        status: 'Open',
-        other: { name: 'Zofia Nowak', avatar: 'ZN', role: 'Student' },
-        lastMessage: 'Możemy się spotkać w bibliotece o 15:00?',
-        lastMessageAt: '2026-05-17T18:50:00',
-        unread: 2,
-    },
-];
-
-const MESSAGES_BY_CONV = {
-    c1: [
-        { id: 'm1', sender: 'other', text: 'Dzień dobry, chciałam zapytać o termin oddania projektu z modułu 3.', sentAt: '2026-05-18T14:20:00' },
-        { id: 'm2', sender: 'me', text: 'Dzień dobry! Termin to 25 maja do godziny 23:59.', sentAt: '2026-05-18T14:21:00' },
-        { id: 'm3', sender: 'other', text: 'Dzień dobry, chciałam zapytać o termin oddania projektu...', sentAt: '2026-05-18T14:22:00' },
-    ],
-    c2: [
-        { id: 'm1', sender: 'other', text: 'Hej, jak idzie Ci quiz z Pythona?', sentAt: '2026-05-18T10:55:00' },
-        { id: 'm2', sender: 'me', text: 'Całkiem nieźle, pytanie 4 było podchwytliwe!', sentAt: '2026-05-18T11:00:00' },
-        { id: 'm3', sender: 'other', text: 'Cześć! Zrobiłeś już zadanie na jutro?', sentAt: '2026-05-18T11:05:00' },
-    ],
-    c3: [
-        { id: 'm1', sender: 'me', text: 'Dzień dobry, czy mogę oddać pracę w poniedziałek?', sentAt: '2026-05-14T16:00:00' },
-        { id: 'm2', sender: 'other', text: 'Oczywiście, proszę oddać do piątku.', sentAt: '2026-05-15T09:30:00' },
-    ],
-    c4: [
-        { id: 'm1', sender: 'other', text: 'Hej Zofia! Idziemy na wykład o 12?', sentAt: '2026-05-17T17:30:00' },
-        { id: 'm2', sender: 'me', text: 'Jasne, do zobaczenia!', sentAt: '2026-05-17T17:45:00' },
-        { id: 'm3', sender: 'other', text: 'Możemy się spotkać w bibliotece o 15:00?', sentAt: '2026-05-17T18:50:00' },
-    ],
-};
 
 const STATUS_LABELS = {
     Open: { label: 'Otwarta', cls: 'status-open' },
@@ -70,100 +11,167 @@ const STATUS_LABELS = {
     Closed: { label: 'Zamknięta', cls: 'status-closed' },
 };
 
-const formatTime = (iso) =>
-    new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+const formatTime = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' }).format(d);
+};
 
 const formatDate = (iso) => {
     const d = new Date(iso);
-    const today = new Date();
-    if (d.toDateString() === today.toDateString()) return formatTime(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) return formatTime(iso);
     return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit' }).format(d);
 };
 
 const MessagesPage = () => {
-    const [activeConv, setActiveConv] = useState('c1');
+    const { user } = useContext(AuthContext);
+    const [conversations, setConversations] = useState([]);
+    const [activeConvId, setActiveConvId] = useState(null);
+    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    const conv = STATIC_CONVERSATIONS.find(c => c.id === activeConv);
-    const messages = MESSAGES_BY_CONV[activeConv] || [];
+    useEffect(() => {
+        let mounted = true;
 
-    const handleSend = (e) => {
+        const load = async () => {
+            try {
+                const data = await getConversations();
+                if (!mounted) return;
+                const list = Array.isArray(data) ? data : [];
+                setConversations(list);
+                if (list.length > 0) {
+                    setActiveConvId(list[0].id);
+                }
+            } catch (err) {
+                if (!mounted) return;
+                console.error('Failed to load conversations:', err);
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+
+        load();
+        return () => { mounted = false; };
+    }, []);
+
+    const loadMessages = useCallback(async (convId) => {
+        try {
+            const data = await getConversationById(convId);
+            const msgs = data?.messages || data?.Messages || [];
+            setMessages(Array.isArray(msgs) ? msgs : []);
+        } catch (err) {
+            console.error('Failed to load messages:', err);
+            setMessages([]);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (activeConvId) {
+            loadMessages(activeConvId);
+        }
+    }, [activeConvId, loadMessages]);
+
+    const handleSend = async (e) => {
         e.preventDefault();
+        if (!newMessage.trim() || !activeConvId) return;
+
+        const text = newMessage.trim();
         setNewMessage('');
+
+        try {
+            await sendMessage(activeConvId, { Body: text });
+
+            setMessages(prev => [...prev, {
+                id: `temp-${Date.now()}`,
+                sender: 'me',
+                text,
+                sentAt: new Date().toISOString()
+            }]);
+        } catch (err) {
+            console.error('Failed to send message:', err);
+        }
     };
+
+    const activeConv = conversations.find(c => c.id === activeConvId);
+
+    if (loading) return (
+        <div className="page-wrapper-messages">
+            <Header variant="dashboard" />
+            <div className="messages-layout"><p>Ładowanie wiadomości...</p></div>
+        </div>
+    );
 
     return (
         <div className="page-wrapper-messages">
             <Header variant="dashboard" />
             <div className="messages-layout">
-                {/* Sidebar */}
                 <aside className="conversations-sidebar">
                     <div className="sidebar-header">
                         <h2 className="sidebar-title">Wiadomości</h2>
-                        <button className="btn-new-conv" title="Nowa rozmowa">
-                            <span className="material-symbols-outlined">edit_square</span>
-                        </button>
                     </div>
                     <div className="conv-list">
-                        {STATIC_CONVERSATIONS.map(c => {
-                            const st = STATUS_LABELS[c.status];
-                            return (
-                                <button
-                                    key={c.id}
-                                    className={`conv-item ${activeConv === c.id ? 'active' : ''}`}
-                                    onClick={() => setActiveConv(c.id)}
-                                >
-                                    <div className="conv-avatar">{c.other.avatar}</div>
-                                    <div className="conv-info">
-                                        <div className="conv-name-row">
-                                            <span className="conv-name">{c.other.name}</span>
-                                            <span className="conv-time">{formatDate(c.lastMessageAt)}</span>
-                                        </div>
-                                        <div className="conv-preview-row">
-                                            <span className="conv-preview">{c.lastMessage}</span>
-                                            {c.unread > 0 && <span className="unread-dot">{c.unread}</span>}
-                                        </div>
+                        {conversations.length === 0 && <p className="conv-empty">Brak konwersacji.</p>}
+                        {conversations.map(c => (
+                            <button
+                                key={c.id}
+                                className={`conv-item ${activeConvId === c.id ? 'active' : ''}`}
+                                onClick={() => setActiveConvId(c.id)}
+                            >
+                                <div className="conv-avatar">
+                                    {((c.otherPerson?.firstName?.[0] || c.participantName?.[0] || '?').toUpperCase())}
+                                </div>
+                                <div className="conv-info">
+                                    <div className="conv-name-row">
+                                        <span className="conv-name">{c.otherPerson?.firstName + ' ' + c.otherPerson?.lastName || c.participantName || 'Nieznany'}</span>
+                                        <span className="conv-time">{c.lastMessageAt ? formatDate(c.lastMessageAt) : ''}</span>
                                     </div>
-                                </button>
-                            );
-                        })}
+                                    <div className="conv-preview-row">
+                                        <span className="conv-preview">{c.lastMessage || ''}</span>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
                     </div>
                 </aside>
 
-                {/* Chat area */}
                 <div className="chat-area">
-                    {conv && (
+                    {activeConv ? (
                         <>
                             <div className="chat-header">
                                 <div className="chat-header-info">
-                                    <div className="chat-avatar">{conv.other.avatar}</div>
+                                    <div className="chat-avatar">
+                                        {((activeConv.otherPerson?.firstName?.[0] || activeConv.participantName?.[0] || '?').toUpperCase())}
+                                    </div>
                                     <div>
-                                        <p className="chat-name">{conv.other.name}</p>
-                                        <span className={`chat-status ${STATUS_LABELS[conv.status].cls}`}>
-                                            {STATUS_LABELS[conv.status].label}
-                                            {conv.type === 'Inquiry' ? ' · Zapytanie' : ' · Bezpośrednia'}
+                                        <p className="chat-name">
+                                            {activeConv.otherPerson?.firstName + ' ' + activeConv.otherPerson?.lastName || activeConv.participantName || 'Nieznany'}
+                                        </p>
+                                        <span className={`chat-status ${STATUS_LABELS[activeConv.status]?.cls || ''}`}>
+                                            {STATUS_LABELS[activeConv.status]?.label || activeConv.status}
                                         </span>
                                     </div>
                                 </div>
-                                {conv.type === 'Inquiry' && conv.status !== 'Closed' && (
-                                    <button className="btn-close-conv">
-                                        <span className="material-symbols-outlined">lock</span>
-                                        Zamknij rozmowę
-                                    </button>
-                                )}
                             </div>
 
                             <div className="messages-list">
-                                {messages.map(m => (
-                                    <div key={m.id} className={`message-bubble ${m.sender === 'me' ? 'mine' : 'theirs'}`}>
-                                        <div className="bubble-text">{m.text}</div>
-                                        <div className="bubble-time">{formatTime(m.sentAt)}</div>
+                                {messages.length === 0 ? (
+                                    <div className="messages-empty">
+                                        <span className="material-symbols-outlined">chat</span>
+                                        <p>Brak wiadomości. Rozpocznij rozmowę!</p>
+                                    </div>
+                                ) : messages.map(m => (
+                                    <div key={m.id} className={`message-bubble ${m.sender === 'me' || m.senderId === user?.id ? 'mine' : 'theirs'}`}>
+                                        <div className="bubble-text">{m.body || m.text}</div>
+                                        <div className="bubble-time">{formatTime(m.createdAt || m.sentAt)}</div>
                                     </div>
                                 ))}
                             </div>
 
                             <form className="message-input-row" onSubmit={handleSend}>
-                                {conv.status === 'Closed' ? (
+                                {activeConv.status === 'Closed' ? (
                                     <div className="closed-notice">
                                         <span className="material-symbols-outlined">lock</span>
                                         Rozmowa jest zamknięta
@@ -184,6 +192,11 @@ const MessagesPage = () => {
                                 )}
                             </form>
                         </>
+                    ) : (
+                        <div className="no-conv-selected">
+                            <span className="material-symbols-outlined">chat</span>
+                            <p>Wybierz rozmowę z listy</p>
+                        </div>
                     )}
                 </div>
             </div>

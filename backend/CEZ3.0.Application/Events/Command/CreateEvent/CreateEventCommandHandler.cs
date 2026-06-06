@@ -28,49 +28,49 @@ public class CreateEventCommandHandler(ILogger<CreateEventCommandHandler> logger
 
         if (currentUser.role == UserRoles.Student.ToString())
         {
-            _logger.LogWarning("User {UserId} with role {Role} attempted to create announcement without permission.",
+            _logger.LogWarning("User {UserId} with role {Role} attempted to create an event without permission.",
                 currentUser.id, currentUser.role);
 
-            throw new ForbiddenException("Current user cant create announcements.");
+            throw new ForbiddenException("Current user cant create events.");
         }
 
         if (request.Title.Length > 100)
         {
-            _logger.LogWarning("Announcement title exceeds maximum length. User: {UserId}, Title Length: {TitleLength}",
+            _logger.LogWarning("Event title exceeds maximum length. User: {UserId}, Title Length: {TitleLength}",
                 currentUser.id, request.Title.Length);
 
-            throw new BadRequestException("Announcement title cannot exceed 100 characters.");
+            throw new BadRequestException("Event title cannot exceed 100 characters.");
         }
 
         if (request.Description.Length > 1000)
         {
-            _logger.LogWarning("Announcement content exceeds maximum length. User: {UserId}, Content Length: {ContentLength}",
+            _logger.LogWarning("Event description exceeds maximum length. User: {UserId}, Description Length: {DescriptionLength}",
                 currentUser.id, request.Description.Length);
 
-            throw new BadRequestException("Announcement content cannot exceed 1000 characters.");
+            throw new BadRequestException("Event description cannot exceed 1000 characters.");
         }
 
         if (request.Recivers == null || request.Recivers.Count == 0)
         {
-            _logger.LogWarning("Announcement creation failed due to missing recipients.");
+            _logger.LogWarning("Event creation failed due to missing recipients.");
 
-            throw new BadRequestException("Announcement must have at least one recipient.");
+            throw new BadRequestException("Event must have at least one recipient.");
         }
 
         if (request.StartTime < DateTime.UtcNow)
         {
-            _logger.LogWarning("Announcement creation failed due to invalid start time. StartTime: {StartTime}",
+            _logger.LogWarning("Event creation failed due to invalid start time. StartTime: {StartTime}",
                 request.StartTime);
 
-            throw new BadRequestException("Announcement start time cannot be in the past.");
+            throw new BadRequestException("Event start time cannot be in the past.");
         }
 
         if (request.EndTime < request.StartTime)
         {
-            _logger.LogWarning("Announcement creation failed due to invalid end time. StartTime: {StartTime}, EndTime: {EndTime}",
+            _logger.LogWarning("Event creation failed due to invalid end time. StartTime: {StartTime}, EndTime: {EndTime}",
                 request.StartTime, request.EndTime);
 
-            throw new BadRequestException("Announcement end time cannot be before start time.");
+            throw new BadRequestException("Event end time cannot be before start time.");
         }
 
         var courseIds = request.Recivers
@@ -82,7 +82,7 @@ public class CreateEventCommandHandler(ILogger<CreateEventCommandHandler> logger
 
         if (reciversIds == null || reciversIds.Count == 0)
         {
-            throw new BadRequestException("Announcement must have at least one recipient.");
+            throw new BadRequestException("Event must have at least one recipient.");
         }
 
         var eventObject = new Event

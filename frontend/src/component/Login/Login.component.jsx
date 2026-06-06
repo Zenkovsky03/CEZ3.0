@@ -40,16 +40,14 @@ const Login = () => {
                         </div>
 
                         <p className="register-link-text">
-                            Nie masz konta? <Link className="link" to="/register" style={{ color: 'rgb(58 124 165)' }}>Zarejestruj się</Link>
+                            Nie masz konta? <Link className="link" to="/register">Zarejestruj się</Link>
                         </p>
                     </div>
                 </main>
 
                 <footer className="page-footer">
                     <div className="footer-links">
-                        <Link className="hover:underline" to="/status">Regulamin</Link>
-                        <span>·</span>
-                        <Link className="hover:underline" to="/privacy-policy">Polityka Prywatności</Link>
+                        <span>&copy; {new Date().getFullYear()} CEZ 3.0</span>
                     </div>
                 </footer>
             </div>

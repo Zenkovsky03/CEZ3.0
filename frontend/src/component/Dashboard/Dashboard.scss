@@ -407,6 +407,37 @@ $border-dark: #1f2937;
     flex-direction: column;
 }
 
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .section-title {
+        margin-bottom: 0;
+    }
+}
+
+.section-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: rgb(58 124 165);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+        text-decoration: underline;
+    }
+
+    .material-symbols-outlined {
+        font-size: 1.1rem;
+    }
+}
+
 .section-title {
     color: $text-dark;
     font-size: 1.375rem;

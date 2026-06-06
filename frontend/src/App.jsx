@@ -24,6 +24,7 @@ import ResetPassword from './component/ResetPassword/ResetPassword';
 import CreateAnnouncement from './component/Announcements/CreateAnnouncement';
 import AnnouncementDetails from './component/Announcements/AnnouncementDetails';
 import CreateEvent from './component/Events/CreateEvent';
+import ProtectedRoute from './component/ProtectedRoute/ProtectedRoute';
 
 function App() {
     return (
@@ -52,8 +53,8 @@ function App() {
                     <Route path="/announcements/create" element={<CreateAnnouncement/>}/>
                     <Route path="/announcements/:id" element={<AnnouncementDetails/>}/>
                     <Route path="/admin" element={<AdminLoginPage/>}/>
-                    <Route path="/admin/users" element={<AdminUsersPage/>}/>
-                    <Route path="/admin/users/edit/:id" element={<EditUserPage/>}/>
+                    <Route path="/admin/users" element={<ProtectedRoute roles={['Admin']}><AdminUsersPage/></ProtectedRoute>}/>
+                    <Route path="/admin/users/edit/:id" element={<ProtectedRoute roles={['Admin']}><EditUserPage/></ProtectedRoute>}/>
                 </Routes>
             </div>
         </BrowserRouter>
