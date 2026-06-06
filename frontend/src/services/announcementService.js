@@ -42,23 +42,4 @@ export async function getAnnouncements(pageNumber = 1, pageSize = 5) {
     return data;
 }
 
-export async function createAnnouncement(payload) {
-    const token = getToken();
-    const response = await fetch(`${apiBaseUrl}/api/announcements`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify(payload)
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-        const error = new Error(data.message || data.Message || 'Nie udało się zapisać ogłoszenia.');
-        error.status = response.status;
-        throw error;
-    }
-    return data;
-}
-
-export default { getAnnouncements, createAnnouncement };
+export default { getAnnouncements };

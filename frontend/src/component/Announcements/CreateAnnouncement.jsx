@@ -1,32 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Header';
-import { getCourses } from '../../services/courseService';
-import { createAnnouncement } from '../../services/announcementService';
 import './Announcements.scss';
+
+const COURSES = [
+    { id: 'c1', name: 'UX/UI Design' },
+    { id: 'c2', name: 'Programowanie webowe – React' },
+    { id: 'c3', name: 'Podstawy baz danych' },
+    { id: 'c4', name: 'Algorytmy i struktury danych' },
+];
 
 const CreateAnnouncement = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState({ title: '', courseId: '', content: '' });
     const [submitted, setSubmitted] = useState(false);
-    const [courses, setCourses] = useState([]);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        getCourses().then(setCourses).catch(() => {});
-    }, []);
 
     const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setError(null);
-        try {
-            await createAnnouncement({ title: form.title, content: form.content, courseId: form.courseId || null });
-            setSubmitted(true);
-        } catch {
-            setError('Nie udało się opublikować ogłoszenia. Spróbuj ponownie.');
-        }
+        setSubmitted(true);
     };
 
     const isValid = form.title.trim() && form.courseId && form.content.trim();
@@ -74,8 +67,6 @@ const CreateAnnouncement = () => {
                         </div>
                     </div>
 
-                    {error && <div className="form-error">{error}</div>}
-
                     <form className="ann-form" onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label className="form-label" htmlFor="title">Tytuł ogłoszenia</label>
@@ -103,7 +94,7 @@ const CreateAnnouncement = () => {
                                     required
                                 >
                                     <option value="">-- Wybierz kurs --</option>
-                                    {courses.map(c => (
+                                    {COURSES.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
                                 </select>

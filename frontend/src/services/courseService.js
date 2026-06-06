@@ -25,6 +25,13 @@ async function request(path, options = {}) {
         ...(options.headers || {})
     };
 
+    console.log('[courseService] -> request', {
+        method,
+        path,
+        hasToken: Boolean(token),
+        body: options.body ? JSON.parse(options.body) : null
+    });
+
     const response = await fetch(path, {
         ...options,
         headers
@@ -32,11 +39,26 @@ async function request(path, options = {}) {
 
     const data = await response.json().catch(() => null);
 
+    console.log('[courseService] <- response', {
+        method,
+        path,
+        status: response.status,
+        ok: response.ok,
+        data
+    });
+
     if (!response.ok) {
         const message = data?.message || data?.Message || `HTTP ${response.status}`;
         const error = new Error(message);
         error.status = response.status;
         error.payload = data;
+        console.error('[courseService] !! error', {
+            method,
+            path,
+            status: error.status,
+            message: error.message,
+            payload: error.payload
+        });
         throw error;
     }
 
@@ -47,6 +69,7 @@ export const getCourses = async () => {
     try {
         return await request('/api/courses');
     } catch (error) {
+        // TODO: Remove fallback when backend exposes GET /api/courses.
         if (error.status !== 404 && error.status !== 405) {
             throw error;
         }
@@ -63,6 +86,7 @@ export const createCourse = async (payload) => {
             body: JSON.stringify(payload)
         });
     } catch (error) {
+        // TODO: Remove fallback when backend create endpoint is finalized.
         if (error.status !== 404 && error.status !== 405) {
             throw error;
         }
@@ -90,6 +114,7 @@ export const addParticipantToCourse = async (courseId, userId) => {
             body: JSON.stringify({ userId })
         });
     } catch (error) {
+        // TODO: Remove fallback when dedicated add-participant endpoint is available.
         if (error.status !== 404 && error.status !== 405) {
             throw error;
         }
@@ -107,6 +132,7 @@ export const removeParticipantFromCourse = async (courseId, userId) => {
             method: 'DELETE'
         });
     } catch (error) {
+        // TODO: Remove fallback when dedicated remove-participant endpoint is available.
         if (error.status !== 404 && error.status !== 405) {
             throw error;
         }
@@ -118,6 +144,7 @@ export const removeParticipantFromCourse = async (courseId, userId) => {
     });
 };
 
+// TODO: Confirm final endpoint path for course structure list.
 export const getCourseSections = (id) => request(`/api/courses/${id}/sections`);
 
 export const deleteCourseSection = (sectionId) =>

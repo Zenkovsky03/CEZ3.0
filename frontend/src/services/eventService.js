@@ -42,23 +42,4 @@ export async function getUserEvents(pageNumber = 1, pageSize = 30) {
     return data;
 }
 
-export async function createEvent(payload) {
-    const token = getToken();
-    const response = await fetch(`${apiBaseUrl}/api/events`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify(payload)
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-        const error = new Error(data.message || data.Message || 'Nie udało się zapisać wydarzenia.');
-        error.status = response.status;
-        throw error;
-    }
-    return data;
-}
-
-export default { getUserEvents, createEvent };
+export default { getUserEvents };

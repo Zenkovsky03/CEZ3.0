@@ -1,9 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Header from '../../Header';
-import { request } from '../../../services/apiClient';
-import { getCourseSections } from '../../../services/courseService';
 import './LessonView.scss';
+
+const STATIC_LESSON = {
+    id: 'l1',
+    title: 'Podstawy teorii kolorów w projektowaniu UI',
+    courseId: 'course1',
+    courseName: 'UX/UI Design',
+    sectionTitle: 'Moduł 3: Kolory i typografia',
+    updatedAt: '2026-05-10T12:00:00',
+    content: `## Teoria kolorów – wprowadzenie
+
+Kolory odgrywają kluczową rolę w projektowaniu interfejsów użytkownika. Właściwy dobór palety barw wpływa na czytelność, estetykę i emocje wywoływane przez produkt.
+
+## Koło barw i relacje kolorów
+
+**Kolory podstawowe**: czerwony, żółty, niebieski (model RYB) lub czerwony, zielony, niebieski (model RGB używany na ekranach).
+
+**Schematy kolorystyczne:**
+- **Monochromatyczny** – odcienie jednego koloru
+- **Analogiczny** – kolory sąsiadujące na kole barw
+- **Komplementarny** – kolory naprzeciwległe na kole barw
+- **Triadyczny** – trzy równo rozmieszczone kolory
+
+## Kontrast i dostępność
+
+Standard WCAG AA wymaga kontrastu co najmniej 4.5:1 dla tekstu normalnego i 3:1 dla tekstu dużego. Używaj narzędzi jak Contrast Checker, aby weryfikować dostępność.
+
+## Psychologia kolorów
+
+Każdy kolor niesie ze sobą skojarzenia kulturowe i emocjonalne:
+- **Niebieski** – zaufanie, spokój, profesjonalizm
+- **Zielony** – natura, wzrost, sukces
+- **Czerwony** – energia, pilność, ostrzeżenie
+- **Żółty** – optymizm, uwaga, ciepło`,
+    attachments: [
+        { id: 'a1', type: 'Video', title: 'Teoria kolorów – wideo wprowadzające (15 min)', url: 'https://youtube.com/watch?v=example1', icon: 'play_circle' },
+        { id: 'a2', type: 'Pdf', title: 'Slajdy z wykładu – Moduł 3', url: 'https://drive.google.com/example-slides.pdf', icon: 'picture_as_pdf' },
+        { id: 'a3', type: 'Link', title: 'Coolors – generator palet kolorystycznych', url: 'https://coolors.co', icon: 'link' },
+        { id: 'a4', type: 'Link', title: 'WebAIM Contrast Checker', url: 'https://webaim.org/resources/contrastchecker', icon: 'link' },
+    ],
+    prevLesson: { id: 'l0', title: 'Wprowadzenie do modułu 3' },
+    nextLesson: { id: 'l2', title: 'Typografia – kroje pisma i hierarchia' },
+};
 
 const ATTACHMENT_COLORS = {
     Video: { bg: '#fee2e2', color: '#dc2626', icon: 'play_circle' },
@@ -14,69 +54,7 @@ const ATTACHMENT_COLORS = {
 
 const LessonView = () => {
     const { cId, lId } = useParams();
-    const [lesson, setLesson] = useState(null);
-    const [attachments, setAttachments] = useState([]);
-    const [sections, setSections] = useState([]);
     const [completed, setCompleted] = useState(false);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const [lessonData, attachmentsData, sectionsData] = await Promise.all([
-                    request(`/api/SectionMaterial/${lId}`),
-                    request(`/api/LessonAttachment/lessons/${lId}/attachments`).catch(() => []),
-                    getCourseSections(cId).catch(() => [])
-                ]);
-                setLesson(lessonData);
-                setAttachments(Array.isArray(attachmentsData) ? attachmentsData : []);
-                setSections(Array.isArray(sectionsData) ? sectionsData : []);
-            } catch {
-                // failed to load
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadData();
-    }, [cId, lId]);
-
-    if (loading) {
-        return (
-            <div className="page-wrapper-lesson">
-                <Header variant="dashboard" />
-                <div className="lesson-layout">
-                    <div className="lesson-main">
-                        <p>Ładowanie lekcji...</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (!lesson) {
-        return (
-            <div className="page-wrapper-lesson">
-                <Header variant="dashboard" />
-                <div className="lesson-layout">
-                    <div className="lesson-main">
-                        <Link to={`/courses/${cId}/structure`} className="back-link">
-                            <span className="material-symbols-outlined">arrow_back</span>
-                            Wróć do kursu
-                        </Link>
-                        <p>Nie znaleziono lekcji.</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // Find current section and build prev/next navigation
-    const allMaterials = sections.flatMap(s => (s.materials || []).map(m => ({ ...m, sectionTitle: s.title })));
-    const currentIndex = allMaterials.findIndex(m => m.id === lId || m.id === lesson.id);
-    const prevLesson = currentIndex > 0 ? allMaterials[currentIndex - 1] : null;
-    const nextLesson = currentIndex >= 0 && currentIndex < allMaterials.length - 1 ? allMaterials[currentIndex + 1] : null;
-
-    const currentSection = sections.find(s => (s.materials || []).some(m => m.id === lId || m.id === lesson.id));
 
     return (
         <div className="page-wrapper-lesson">
@@ -84,43 +62,45 @@ const LessonView = () => {
             <div className="lesson-layout">
                 {/* Sidebar nav */}
                 <aside className="lesson-sidebar">
-                    <div className="sidebar-section-title">{currentSection?.title || ''}</div>
+                    <div className="sidebar-section-title">{STATIC_LESSON.sectionTitle}</div>
                     <nav className="lesson-nav">
-                        {(currentSection?.materials || []).map(m => (
-                            <Link
-                                key={m.id}
-                                to={`/courses/${cId}/lessons/${m.id}`}
-                                className={`lesson-nav-item ${m.id === lId ? 'active' : ''}`}
-                            >
-                                <span className="material-symbols-outlined nav-icon">
-                                    {m.id === lId ? 'play_circle' : 'radio_button_unchecked'}
-                                </span>
-                                {m.title}
-                            </Link>
-                        ))}
+                        <Link to="#" className="lesson-nav-item">
+                            <span className="material-symbols-outlined nav-icon done-icon">check_circle</span>
+                            Wprowadzenie do modułu 3
+                        </Link>
+                        <Link to="#" className="lesson-nav-item active">
+                            <span className="material-symbols-outlined nav-icon current-icon">play_circle</span>
+                            Podstawy teorii kolorów
+                        </Link>
+                        <Link to="#" className="lesson-nav-item">
+                            <span className="material-symbols-outlined nav-icon">radio_button_unchecked</span>
+                            Typografia – kroje pisma
+                        </Link>
+                        <Link to="#" className="lesson-nav-item">
+                            <span className="material-symbols-outlined nav-icon">radio_button_unchecked</span>
+                            Ćwiczenia praktyczne
+                        </Link>
                     </nav>
                 </aside>
 
                 {/* Main content */}
                 <div className="lesson-main">
                     <div className="lesson-breadcrumb">
-                        <Link to={`/courses/${cId}/structure`}>Kurs</Link>
+                        <Link to={`/courses/${STATIC_LESSON.courseId}`}>{STATIC_LESSON.courseName}</Link>
                         <span className="material-symbols-outlined">chevron_right</span>
-                        <span>{currentSection?.title || ''}</span>
+                        <span>{STATIC_LESSON.sectionTitle}</span>
                     </div>
 
                     <div className="lesson-content-card">
                         <div className="lesson-header">
-                            <h1 className="lesson-title">{lesson.title}</h1>
-                            {lesson.updatedAt && (
-                                <p className="lesson-updated">
-                                    Ostatnia aktualizacja: {new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(lesson.updatedAt))}
-                                </p>
-                            )}
+                            <h1 className="lesson-title">{STATIC_LESSON.title}</h1>
+                            <p className="lesson-updated">
+                                Ostatnia aktualizacja: {new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(STATIC_LESSON.updatedAt))}
+                            </p>
                         </div>
 
                         <div className="lesson-body">
-                            {(lesson.content || '').split('\n\n').map((block, i) => {
+                            {STATIC_LESSON.content.split('\n\n').map((block, i) => {
                                 if (block.startsWith('## ')) {
                                     return <h2 key={i} className="lesson-h2">{block.slice(3)}</h2>;
                                 }
@@ -136,14 +116,14 @@ const LessonView = () => {
                         </div>
 
                         {/* Attachments */}
-                        {attachments.length > 0 && (
+                        {STATIC_LESSON.attachments.length > 0 && (
                             <div className="attachments-section">
                                 <h3 className="attachments-title">
                                     <span className="material-symbols-outlined">attach_file</span>
                                     Materiały do lekcji
                                 </h3>
                                 <div className="attachments-grid">
-                                    {attachments.map(att => {
+                                    {STATIC_LESSON.attachments.map(att => {
                                         const style = ATTACHMENT_COLORS[att.type] || ATTACHMENT_COLORS.Link;
                                         return (
                                             <a
@@ -157,7 +137,7 @@ const LessonView = () => {
                                                     <span className="material-symbols-outlined">{style.icon}</span>
                                                 </div>
                                                 <div className="att-info">
-                                                    <span className="att-title">{att.title || att.fileName}</span>
+                                                    <span className="att-title">{att.title}</span>
                                                     <span className="att-type">{att.type}</span>
                                                 </div>
                                                 <span className="material-symbols-outlined att-arrow">open_in_new</span>
@@ -168,7 +148,7 @@ const LessonView = () => {
                             </div>
                         )}
 
-                        {/* Complete button + nav */}
+                        {/* Complete button */}
                         <div className="lesson-footer">
                             <button
                                 className={`btn-complete ${completed ? 'completed' : ''}`}
@@ -181,20 +161,20 @@ const LessonView = () => {
                             </button>
 
                             <div className="lesson-nav-btns">
-                                {prevLesson && (
-                                    <Link to={`/courses/${cId}/lessons/${prevLesson.id}`} className="btn-nav-lesson prev">
+                                {STATIC_LESSON.prevLesson && (
+                                    <Link to={`/courses/${STATIC_LESSON.courseId}/lessons/${STATIC_LESSON.prevLesson.id}`} className="btn-nav-lesson prev">
                                         <span className="material-symbols-outlined">arrow_back</span>
                                         <div>
                                             <span className="nav-direction">Poprzednia</span>
-                                            <span className="nav-lesson-title">{prevLesson.title}</span>
+                                            <span className="nav-lesson-title">{STATIC_LESSON.prevLesson.title}</span>
                                         </div>
                                     </Link>
                                 )}
-                                {nextLesson && (
-                                    <Link to={`/courses/${cId}/lessons/${nextLesson.id}`} className="btn-nav-lesson next">
+                                {STATIC_LESSON.nextLesson && (
+                                    <Link to={`/courses/${STATIC_LESSON.courseId}/lessons/${STATIC_LESSON.nextLesson.id}`} className="btn-nav-lesson next">
                                         <div>
                                             <span className="nav-direction">Następna</span>
-                                            <span className="nav-lesson-title">{nextLesson.title}</span>
+                                            <span className="nav-lesson-title">{STATIC_LESSON.nextLesson.title}</span>
                                         </div>
                                         <span className="material-symbols-outlined">arrow_forward</span>
                                     </Link>

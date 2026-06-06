@@ -9,7 +9,6 @@ import {
     getCourseById,
     getCourseSections
 } from '../../../services/courseService';
-import { request } from '../../../services/apiClient';
 import './CourseStructure.scss';
 
 const CourseStructureContainer = () => {
@@ -22,9 +21,6 @@ const CourseStructureContainer = () => {
     const [addModuleLoading, setAddModuleLoading] = useState(false);
     const [newModuleTitle, setNewModuleTitle] = useState('');
     const [newModuleOrderIndex, setNewModuleOrderIndex] = useState(1);
-    const [editingModule, setEditingModule] = useState(null);
-    const [editModuleTitle, setEditModuleTitle] = useState('');
-    const [editModuleLoading, setEditModuleLoading] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -41,6 +37,7 @@ const CourseStructureContainer = () => {
                 setSections(Array.isArray(sectionsData) ? sectionsData : []);
             } catch (err) {
                 setError('Wystąpił błąd podczas ładowania struktury kursu');
+                console.error('Error loading course structure:', err);
             } finally {
                 setLoading(false);
             }
@@ -55,33 +52,9 @@ const CourseStructureContainer = () => {
         setIsAddModalOpen(true);
     };
 
-    const handleEditModule = (module) => {
-        setEditingModule(module);
-        setEditModuleTitle(module.title || '');
-    };
-
-    const handleSaveEdit = async () => {
-        if (!editModuleTitle.trim()) return;
-        try {
-            setEditModuleLoading(true);
-            await request(`/api/CourseSection/Edit/${editingModule.id}`, {
-                method: 'POST',
-                body: JSON.stringify({ title: editModuleTitle.trim() })
-            });
-            const sectionsData = await getCourseSections(id);
-            setSections(Array.isArray(sectionsData) ? sectionsData : []);
-            setEditingModule(null);
-            setEditModuleTitle('');
-        } catch {
-            alert('Nie udało się zapisać zmian.');
-        } finally {
-            setEditModuleLoading(false);
-        }
-    };
-
-    const handleCloseEditModal = () => {
-        setEditingModule(null);
-        setEditModuleTitle('');
+    const handleEditModule = (moduleId) => {
+        console.log('Edit module:', moduleId);
+        // TODO: Navigate to edit module form or open modal
     };
 
     const handleDeleteModule = async (moduleId) => {
@@ -93,6 +66,7 @@ const CourseStructureContainer = () => {
             await deleteCourseSection(moduleId);
             setSections(prev => prev.filter(s => s.id !== moduleId));
         } catch (error) {
+            console.error('Error deleting module:', error);
             alert('Nie udało się usunąć modułu');
         }
     };
@@ -114,6 +88,7 @@ const CourseStructureContainer = () => {
             setIsAddModalOpen(false);
             setNewModuleTitle('');
         } catch (createError) {
+            console.error('Error creating module:', createError);
             alert('Nie udało się utworzyć modułu');
         } finally {
             setAddModuleLoading(false);
@@ -140,16 +115,6 @@ const CourseStructureContainer = () => {
                 onTitleChange={setNewModuleTitle}
                 onOrderIndexChange={setNewModuleOrderIndex}
                 loading={addModuleLoading}
-            />
-            <AddModuleModal
-                isOpen={!!editingModule}
-                onClose={handleCloseEditModal}
-                onSubmit={handleSaveEdit}
-                title={editModuleTitle}
-                orderIndex={editingModule?.orderIndex || 1}
-                onTitleChange={setEditModuleTitle}
-                onOrderIndexChange={() => {}}
-                loading={editModuleLoading}
             />
         </>
     );
