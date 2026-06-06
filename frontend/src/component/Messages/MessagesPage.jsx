@@ -1,67 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../Header';
+import { getConversations, getConversation, sendMessage } from '../../services/conversationService';
 import './MessagesPage.scss';
-
-const STATIC_CONVERSATIONS = [
-    {
-        id: 'c1',
-        type: 'Inquiry',
-        status: 'AwaitingTeacherResponse',
-        other: { name: 'dr Anna Nowak', avatar: 'AN', role: 'Teacher' },
-        lastMessage: 'Dzień dobry, chciałam zapytać o termin oddania projektu...',
-        lastMessageAt: '2026-05-18T14:22:00',
-        unread: 1,
-    },
-    {
-        id: 'c2',
-        type: 'Direct',
-        status: 'Open',
-        other: { name: 'Marek Wiśniewski', avatar: 'MW', role: 'Student' },
-        lastMessage: 'Cześć! Zrobiłeś już zadanie na jutro?',
-        lastMessageAt: '2026-05-18T11:05:00',
-        unread: 0,
-    },
-    {
-        id: 'c3',
-        type: 'Inquiry',
-        status: 'Closed',
-        other: { name: 'dr hab. Piotr Zieliński', avatar: 'PZ', role: 'Teacher' },
-        lastMessage: 'Oczywiście, proszę oddać do piątku.',
-        lastMessageAt: '2026-05-15T09:30:00',
-        unread: 0,
-    },
-    {
-        id: 'c4',
-        type: 'Direct',
-        status: 'Open',
-        other: { name: 'Zofia Nowak', avatar: 'ZN', role: 'Student' },
-        lastMessage: 'Możemy się spotkać w bibliotece o 15:00?',
-        lastMessageAt: '2026-05-17T18:50:00',
-        unread: 2,
-    },
-];
-
-const MESSAGES_BY_CONV = {
-    c1: [
-        { id: 'm1', sender: 'other', text: 'Dzień dobry, chciałam zapytać o termin oddania projektu z modułu 3.', sentAt: '2026-05-18T14:20:00' },
-        { id: 'm2', sender: 'me', text: 'Dzień dobry! Termin to 25 maja do godziny 23:59.', sentAt: '2026-05-18T14:21:00' },
-        { id: 'm3', sender: 'other', text: 'Dzień dobry, chciałam zapytać o termin oddania projektu...', sentAt: '2026-05-18T14:22:00' },
-    ],
-    c2: [
-        { id: 'm1', sender: 'other', text: 'Hej, jak idzie Ci quiz z Pythona?', sentAt: '2026-05-18T10:55:00' },
-        { id: 'm2', sender: 'me', text: 'Całkiem nieźle, pytanie 4 było podchwytliwe!', sentAt: '2026-05-18T11:00:00' },
-        { id: 'm3', sender: 'other', text: 'Cześć! Zrobiłeś już zadanie na jutro?', sentAt: '2026-05-18T11:05:00' },
-    ],
-    c3: [
-        { id: 'm1', sender: 'me', text: 'Dzień dobry, czy mogę oddać pracę w poniedziałek?', sentAt: '2026-05-14T16:00:00' },
-        { id: 'm2', sender: 'other', text: 'Oczywiście, proszę oddać do piątku.', sentAt: '2026-05-15T09:30:00' },
-    ],
-    c4: [
-        { id: 'm1', sender: 'other', text: 'Hej Zofia! Idziemy na wykład o 12?', sentAt: '2026-05-17T17:30:00' },
-        { id: 'm2', sender: 'me', text: 'Jasne, do zobaczenia!', sentAt: '2026-05-17T17:45:00' },
-        { id: 'm3', sender: 'other', text: 'Możemy się spotkać w bibliotece o 15:00?', sentAt: '2026-05-17T18:50:00' },
-    ],
-};
 
 const STATUS_LABELS = {
     Open: { label: 'Otwarta', cls: 'status-open' },
@@ -80,17 +20,54 @@ const formatDate = (iso) => {
     return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit' }).format(d);
 };
 
+const getInitials = (name) => {
+    if (!name) return '?';
+    return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+};
+
 const MessagesPage = () => {
-    const [activeConv, setActiveConv] = useState('c1');
+    const [conversations, setConversations] = useState([]);
+    const [activeConv, setActiveConv] = useState(null);
+    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    const conv = STATIC_CONVERSATIONS.find(c => c.id === activeConv);
-    const messages = MESSAGES_BY_CONV[activeConv] || [];
+    useEffect(() => {
+        getConversations()
+            .then(data => {
+                const list = Array.isArray(data) ? data : [];
+                setConversations(list);
+                if (list.length > 0) handleSelectConv(list[0]);
+            })
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, []);
 
-    const handleSend = (e) => {
-        e.preventDefault();
-        setNewMessage('');
+    const handleSelectConv = async (conv) => {
+        setActiveConv(conv);
+        try {
+            const full = await getConversation(conv.id);
+            setMessages(Array.isArray(full?.messages) ? full.messages : []);
+        } catch {
+            setMessages([]);
+        }
     };
+
+    const handleSend = async (e) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !activeConv) return;
+        try {
+            await sendMessage(activeConv.id, newMessage.trim());
+            setNewMessage('');
+            const full = await getConversation(activeConv.id);
+            setMessages(Array.isArray(full?.messages) ? full.messages : []);
+        } catch {
+            // silently fail — message wasn't sent
+        }
+    };
+
+    const conv = activeConv;
+    const statusInfo = conv ? (STATUS_LABELS[conv.status] || { label: conv.status, cls: 'status-open' }) : null;
 
     return (
         <div className="page-wrapper-messages">
@@ -105,23 +82,27 @@ const MessagesPage = () => {
                         </button>
                     </div>
                     <div className="conv-list">
-                        {STATIC_CONVERSATIONS.map(c => {
-                            const st = STATUS_LABELS[c.status];
+                        {loading && <p style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>Ładowanie...</p>}
+                        {!loading && conversations.length === 0 && (
+                            <p style={{ padding: '1rem', color: 'var(--color-text-muted)' }}>Brak konwersacji.</p>
+                        )}
+                        {conversations.map(c => {
+                            const st = STATUS_LABELS[c.status] || { label: c.status, cls: 'status-open' };
+                            const otherName = c.recipientName || c.creatorName || 'Nieznany';
                             return (
                                 <button
                                     key={c.id}
-                                    className={`conv-item ${activeConv === c.id ? 'active' : ''}`}
-                                    onClick={() => setActiveConv(c.id)}
+                                    className={`conv-item ${activeConv?.id === c.id ? 'active' : ''}`}
+                                    onClick={() => handleSelectConv(c)}
                                 >
-                                    <div className="conv-avatar">{c.other.avatar}</div>
+                                    <div className="conv-avatar">{getInitials(otherName)}</div>
                                     <div className="conv-info">
                                         <div className="conv-name-row">
-                                            <span className="conv-name">{c.other.name}</span>
-                                            <span className="conv-time">{formatDate(c.lastMessageAt)}</span>
+                                            <span className="conv-name">{otherName}</span>
+                                            <span className="conv-time">{c.updatedAt ? formatDate(c.updatedAt) : ''}</span>
                                         </div>
                                         <div className="conv-preview-row">
-                                            <span className="conv-preview">{c.lastMessage}</span>
-                                            {c.unread > 0 && <span className="unread-dot">{c.unread}</span>}
+                                            <span className="conv-preview">{c.title}</span>
                                         </div>
                                     </div>
                                 </button>
@@ -132,32 +113,26 @@ const MessagesPage = () => {
 
                 {/* Chat area */}
                 <div className="chat-area">
-                    {conv && (
+                    {conv && statusInfo && (
                         <>
                             <div className="chat-header">
                                 <div className="chat-header-info">
-                                    <div className="chat-avatar">{conv.other.avatar}</div>
+                                    <div className="chat-avatar">{getInitials(conv.recipientName || conv.creatorName)}</div>
                                     <div>
-                                        <p className="chat-name">{conv.other.name}</p>
-                                        <span className={`chat-status ${STATUS_LABELS[conv.status].cls}`}>
-                                            {STATUS_LABELS[conv.status].label}
+                                        <p className="chat-name">{conv.recipientName || conv.creatorName || 'Nieznany'}</p>
+                                        <span className={`chat-status ${statusInfo.cls}`}>
+                                            {statusInfo.label}
                                             {conv.type === 'Inquiry' ? ' · Zapytanie' : ' · Bezpośrednia'}
                                         </span>
                                     </div>
                                 </div>
-                                {conv.type === 'Inquiry' && conv.status !== 'Closed' && (
-                                    <button className="btn-close-conv">
-                                        <span className="material-symbols-outlined">lock</span>
-                                        Zamknij rozmowę
-                                    </button>
-                                )}
                             </div>
 
                             <div className="messages-list">
                                 {messages.map(m => (
-                                    <div key={m.id} className={`message-bubble ${m.sender === 'me' ? 'mine' : 'theirs'}`}>
-                                        <div className="bubble-text">{m.text}</div>
-                                        <div className="bubble-time">{formatTime(m.sentAt)}</div>
+                                    <div key={m.id} className={`message-bubble ${m.isOwn ? 'mine' : 'theirs'}`}>
+                                        <div className="bubble-text">{m.content}</div>
+                                        <div className="bubble-time">{m.sentAt ? formatTime(m.sentAt) : ''}</div>
                                     </div>
                                 ))}
                             </div>

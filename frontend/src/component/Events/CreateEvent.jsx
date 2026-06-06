@@ -1,15 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Header';
+import { getCourses } from '../../services/courseService';
+import { createEvent } from '../../services/eventService';
 import './CreateEvent.scss';
-
-const COURSES = [
-    { id: '', name: 'Brak (wydarzenie ogólne)' },
-    { id: 'c1', name: 'UX/UI Design' },
-    { id: 'c2', name: 'Programowanie webowe – React' },
-    { id: 'c3', name: 'Podstawy baz danych' },
-    { id: 'c4', name: 'Algorytmy i struktury danych' },
-];
 
 const EVENT_TYPES = ['Wykład', 'Ćwiczenia', 'Egzamin', 'Kolokwium', 'Konsultacje', 'Inne'];
 
@@ -27,12 +21,32 @@ const CreateEvent = () => {
         location: '',
     });
     const [submitted, setSubmitted] = useState(false);
+    const [courses, setCourses] = useState([]);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        getCourses().then(setCourses).catch(() => {});
+    }, []);
 
     const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
+        setError(null);
+        try {
+            await createEvent({
+                title: form.title,
+                description: form.description || null,
+                startTime: `${form.startDate}T${form.startTime}`,
+                endTime: `${form.endDate}T${form.endTime}`,
+                eventType: form.type,
+                courseId: form.courseId || null,
+                location: form.location || null,
+            });
+            setSubmitted(true);
+        } catch {
+            setError('Nie udało się dodać wydarzenia. Spróbuj ponownie.');
+        }
     };
 
     const isValid = form.title.trim() && form.startDate && form.startTime && form.endDate && form.endTime;
@@ -80,6 +94,8 @@ const CreateEvent = () => {
                             <p className="form-card-subtitle">Dodaj wydarzenie do kalendarza kursu lub ogólnego</p>
                         </div>
                     </div>
+
+                    {error && <div className="form-error">{error}</div>}
 
                     <form className="event-form" onSubmit={handleSubmit}>
                         {/* Title + type row */}
@@ -148,7 +164,8 @@ const CreateEvent = () => {
                             <label className="form-label" htmlFor="courseId">Powiązany kurs (opcjonalnie)</label>
                             <div className="select-wrap">
                                 <select id="courseId" name="courseId" className="form-select" value={form.courseId} onChange={handleChange}>
-                                    {COURSES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    <option value="">Brak (wydarzenie ogólne)</option>
+                                    {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                                 <span className="material-symbols-outlined select-icon">expand_more</span>
                             </div>

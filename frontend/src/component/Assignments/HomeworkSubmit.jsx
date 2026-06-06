@@ -1,39 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Header from '../Header';
+import { request } from '../../services/apiClient';
 import './HomeworkSubmit.scss';
-
-const STATIC_HOMEWORK = {
-    title: 'Praca domowa: Projekt makiety UX',
-    course: 'UX/UI Design',
-    dueDate: '2026-05-20T23:59:00',
-    description: `Stwórz makietę (wireframe) dla mobilnej aplikacji e-commerce. Projekt powinien zawierać:
-    
-1. Ekran listy produktów z filtrowaniem i sortowaniem
-2. Ekran szczegółów produktu z galerią zdjęć
-3. Koszyk zakupowy z podsumowaniem zamówienia
-4. Ekran finalizacji zakupu
-
-Wymagania techniczne:
-- Użyj narzędzia Figma lub Adobe XD
-- Zachowaj spójność systemu designu
-- Opisz kluczowe interakcje w komentarzach
-
-Oddaj link do projektu lub plik PDF z makietami.`,
-};
 
 const formatDate = (iso) =>
     new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 
 const HomeworkSubmit = () => {
     const { id } = useParams();
+    const [homework, setHomework] = useState(null);
     const [submissionText, setSubmissionText] = useState('');
     const [attachmentUrl, setAttachmentUrl] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        request(`/api/assignments/${id}/solve`)
+            .then(data => setHomework(data))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
+        try {
+            await request(`/api/assignments/${id}/submit-homework`, {
+                method: 'POST',
+                body: JSON.stringify({ submissionUrl: attachmentUrl, description: submissionText || null })
+            });
+            setSubmitted(true);
+        } catch {
+            alert('Nie udało się wysłać pracy. Spróbuj ponownie.');
+        }
     };
 
     if (submitted) {
@@ -57,6 +56,17 @@ const HomeworkSubmit = () => {
         );
     }
 
+    if (loading) {
+        return (
+            <div className="page-wrapper-homework">
+                <Header variant="dashboard" />
+                <div className="main-content">
+                    <p>Ładowanie zadania...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="page-wrapper-homework">
             <Header variant="dashboard" />
@@ -75,23 +85,28 @@ const HomeworkSubmit = () => {
                             </div>
                             <div>
                                 <span className="hw-type-chip">Praca domowa</span>
-                                <p className="hw-course">{STATIC_HOMEWORK.course}</p>
                             </div>
                         </div>
 
-                        <h2 className="hw-title">{STATIC_HOMEWORK.title}</h2>
+                        <h2 className="hw-title">{homework?.title || 'Zadanie'}</h2>
 
-                        <div className="hw-due">
-                            <span className="material-symbols-outlined">schedule</span>
-                            <span>Termin: <strong>{formatDate(STATIC_HOMEWORK.dueDate)}</strong></span>
-                        </div>
+                        {homework?.dueDate && (
+                            <div className="hw-due">
+                                <span className="material-symbols-outlined">schedule</span>
+                                <span>Termin: <strong>{formatDate(homework.dueDate)}</strong></span>
+                            </div>
+                        )}
 
-                        <div className="hw-description-label">Opis zadania</div>
-                        <div className="hw-description">
-                            {STATIC_HOMEWORK.description.split('\n').map((line, i) => (
-                                <p key={i}>{line}</p>
-                            ))}
-                        </div>
+                        {homework?.description && (
+                            <>
+                                <div className="hw-description-label">Opis zadania</div>
+                                <div className="hw-description">
+                                    {homework.description.split('\n').map((line, i) => (
+                                        <p key={i}>{line}</p>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Right: submission form */}

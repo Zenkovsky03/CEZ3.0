@@ -1,65 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../Header';
+import { getThreads } from '../../services/forumService';
 import './ForumList.scss';
-
-const STATIC_THREADS = [
-    {
-        id: 't1',
-        title: 'Jak zrozumieć różnicę między wireframe a prototype?',
-        author: { name: 'Anna Kowalska', avatar: 'AK' },
-        course: 'UX/UI Design',
-        createdAt: '2026-05-17T10:30:00',
-        replyCount: 8,
-        isClosed: false,
-        isPinned: true,
-        preview: 'Mam problem ze zrozumieniem kiedy używamy wireframe a kiedy prototypu...',
-    },
-    {
-        id: 't2',
-        title: 'Błąd TypeError przy imporcie modułu os w Pythonie',
-        author: { name: 'Piotr Jabłoński', avatar: 'PJ' },
-        course: 'Wprowadzenie do Pythona',
-        createdAt: '2026-05-18T08:15:00',
-        replyCount: 3,
-        isClosed: false,
-        isPinned: false,
-        preview: 'Kiedy próbuję zaimportować moduł os, pojawia się nieoczekiwany błąd...',
-    },
-    {
-        id: 't3',
-        title: 'Zasoby do nauki Figmy – polecane kursy i tutoriale',
-        author: { name: 'dr Anna Nowak', avatar: 'AN' },
-        course: 'UX/UI Design',
-        createdAt: '2026-05-10T12:00:00',
-        replyCount: 15,
-        isClosed: false,
-        isPinned: true,
-        preview: 'Zebrałam listę najlepszych materiałów do nauki projektowania w Figmie...',
-    },
-    {
-        id: 't4',
-        title: 'Pytanie o różnicę między list a tuple w Pythonie',
-        author: { name: 'Marek Wiśniewski', avatar: 'MW' },
-        course: 'Wprowadzenie do Pythona',
-        createdAt: '2026-05-14T16:45:00',
-        replyCount: 6,
-        isClosed: true,
-        isPinned: false,
-        preview: 'Kiedy powinno się używać list, a kiedy tuple? Czy wydajność ma znaczenie?',
-    },
-    {
-        id: 't5',
-        title: 'Terminarz zaliczeń – ważne daty i wymagania',
-        author: { name: 'dr hab. Piotr Zieliński', avatar: 'PZ' },
-        course: 'Wprowadzenie do Pythona',
-        createdAt: '2026-05-01T09:00:00',
-        replyCount: 2,
-        isClosed: false,
-        isPinned: true,
-        preview: 'Informacje o terminach zaliczeń i wymaganiach do zaliczenia kursu...',
-    },
-];
 
 const formatDate = (iso) => {
     const d = new Date(iso);
@@ -72,11 +15,20 @@ const formatDate = (iso) => {
 };
 
 const ForumList = () => {
+    const [threads, setThreads] = useState([]);
     const [search, setSearch] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    const filtered = STATIC_THREADS
+    useEffect(() => {
+        getThreads()
+            .then(data => setThreads(Array.isArray(data) ? data : []))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, []);
+
+    const filtered = threads
         .filter(t => !search || t.title.toLowerCase().includes(search.toLowerCase()))
-        .sort((a, b) => b.isPinned - a.isPinned);
+        .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
     return (
         <div className="page-wrapper-forum">
@@ -105,42 +57,52 @@ const ForumList = () => {
                 </div>
 
                 <div className="threads-list">
-                    {filtered.length === 0 && (
+                    {loading && (
+                        <div className="empty-state">
+                            <p>Ładowanie wątków...</p>
+                        </div>
+                    )}
+                    {!loading && filtered.length === 0 && (
                         <div className="empty-state">
                             <span className="material-symbols-outlined empty-icon">forum</span>
                             <p>Nie znaleziono wątków pasujących do wyszukiwania.</p>
                         </div>
                     )}
-                    {filtered.map(t => (
-                        <Link to={`/forum/${t.id}`} key={t.id} className="thread-card">
-                            <div className="thread-left">
-                                <div className="thread-author-avatar">{t.author.avatar}</div>
-                                <div className="thread-info">
-                                    <div className="thread-tags">
-                                        {t.isPinned && (
-                                            <span className="tag tag-pinned">
-                                                <span className="material-symbols-outlined">push_pin</span>
-                                                Przypięty
-                                            </span>
-                                        )}
-                                        {t.isClosed && <span className="tag tag-closed">Zamknięty</span>}
-                                        <span className="tag tag-course">{t.course}</span>
+                    {filtered.map(t => {
+                        const authorName = t.author
+                            ? `${t.author.firstName || ''} ${t.author.lastName || ''}`.trim()
+                            : t.authorName || 'Nieznany';
+                        const initials = authorName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+                        return (
+                            <Link to={`/forum/${t.id}`} key={t.id} className="thread-card">
+                                <div className="thread-left">
+                                    <div className="thread-author-avatar">{initials}</div>
+                                    <div className="thread-info">
+                                        <div className="thread-tags">
+                                            {t.isPinned && (
+                                                <span className="tag tag-pinned">
+                                                    <span className="material-symbols-outlined">push_pin</span>
+                                                    Przypięty
+                                                </span>
+                                            )}
+                                            {!t.isOpen && <span className="tag tag-closed">Zamknięty</span>}
+                                        </div>
+                                        <h3 className="thread-title">{t.title}</h3>
+                                        <p className="thread-preview">{t.content?.slice(0, 120)}{t.content?.length > 120 ? '...' : ''}</p>
+                                        <p className="thread-meta">
+                                            {authorName} · {formatDate(t.createdAt)}
+                                        </p>
                                     </div>
-                                    <h3 className="thread-title">{t.title}</h3>
-                                    <p className="thread-preview">{t.preview}</p>
-                                    <p className="thread-meta">
-                                        {t.author.name} · {formatDate(t.createdAt)}
-                                    </p>
                                 </div>
-                            </div>
-                            <div className="thread-right">
-                                <div className="reply-count">
-                                    <span className="material-symbols-outlined">forum</span>
-                                    <span>{t.replyCount}</span>
+                                <div className="thread-right">
+                                    <div className="reply-count">
+                                        <span className="material-symbols-outlined">forum</span>
+                                        <span>{t.totalReplies ?? 0}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
-                    ))}
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </div>
