@@ -121,11 +121,11 @@ const MessagesPage = () => {
                                 onClick={() => setActiveConvId(c.id)}
                             >
                                 <div className="conv-avatar">
-                                    {((c.otherPerson?.firstName?.[0] || c.participantName?.[0] || '?').toUpperCase())}
+                                    {((c.otherPersonFirstName?.[0] || c.otherPerson?.firstName?.[0] || c.participantName?.[0] || '?').toUpperCase())}
                                 </div>
                                 <div className="conv-info">
                                     <div className="conv-name-row">
-                                        <span className="conv-name">{c.otherPerson?.firstName + ' ' + c.otherPerson?.lastName || c.participantName || 'Nieznany'}</span>
+                                        <span className="conv-name">{[c.otherPersonFirstName, c.otherPersonLastName].filter(Boolean).join(' ') || [c.otherPerson?.firstName, c.otherPerson?.lastName].filter(Boolean).join(' ') || c.participantName || 'Nieznany'}</span>
                                         <span className="conv-time">{c.lastMessageAt ? formatDate(c.lastMessageAt) : ''}</span>
                                     </div>
                                     <div className="conv-preview-row">
@@ -143,11 +143,11 @@ const MessagesPage = () => {
                             <div className="chat-header">
                                 <div className="chat-header-info">
                                     <div className="chat-avatar">
-                                        {((activeConv.otherPerson?.firstName?.[0] || activeConv.participantName?.[0] || '?').toUpperCase())}
+                                        {((activeConv.otherPersonFirstName?.[0] || activeConv.otherPerson?.firstName?.[0] || activeConv.participantName?.[0] || '?').toUpperCase())}
                                     </div>
                                     <div>
                                         <p className="chat-name">
-                                            {activeConv.otherPerson?.firstName + ' ' + activeConv.otherPerson?.lastName || activeConv.participantName || 'Nieznany'}
+                                            {[activeConv.otherPersonFirstName, activeConv.otherPersonLastName].filter(Boolean).join(' ') || [activeConv.otherPerson?.firstName, activeConv.otherPerson?.lastName].filter(Boolean).join(' ') || activeConv.participantName || 'Nieznany'}
                                         </p>
                                         <span className={`chat-status ${STATUS_LABELS[activeConv.status]?.cls || ''}`}>
                                             {STATUS_LABELS[activeConv.status]?.label || activeConv.status}
@@ -164,6 +164,9 @@ const MessagesPage = () => {
                                     </div>
                                 ) : messages.map(m => (
                                     <div key={m.id} className={`message-bubble ${m.sender === 'me' || m.senderId === user?.id ? 'mine' : 'theirs'}`}>
+                                        {m.sender !== 'me' && m.senderId !== user?.id && m.senderName && (
+                                            <div className="bubble-author">{m.senderName}</div>
+                                        )}
                                         <div className="bubble-text">{m.body || m.text}</div>
                                         <div className="bubble-time">{formatTime(m.createdAt || m.sentAt)}</div>
                                     </div>

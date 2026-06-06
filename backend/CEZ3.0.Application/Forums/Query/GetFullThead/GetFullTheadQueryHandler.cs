@@ -39,6 +39,10 @@ public class GetFullTheadQueryHandler(ILogger<GetFullTheadQueryHandler> logger,
 
         var totalReplays = await _threadReplayRepository.GetTotalReplaysByThreadIdAsync(threadId);
 
+        var replyAuthorIds = replays.Select(r => r.AuthorId).Distinct().ToList();
+        var replyAuthors = await _userRepository.GetUsersByIdsAsync(replyAuthorIds);
+        var replyAuthorDict = replyAuthors.ToDictionary(u => u.Id, u => u);
+
         var dto = new ThreadDto
         {
             Id = thread.Id,
@@ -55,12 +59,19 @@ public class GetFullTheadQueryHandler(ILogger<GetFullTheadQueryHandler> logger,
             CreatedAt = thread.CreatedAt,
             IsOpen = thread.IsOpen,
             TotalReplies = thread.TotalReplies,
-            Replies = new PagedResult<ThreadReplayDto>(replays.Select(r => new ThreadReplayDto
+            Replies = new PagedResult<ThreadReplayDto>(replays.Select(r =>
             {
-                Id = r.Id,
-                Content = r.Content,
-                AuthorId = r.AuthorId,
-                CreatedAt = r.CreatedAt
+                var replyAuthor = replyAuthorDict.GetValueOrDefault(r.AuthorId);
+                return new ThreadReplayDto
+                {
+                    Id = r.Id,
+                    Content = r.Content,
+                    AuthorId = r.AuthorId,
+                    AuthorName = replyAuthor == null
+                        ? "Nieznany"
+                        : $"{replyAuthor.FirstName} {replyAuthor.LastName}",
+                    CreatedAt = r.CreatedAt
+                };
             }).ToList(), request.PageNumber, request.PageSize, totalReplays)
         };
 

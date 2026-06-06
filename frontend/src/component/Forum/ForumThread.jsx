@@ -29,7 +29,13 @@ const ForumThread = () => {
             try {
                 const data = await getThreadById(id);
                 if (!mounted) return;
-                setThread(data?.thread || data?.Thread || data);
+                const t = data?.thread || data?.Thread || data;
+                if (t) {
+                    const authorName = t.author
+                        ? [t.author.firstName, t.author.lastName].filter(Boolean).join(' ') || 'Nieznany'
+                        : t.authorName || 'Nieznany';
+                    setThread({ ...t, authorName, isClosed: t.isClosed ?? !t.isOpen });
+                }
                 const replyList = data?.thread?.replies?.items || data?.thread?.Replies?.items || data?.replies || data?.Replies || [];
                 setReplies(Array.isArray(replyList) ? replyList : []);
             } catch (err) {

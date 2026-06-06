@@ -34,13 +34,17 @@ public class CourseEnrollmentSeeder : ISeeder
 
         // Course1 & Course2 → all 10 students
         // Course3 → students 1-7
-        // Course4 → students 4-10
+        // Course4 → students 1-10 (was 4-10, expanded for student1)
+        // Course5 → students 1-7 (Physics)
+        // Course6 → students 1-5 (Biology)
         var enrollmentMap = new (ObjectId CourseId, ObjectId[] Students)[]
         {
             (SeedIds.Course1, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
             (SeedIds.Course2, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
             (SeedIds.Course3, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7 }),
-            (SeedIds.Course4, new[] { SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
+            (SeedIds.Course4, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7,SeedIds.Student8,SeedIds.Student9,SeedIds.Student10 }),
+            (SeedIds.Course5, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5,SeedIds.Student6,SeedIds.Student7 }),
+            (SeedIds.Course6, new[] { SeedIds.Student1,SeedIds.Student2,SeedIds.Student3,SeedIds.Student4,SeedIds.Student5 }),
         };
 
         var enrollments = new List<CourseEnrollment>();

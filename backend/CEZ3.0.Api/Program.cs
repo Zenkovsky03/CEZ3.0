@@ -1,10 +1,13 @@
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CEZ3._0.Application.Extensions;
 using CEZ3._0.Application.Helpers.Scalar;
 using CEZ3._0.Infrastructure.Extentions;
 using CEZ3._0.Infrastructure.Persistence.Seeders;
 using DotNetEnv;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +18,11 @@ if (File.Exists(envPath)) Env.Load(envPath);
 
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new ObjectIdHexConverter());
+    });
 
 
 builder.Services.AddOpenApi("v1", opt =>
@@ -78,3 +85,16 @@ app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();
+
+public class ObjectIdHexConverter : JsonConverter<ObjectId>
+{
+    public override ObjectId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return ObjectId.Parse(reader.GetString()!);
+    }
+
+    public override void Write(Utf8JsonWriter writer, ObjectId value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}

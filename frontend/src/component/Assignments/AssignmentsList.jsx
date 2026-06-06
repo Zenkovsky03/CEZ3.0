@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
 import Header from '../Header';
 import { getNearestAssignments } from '../../services/assignmentService';
 import { getCourses } from '../../services/courseService';
@@ -16,6 +17,7 @@ const formatDate = (iso) => {
 };
 
 const AssignmentsList = () => {
+    const { user } = useContext(AuthContext);
     const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -105,10 +107,12 @@ const AssignmentsList = () => {
                         <h1 className="page-title">Zadania</h1>
                         <p className="page-subtitle">Twoje aktywne i zakończone zadania</p>
                     </div>
-                    <Link to="/assignments/ungraded" className="btn-secondary">
-                        <span className="material-symbols-outlined">grading</span>
-                        Do oceniania
-                    </Link>
+                    {user?.role !== 'Student' && (
+                        <Link to="/assignments/ungraded" className="btn-secondary">
+                            <span className="material-symbols-outlined">grading</span>
+                            Do oceniania
+                        </Link>
+                    )}
                 </div>
 
                 <div className="filter-tabs">

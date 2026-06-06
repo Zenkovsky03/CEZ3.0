@@ -8,6 +8,7 @@ const navigationItems = [
     { key: 'dashboard', label: 'Pulpit', to: '/', icon: 'dashboard', exact: true, roles: null },
     { key: 'courses', label: 'Wszystkie kursy', to: '/courses', icon: 'library_books', roles: null },
     { key: 'assignments', label: 'Zadania', to: '/assignments', icon: 'assignment', roles: null },
+    { key: 'grades', label: 'Oceny', to: '/grades', icon: 'grade', roles: null },
     { key: 'calendar', label: 'Kalendarz', to: '/calendar', icon: 'calendar_today', roles: null },
     { key: 'messages', label: 'Wiadomości', to: '/messages', icon: 'chat_bubble', roles: null },
     { key: 'forum', label: 'Forum', to: '/forum', icon: 'forum', roles: null }

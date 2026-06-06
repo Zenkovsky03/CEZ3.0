@@ -5,26 +5,39 @@ using CEZ3._0.Domain.Exceptions;
 using CEZ3._0.Domain.Repositories;
 using MediatR;
 using MongoDB.Bson;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CEZ3._0.Application.Conversations.Query.GetUserConversations
+namespace CEZ3._0.Application.Conversations.Query.GetUserConversations;
+
+public class GetUserConversationsQueryHandler(
+    IConversationRepository repository,
+    IUserContext userContext,
+    IUserRepository userRepository) : IRequestHandler<GetUserConversationsQuery, List<ConversationDto>>
 {
-    public class GetUserConversationsQueryHandler(
-        IConversationRepository repository,
-        IUserContext userContext) : IRequestHandler<GetUserConversationsQuery, List<ConversationDto>>
+    public async Task<List<ConversationDto>> Handle(GetUserConversationsQuery request, CancellationToken cancellationToken)
     {
-        public async Task<List<ConversationDto>> Handle(GetUserConversationsQuery request, CancellationToken cancellationToken)
+        var user = userContext.GetCurrentUser() ?? throw new UnauthorizedException("Session expired");
+        var userId = ObjectId.Parse(user.id);
+
+        var conversations = await repository.GetUserConversationAsync(userId);
+
+        var otherUserIds = conversations
+            .Select(c => c.CreatorId == userId ? c.RecipientId : c.CreatorId)
+            .Distinct()
+            .ToList();
+
+        var users = await userRepository.GetUsersByIdsAsync(otherUserIds);
+        var userDict = users.ToDictionary(u => u.Id, u => u);
+
+        var result = new List<ConversationDto>();
+        foreach (var c in conversations)
         {
-            var user = userContext.GetCurrentUser() ?? throw new UnauthorizedException("Session expired");
-            var userId = ObjectId.Parse(user.id);
+            var otherId = c.CreatorId == userId ? c.RecipientId : c.CreatorId;
+            var otherUser = userDict.GetValueOrDefault(otherId);
 
-            var conversations = await repository.GetUserConversationAsync(userId);
+            var messages = await repository.GetMessagesByConversationIdAsync(c.Id);
+            var lastMsg = messages.MaxBy(m => m.SentAt);
 
-            return conversations.Select(c => new ConversationDto
+            result.Add(new ConversationDto
             {
                 Id = c.Id.ToString(),
                 Title = c.Title,
@@ -32,10 +45,16 @@ namespace CEZ3._0.Application.Conversations.Query.GetUserConversations
                 Status = (int)c.Status,
                 CreatorId = c.CreatorId.ToString(),
                 RecipientId = c.RecipientId.ToString(),
+                OtherPersonFirstName = otherUser?.FirstName ?? "",
+                OtherPersonLastName = otherUser?.LastName ?? "",
+                LastMessage = lastMsg?.Body,
+                LastMessageAt = lastMsg?.SentAt,
                 CreatedAt = c.CreatedAt,
                 UpdatedAt = c.UpdatedAt,
                 ClosedAt = c.ClosedAt
-            }).OrderByDescending(c => c.UpdatedAt).ToList();
+            });
         }
+
+        return result.OrderByDescending(c => c.UpdatedAt).ToList();
     }
 }

@@ -7,12 +7,14 @@ import {
     getCourseParticipants,
     removeParticipantFromCourse
 } from '../../../services/courseService';
+import { getMyGrades } from '../../../services/gradeService';
 import './CourseDetails.scss';
 
 const CourseDetailsContainer = () => {
     const { id } = useParams();
     const [course, setCourse] = useState(null);
     const [participants, setParticipants] = useState([]);
+    const [grades, setGrades] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -22,13 +24,16 @@ const CourseDetailsContainer = () => {
             setError(null);
 
             try {
-                const [courseData, participantsData] = await Promise.all([
+                const [courseData, participantsData, gradesData] = await Promise.all([
                     getCourseById(id),
-                    getCourseParticipants(id)
+                    getCourseParticipants(id),
+                    getMyGrades(id).catch(() => [])
                 ]);
 
                 setCourse(courseData || null);
                 setParticipants(Array.isArray(participantsData) ? participantsData : []);
+                const rawGrades = Array.isArray(gradesData) ? gradesData : gradesData?.items || gradesData?.Items || [];
+                setGrades(rawGrades);
             } catch (err) {
                 setError('Wystąpił błąd podczas ładowania danych');
                 console.error('Error loading course details:', err);
@@ -69,6 +74,7 @@ const CourseDetailsContainer = () => {
         <CourseDetails
             course={course}
             participants={participants}
+            grades={grades}
             loading={loading}
             error={error}
             onRemoveParticipant={handleRemoveParticipant}

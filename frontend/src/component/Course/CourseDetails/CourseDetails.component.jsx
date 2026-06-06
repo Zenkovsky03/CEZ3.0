@@ -6,9 +6,21 @@ import CourseHeader from '../CourseHeader';
 import CourseInfo from '../CourseInfo';
 import ParticipantsList from '../ParticipantsList';
 
+const formatDate = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+};
+
+const GRADE_COLORS = {
+    A: '#16a34a', B: '#2563eb', C: '#ca8a04',
+    D: '#f97316', E: '#dc2626', F: '#dc2626'
+};
+
 const CourseDetails = ({
                            course,
                            participants,
+                           grades,
                            loading,
                            error,
                            onRemoveParticipant,
@@ -73,6 +85,32 @@ const CourseDetails = ({
                             onAdd={onAddParticipant}
                         />
                     </div>
+
+                    {user?.role === 'Student' && grades.length > 0 && (
+                        <div className="course-grades-section">
+                            <h2 className="section-heading">Moje oceny w tym kursie</h2>
+                            <div className="course-grades-table">
+                                <div className="grades-table-header">
+                                    <span className="col-assignment">Zadanie</span>
+                                    <span className="col-score">Wynik</span>
+                                    <span className="col-mark">Ocena</span>
+                                    <span className="col-date">Data</span>
+                                </div>
+                                {grades.map(g => (
+                                    <div key={g.id} className="grades-row">
+                                        <span className="col-assignment">{g.assignmentTitle}</span>
+                                        <span className="col-score">{g.pointsRecieved}/{g.maxPoints}</span>
+                                        <span className="col-mark">
+                                            <span className="grade-badge-sm" style={{ background: GRADE_COLORS[g.mark] || '#6b7280' }}>
+                                                {g.mark || '—'}
+                                            </span>
+                                        </span>
+                                        <span className="col-date">{formatDate(g.createdAt)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

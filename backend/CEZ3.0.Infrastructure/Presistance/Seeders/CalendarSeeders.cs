@@ -42,12 +42,12 @@ public class AnnouncementSeeder : ISeeder
 
         await _db.Announcements.AddRangeAsync(announcements, cancellationToken);
 
-        var allStudents = new[] { SeedIds.Student1, SeedIds.Student2, SeedIds.Student3, SeedIds.Student4, SeedIds.Student5, SeedIds.Student6, SeedIds.Student7, SeedIds.Student8, SeedIds.Student9, SeedIds.Student10 };
+        var allUsers = new[] { SeedIds.Admin, SeedIds.Teacher1, SeedIds.Teacher2, SeedIds.Teacher3, SeedIds.Student1, SeedIds.Student2, SeedIds.Student3, SeedIds.Student4, SeedIds.Student5, SeedIds.Student6, SeedIds.Student7, SeedIds.Student8, SeedIds.Student9, SeedIds.Student10 };
         var userAnnouncements = new List<UserAnnouncement>();
 
         foreach (var ann in announcements)
-            foreach (var sid in allStudents)
-                userAnnouncements.Add(new UserAnnouncement { Id = ObjectId.GenerateNewId(), UserId = sid, AnnouncementId = ann.Id, User = null!, Announcement = null!, IsActive = true, CreatedAt = now });
+            foreach (var uid in allUsers)
+                userAnnouncements.Add(new UserAnnouncement { Id = ObjectId.GenerateNewId(), UserId = uid, AnnouncementId = ann.Id, User = null!, Announcement = null!, IsActive = true, CreatedAt = now });
 
         await _db.UserAnnouncements.AddRangeAsync(userAnnouncements, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
@@ -92,12 +92,12 @@ public class EventSeeder : ISeeder
 
         await _db.Events.AddRangeAsync(events, cancellationToken);
 
-        var allStudents = new[] { SeedIds.Student1, SeedIds.Student2, SeedIds.Student3, SeedIds.Student4, SeedIds.Student5, SeedIds.Student6, SeedIds.Student7, SeedIds.Student8, SeedIds.Student9, SeedIds.Student10 };
+        var allUsers = new[] { SeedIds.Admin, SeedIds.Teacher1, SeedIds.Teacher2, SeedIds.Teacher3, SeedIds.Student1, SeedIds.Student2, SeedIds.Student3, SeedIds.Student4, SeedIds.Student5, SeedIds.Student6, SeedIds.Student7, SeedIds.Student8, SeedIds.Student9, SeedIds.Student10 };
         var userEvents = new List<UserEvent>();
 
         foreach (var ev in events)
-            foreach (var sid in allStudents)
-                userEvents.Add(new UserEvent { Id = ObjectId.GenerateNewId(), UserId = sid, EventId = ev.Id, User = null!, Event = null!, IsActive = true, CreatedAt = now });
+            foreach (var uid in allUsers)
+                userEvents.Add(new UserEvent { Id = ObjectId.GenerateNewId(), UserId = uid, EventId = ev.Id, User = null!, Event = null!, IsActive = true, CreatedAt = now });
 
         await _db.UserEvents.AddRangeAsync(userEvents, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);

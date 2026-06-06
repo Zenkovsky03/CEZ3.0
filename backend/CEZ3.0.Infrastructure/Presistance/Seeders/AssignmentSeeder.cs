@@ -2,6 +2,7 @@ using CEZ3._0.Domain.Entities;
 using CEZ3._0.Infrastructure.Presistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 
 namespace CEZ3._0.Infrastructure.Persistence.Seeders;
 
@@ -20,21 +21,13 @@ public class AssignmentSeeder : ISeeder
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        var anyExists = await _db.Assignments.AsNoTracking().AnyAsync(cancellationToken);
-        if (anyExists)
-        {
-            _logger.LogInformation("Assignments already seeded — skipping.");
-            return;
-        }
-
         _db.ChangeTracker.Clear();
-
         var now = DateTime.UtcNow;
 
-        var assignments = new List<Assignment>
+        var allDesired = new Dictionary<ObjectId, Assignment>
         {
             // ── Assignment 1: Algebra Quiz (auto-graded) ──────────────
-            new()
+            [SeedIds.Assignment1] = new()
             {
                 Id = SeedIds.Assignment1, CourseId = SeedIds.Course1, SectionId = SeedIds.Section1Course1,
                 Title = "Algebra Basics Quiz", Description = "Short quiz on variables and basic operations.",
@@ -63,7 +56,7 @@ public class AssignmentSeeder : ISeeder
             },
 
             // ── Assignment 2: Literature Test (manual) ─────────────────
-            new()
+            [SeedIds.Assignment2] = new()
             {
                 Id = SeedIds.Assignment2, CourseId = SeedIds.Course2, SectionId = SeedIds.Section1Course2,
                 Title = "Romanticism Knowledge Test", Description = "Test covering key themes of Polish Romanticism.",
@@ -82,7 +75,7 @@ public class AssignmentSeeder : ISeeder
             },
 
             // ── Assignment 3: CS Quiz (auto-graded) ────────────────────
-            new()
+            [SeedIds.Assignment3] = new()
             {
                 Id = SeedIds.Assignment3, CourseId = SeedIds.Course3, SectionId = SeedIds.Section1Course3,
                 Title = "C# Fundamentals Quiz", Description = "Quiz covering basic C# syntax and types.",
@@ -117,7 +110,7 @@ public class AssignmentSeeder : ISeeder
             },
 
             // ── Assignment 4: English Quiz (auto-graded) ───────────────
-            new()
+            [SeedIds.Assignment4] = new()
             {
                 Id = SeedIds.Assignment4, CourseId = SeedIds.Course4, SectionId = SeedIds.Section1Course4,
                 Title = "Essay Structure Quiz", Description = "Quiz on academic essay structure.",
@@ -144,7 +137,7 @@ public class AssignmentSeeder : ISeeder
             },
 
             // ── Assignment 5: Geometry Test (manual) ───────────────────
-            new()
+            [SeedIds.Assignment5] = new()
             {
                 Id = SeedIds.Assignment5, CourseId = SeedIds.Course1, SectionId = SeedIds.Section2Course1,
                 Title = "Geometry Mid-term Test", Description = "Covers points, lines, planes and basic theorems.",
@@ -169,11 +162,114 @@ public class AssignmentSeeder : ISeeder
                     },
                 }
             },
+
+            // ── Assignment 6: Physics Quiz (auto-graded) ──────────────
+            [SeedIds.Assignment6] = new()
+            {
+                Id = SeedIds.Assignment6, CourseId = SeedIds.Course5, SectionId = SeedIds.Section1Course5,
+                Title = "Mechanika - Quiz", Description = "Krótki quiz z zasad dynamiki Newtona i ruchu.",
+                MaxPoint = 10, DueDate = now.AddDays(14), TaskType = "Quiz", IsAutoGraded = true, CreatedAt = now,
+                Questions = new List<QuizQuestion>
+                {
+                    new() { Id = SeedIds.Q6_1, Text = "Jaka jest jednostka siły w układzie SI?", Type = "SingleChoice", Points = 5,
+                        Answers = new List<QuizAnswer>
+                        {
+                            new() { Id = SeedIds.A6_Q1_1, Text = "Dżul (J)",     IsCorrect = false },
+                            new() { Id = SeedIds.A6_Q1_2, Text = "Newton (N)",   IsCorrect = true  },
+                            new() { Id = SeedIds.A6_Q1_3, Text = "Wat (W)",      IsCorrect = false },
+                            new() { Id = SeedIds.A6_Q1_4, Text = "Paskal (Pa)",  IsCorrect = false },
+                        }
+                    },
+                    new() { Id = SeedIds.Q6_2, Text = "Które z poniższych są wektorami?", Type = "MultipleChoice", Points = 5,
+                        Answers = new List<QuizAnswer>
+                        {
+                            new() { Id = SeedIds.A6_Q2_1, Text = "Siła",         IsCorrect = true  },
+                            new() { Id = SeedIds.A6_Q2_2, Text = "Masa",         IsCorrect = false },
+                            new() { Id = SeedIds.A6_Q2_3, Text = "Prędkość",     IsCorrect = true  },
+                            new() { Id = SeedIds.A6_Q2_4, Text = "Temperatura",  IsCorrect = false },
+                        }
+                    },
+                }
+            },
+
+            // ── Assignment 7: Physics Test (manual) ────────────────────
+            [SeedIds.Assignment7] = new()
+            {
+                Id = SeedIds.Assignment7, CourseId = SeedIds.Course5, SectionId = SeedIds.Section2Course5,
+                Title = "Termodynamika - Sprawdzian", Description = "Sprawdzian z podstaw termodynamiki i przemian gazowych.",
+                MaxPoint = 25, DueDate = now.AddDays(21), TaskType = "Test", IsAutoGraded = false, CreatedAt = now,
+                Questions = new List<QuizQuestion>
+                {
+                    new() { Id = SeedIds.Q7_1, Text = "Podaj treść pierwszej zasady termodynamiki.", Type = "SingleChoice", Points = 25,
+                        Answers = new List<QuizAnswer>
+                        {
+                            new() { Id = SeedIds.A7_Q1_1, Text = "ΔU = Q + W",         IsCorrect = true  },
+                            new() { Id = SeedIds.A7_Q1_2, Text = "F = ma",             IsCorrect = false },
+                            new() { Id = SeedIds.A7_Q1_3, Text = "pV = nRT",           IsCorrect = false },
+                        }
+                    },
+                }
+            },
+
+            // ── Assignment 8: Biology Quiz (auto-graded) ──────────────
+            [SeedIds.Assignment8] = new()
+            {
+                Id = SeedIds.Assignment8, CourseId = SeedIds.Course6, SectionId = SeedIds.Section1Course6,
+                Title = "Biologia komórki - Quiz", Description = "Quiz z budowy komórki eukariotycznej i podziałów komórkowych.",
+                MaxPoint = 10, DueDate = now.AddDays(14), TaskType = "Quiz", IsAutoGraded = true, CreatedAt = now,
+                Questions = new List<QuizQuestion>
+                {
+                    new() { Id = SeedIds.Q8_1, Text = "Który organellum odpowiada za produkcję energii?", Type = "SingleChoice", Points = 5,
+                        Answers = new List<QuizAnswer>
+                        {
+                            new() { Id = SeedIds.A8_Q1_1, Text = "Jądro komórkowe",    IsCorrect = false },
+                            new() { Id = SeedIds.A8_Q1_2, Text = "Mitochondrium",      IsCorrect = true  },
+                            new() { Id = SeedIds.A8_Q1_3, Text = "Aparat Golgiego",    IsCorrect = false },
+                        }
+                    },
+                    new() { Id = SeedIds.Q8_2, Text = "Które procesy zachodzą w jądrze komórkowym?", Type = "MultipleChoice", Points = 5,
+                        Answers = new List<QuizAnswer>
+                        {
+                            new() { Id = SeedIds.A8_Q2_1, Text = "Replikacja DNA",     IsCorrect = true  },
+                            new() { Id = SeedIds.A8_Q2_2, Text = "Translacja",         IsCorrect = false },
+                            new() { Id = SeedIds.A8_Q2_3, Text = "Transkrypcja",       IsCorrect = true  },
+                        }
+                    },
+                }
+            },
+
+            // ── Assignment 9: Biology Test (manual) ───────────────────
+            [SeedIds.Assignment9] = new()
+            {
+                Id = SeedIds.Assignment9, CourseId = SeedIds.Course6, SectionId = SeedIds.Section2Course6,
+                Title = "Genetyka - Sprawdzian", Description = "Sprawdzian z podstaw dziedziczenia i budowy DNA.",
+                MaxPoint = 25, DueDate = now.AddDays(28), TaskType = "Test", IsAutoGraded = false, CreatedAt = now,
+                Questions = new List<QuizQuestion>
+                {
+                    new() { Id = SeedIds.Q9_1, Text = "Jak nazywają się zasady azotowe w DNA?", Type = "SingleChoice", Points = 25,
+                        Answers = new List<QuizAnswer>
+                        {
+                            new() { Id = SeedIds.A9_Q1_1, Text = "A, T, C, G",         IsCorrect = true  },
+                            new() { Id = SeedIds.A9_Q1_2, Text = "A, U, C, G",         IsCorrect = false },
+                            new() { Id = SeedIds.A9_Q1_3, Text = "A, T, U, C",         IsCorrect = false },
+                        }
+                    },
+                }
+            },
         };
 
-        await _db.Assignments.AddRangeAsync(assignments, cancellationToken);
+        var existingIds = await _db.Assignments.AsNoTracking().Select(a => a.Id).ToListAsync(cancellationToken);
+        var toAdd = allDesired.Where(kv => !existingIds.Contains(kv.Key)).Select(kv => kv.Value).ToList();
+
+        if (toAdd.Count == 0)
+        {
+            _logger.LogInformation("Assignments already fully seeded — skipping.");
+            return;
+        }
+
+        await _db.Assignments.AddRangeAsync(toAdd, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Seeded {Count} assignments.", assignments.Count);
+        _logger.LogInformation("Seeded {Count} new assignments.", toAdd.Count);
     }
 }

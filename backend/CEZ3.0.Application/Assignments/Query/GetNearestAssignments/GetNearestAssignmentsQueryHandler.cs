@@ -55,6 +55,7 @@ public class GetNearestAssignmentsQueryHandler(ILogger<GetNearestAssignmentsQuer
 
         var dto = nearestAssignments.Select(a => new AssignmentEventDto
         {
+            Id = a.Id,
             CourseSectionTitle = sectionDict.TryGetValue(a.SectionId, out var title)
                 ? title
                 : "Unknown Section",

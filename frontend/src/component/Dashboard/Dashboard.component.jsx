@@ -175,14 +175,27 @@ const Dashboard = () => {
                             </section>
 
                             <section className="dashboard-section">
-                                <h2 className="section-title">Najbliższe zadania</h2>
+                                <div className="section-header">
+                                    <h2 className="section-title">Najbliższe zadania</h2>
+                                    <Link to="/assignments" className="section-action">
+                                        Zobacz wszystkie
+                                    </Link>
+                                </div>
                                 <div className="assignments-card">
                                     {assignments.length === 0 && <p className="dashboard-feedback">Brak najbliższych zadań.</p>}
                                     {assignments.map(a => (
-                                        <div key={a.id || a.assignmentId} className="assignment-item">
-                                            <p className="assignment-title">{a.title || a.assignmentTitle}</p>
-                                            <p className="assignment-due">{formatDate(a.dueDate || a.deadline)}</p>
-                                        </div>
+                                        <Link key={a.id || a.assignmentId} to={`/assignments/${a.id}/quiz`} className="assignment-item">
+                                            <span className="material-symbols-outlined assignment-item-icon">
+                                                {a.taskType === 'Quiz' ? 'quiz' : a.taskType === 'Test' ? 'assignment' : 'edit_document'}
+                                            </span>
+                                            <div className="assignment-item-info">
+                                                <p className="assignment-item-title">{a.title || a.assignmentTitle}</p>
+                                                {a.courseSectionTitle && (
+                                                    <p className="assignment-item-section">{a.courseSectionTitle}</p>
+                                                )}
+                                            </div>
+                                            <p className="assignment-item-due">{formatDate(a.dueDate || a.deadline)}</p>
+                                        </Link>
                                     ))}
                                 </div>
                             </section>

@@ -16,6 +16,7 @@ import AssignmentsList from './component/Assignments/AssignmentsList';
 import QuizSolve from './component/Assignments/QuizSolve';
 import HomeworkSubmit from './component/Assignments/HomeworkSubmit';
 import UngradedHomework from './component/Assignments/UngradedHomework';
+import GradesPage from './component/Grades';
 import MessagesPage from './component/Messages/MessagesPage';
 import ForumList from './component/Forum/ForumList';
 import ForumThread from './component/Forum/ForumThread';
@@ -47,6 +48,7 @@ function App() {
                     <Route path="/assignments/ungraded" element={<UngradedHomework/>}/>
                     <Route path="/assignments/:id/quiz" element={<QuizSolve/>}/>
                     <Route path="/assignments/:id/homework" element={<HomeworkSubmit/>}/>
+                    <Route path="/grades" element={<GradesPage/>}/>
                     <Route path="/messages" element={<MessagesPage/>}/>
                     <Route path="/forum" element={<ForumList/>}/>
                     <Route path="/forum/:id" element={<ForumThread/>}/>

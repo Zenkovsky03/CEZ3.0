@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../../Header';
 import CourseForm from '../CourseForm/index.jsx';
 
 const CourseCreate = ({ isEditMode = false }) => {
     return (
         <div className="page-wrapper-course">
-            <Header variant="dashboard" />
             <div className="page-container">
                 <main className="main-content">
                     <div className="course-wrapper">

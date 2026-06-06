@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../../../context/AuthContext';
 import CourseList from './CourseList.component';
 import { getCourses } from '../../../services/courseService';
 import './CourseList.scss';
 
 const CourseListContainer = () => {
+    const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -89,6 +91,8 @@ const CourseListContainer = () => {
         navigate('/courses/create');
     };
 
+    const canCreate = user?.role === 'Admin' || user?.role === 'Teacher';
+
     return (
         <CourseList
             courses={filteredCourses}
@@ -96,7 +100,7 @@ const CourseListContainer = () => {
             error={error}
             filters={filters}
             onFilterChange={handleFilterChange}
-            onCreateCourse={handleCreateCourse}
+            onCreateCourse={canCreate ? handleCreateCourse : undefined}
         />
     );
 };

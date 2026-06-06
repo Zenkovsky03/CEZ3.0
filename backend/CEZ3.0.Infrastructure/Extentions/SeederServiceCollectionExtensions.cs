@@ -12,6 +12,7 @@ public static class SeederServiceCollectionExtensions
         services.AddScoped<ISeeder, CourseEnrollmentSeeder>();
         services.AddScoped<ISeeder, CourseSectionSeeder>();
         services.AddScoped<ISeeder, SectionMaterialSeeder>();
+        services.AddScoped<ISeeder, ForumSeeder>();
         services.AddScoped<ISeeder, AssignmentSeeder>();
         services.AddScoped<ISeeder, StudentAssignmentAttemptSeeder>();
         services.AddScoped<ISeeder, GradeSeeder>();

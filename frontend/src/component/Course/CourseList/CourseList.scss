@@ -2,11 +2,11 @@
   position: relative;
   min-height: 100vh;
   background: rgb(244 247 246 / 1);
-  padding: 2rem 1rem;
 
   .main-content {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 0 1rem 2rem;
     animation: fadeIn 0.3s ease-out;
 
     @keyframes fadeIn {

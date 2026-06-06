@@ -28,7 +28,12 @@ const ForumList = () => {
             try {
                 const data = await getThreadHeaders(1, 50);
                 if (!mounted) return;
-                const list = data?.threads || data?.Threads || data?.items || data?.Items || (Array.isArray(data) ? data : []);
+                const raw = data?.threads || data?.Threads || data?.items || data?.Items || (Array.isArray(data) ? data : []);
+                const list = (Array.isArray(raw) ? raw : []).map(t => ({
+                    ...t,
+                    isClosed: t.isClosed ?? !t.isOpen,
+                    replyCount: t.replyCount || t.totalReplies || t.replies?.length || 0
+                }));
                 setThreads(list);
             } catch (err) {
                 if (!mounted) return;

@@ -40,6 +40,7 @@ public class ConversationSeeder : ISeeder
             new() { Id = SeedIds.Conversation3, Title = "Help with C# value types",             Type = ConversationType.Inquiry, Status = InquirySatus.Open,                    CreatorId = SeedIds.Student5, RecipientId = SeedIds.Teacher3, CreatedAt = now.AddHours(-2),  UpdatedAt = now.AddHours(-1) },
             new() { Id = SeedIds.Conversation4, Title = "Essay submission clarification",        Type = ConversationType.Inquiry, Status = InquirySatus.Closed,                  CreatorId = SeedIds.Student8, RecipientId = SeedIds.Teacher1, CreatedAt = now.AddDays(-3),   UpdatedAt = now.AddDays(-1),  ClosedAt = now.AddDays(-1) },
             new() { Id = SeedIds.Conversation5, Title = "Grade appeal — Algebra quiz",          Type = ConversationType.Inquiry, Status = InquirySatus.AwaitingTeacherResponse,  CreatorId = SeedIds.Student4, RecipientId = SeedIds.Teacher1, CreatedAt = now.AddHours(-1),  UpdatedAt = now.AddMinutes(-10) },
+            new() { Id = SeedIds.Conversation6, Title = "Question about sorting in C#",         Type = ConversationType.Inquiry, Status = InquirySatus.AwaitingStudentResponse, CreatorId = SeedIds.Student1, RecipientId = SeedIds.Teacher3, CreatedAt = now.AddHours(-7),  UpdatedAt = now.AddHours(-5) },
         };
 
         await _db.Conversations.AddRangeAsync(conversations, cancellationToken);
@@ -68,6 +69,12 @@ public class ConversationSeeder : ISeeder
 
             // Conversation 5
             new() { Id = ObjectId.GenerateNewId(), ConversationId = SeedIds.Conversation5, SenderId = SeedIds.Student4, Body = "I believe my quiz score is incorrect. I selected 7 as a prime number but it was marked wrong.", SentAt = now.AddHours(-1), IsRead = false },
+
+            // Conversation 6
+            new() { Id = ObjectId.GenerateNewId(), ConversationId = SeedIds.Conversation6, SenderId = SeedIds.Student1, Body = "Hello, I have a question about bubble sort vs insertion sort from the materials in Module 1. Which one should I use for small arrays?", SentAt = now.AddHours(-7), IsRead = true },
+            new() { Id = ObjectId.GenerateNewId(), ConversationId = SeedIds.Conversation6, SenderId = SeedIds.Teacher3, Body = "Great question! For small arrays (say < 50 elements), insertion sort is generally preferred. It has O(n) best-case performance when the array is nearly sorted. Bubble sort is mainly educational. I posted a code example in the forum thread you opened.", SentAt = now.AddHours(-6), IsRead = true },
+            new() { Id = ObjectId.GenerateNewId(), ConversationId = SeedIds.Conversation6, SenderId = SeedIds.Student1, Body = "Thank you! I saw your reply on the forum — the code example really helped me understand the implementation difference.", SentAt = now.AddHours(-5), IsRead = true },
+            new() { Id = ObjectId.GenerateNewId(), ConversationId = SeedIds.Conversation6, SenderId = SeedIds.Teacher3, Body = "You're welcome! I'd suggest trying to implement both algorithms on your own and timing them with Stopwatch. That'll give you a practical understanding of the performance differences.", SentAt = now.AddHours(-5).AddMinutes(10), IsRead = false },
         };
 
         await _db.Messages.AddRangeAsync(messages, cancellationToken);
