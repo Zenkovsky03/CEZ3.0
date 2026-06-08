@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Login.scss';
 import UsosWebIcon from '../UsosWebIcon';
 import LoginForm from '../LoginForm';
@@ -8,6 +9,7 @@ import AuthContext from '../../context/AuthContext';
 
 const Login = () => {
     const { user } = useContext(AuthContext);
+    const { t } = useTranslation();
 
     if (user) {
         return <Navigate to="/" replace />;
@@ -19,8 +21,8 @@ const Login = () => {
                 <main className="main-content">
                     <div className="login-wrapper">
                         <div className="login-header-text">
-                            <h1 className="login-title">Witaj z powrotem!</h1>
-                            <p className="login-subtitle">Zaloguj się na swoje konto, aby kontynuować naukę.</p>
+                            <h1 className="login-title">{t('auth.login_title')}</h1>
+                            <p className="login-subtitle">{t('auth.login_subtitle')}</p>
                         </div>
 
                         <div className="login-card">
@@ -29,18 +31,18 @@ const Login = () => {
                             <div className="divider">
                                 <div className="divider-line" aria-hidden="true"></div>
                                 <div className="divider-text-container">
-                                    <span className="divider-text">Lub zaloguj się przez</span>
+                                    <span className="divider-text">{t('auth.login_via')}</span>
                                 </div>
                             </div>
 
                             <button type="button" className="button secondary-button">
                                 <UsosWebIcon />
-                                <span>USOSweb</span>
+                                <span>{t('auth.usos_web')}</span>
                             </button>
                         </div>
 
                         <p className="register-link-text">
-                            Nie masz konta? <Link className="link" to="/register">Zarejestruj się</Link>
+                            {t('auth.no_account')} <Link className="link" to="/register">{t('auth.register')}</Link>
                         </p>
                     </div>
                 </main>

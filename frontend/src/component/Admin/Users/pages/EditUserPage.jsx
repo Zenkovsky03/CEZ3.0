@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../Layout/AdminLayout';
 import { ErrorAlert, SuccessAlert, LoadingSpinner, Breadcrumb, ProfilePreview } from '../components/ui';
@@ -7,6 +8,7 @@ import { getAllUsers, updateUser, updateUserRole, blockUser, unblockUser, regist
 import '../AdminUsersPageNew.scss';
 
 const EditUserPage = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const isNewUser = id === 'new';
@@ -39,11 +41,11 @@ const EditUserPage = () => {
                 const foundUser = data.items?.find(u => u.id === id);
                 
                 if (!foundUser) {
-                    throw new Error('Nie znaleziono użytkownika o podanym ID');
+                    throw new Error(t('Nie znaleziono użytkownika o podanym ID'));
                 }
 
                 if (foundUser.role === 'Admin') {
-                    throw new Error('Nie możesz edytować konta administratora');
+                    throw new Error(t('Nie możesz edytować konta administratora'));
                 }
 
                 setUser(foundUser);
@@ -61,7 +63,7 @@ const EditUserPage = () => {
         };
         
         fetchUser();
-    }, [id, navigate, isNewUser]);
+    }, [id, navigate, isNewUser, t]);
     
     useEffect(() => {
         if (!user) return;
@@ -92,35 +94,35 @@ const EditUserPage = () => {
         const errors = {};
         
         if (!firstName || firstName.trim().length < 2) {
-            errors.firstName = 'Imię musi mieć co najmniej 2 znaki';
+            errors.firstName = t('Imię musi mieć co najmniej 2 znaki');
         } else if (firstName.trim().length > 50) {
-            errors.firstName = 'Imię nie może przekraczać 50 znaków';
+            errors.firstName = t('Imię nie może przekraczać 50 znaków');
         } else if (!/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s-]+$/.test(firstName)) {
-            errors.firstName = 'Imię może zawierać tylko litery, spacje i myślniki';
+            errors.firstName = t('Imię może zawierać tylko litery, spacje i myślniki');
         }
         
         if (!lastName || lastName.trim().length < 2) {
-            errors.lastName = 'Nazwisko musi mieć co najmniej 2 znaki';
+            errors.lastName = t('Nazwisko musi mieć co najmniej 2 znaki');
         } else if (lastName.trim().length > 50) {
-            errors.lastName = 'Nazwisko nie może przekraczać 50 znaków';
+            errors.lastName = t('Nazwisko nie może przekraczać 50 znaków');
         } else if (!/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s-]+$/.test(lastName)) {
-            errors.lastName = 'Nazwisko może zawierać tylko litery, spacje i myślniki';
+            errors.lastName = t('Nazwisko może zawierać tylko litery, spacje i myślniki');
         }
         
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            errors.email = 'Nieprawidłowy adres e-mail';
+            errors.email = t('Nieprawidłowy adres e-mail');
         } else if (email.length > 100) {
-            errors.email = 'Adres e-mail nie może przekraczać 100 znaków';
+            errors.email = t('Adres e-mail nie może przekraczać 100 znaków');
         }
 
         if (isNewUser) {
             if (!password || password.length < 6) {
-                errors.password = 'Hasło musi mieć co najmniej 6 znaków';
+                errors.password = t('Hasło musi mieć co najmniej 6 znaków');
             } else if (password.length > 100) {
-                errors.password = 'Hasło nie może przekraczać 100 znaków';
+                errors.password = t('Hasło nie może przekraczać 100 znaków');
             }
             if (password !== confirmPassword) {
-                errors.confirmPassword = 'Hasła nie są zgodne';
+                errors.confirmPassword = t('Hasła nie są zgodne');
             }
         }
         
@@ -160,7 +162,7 @@ const EditUserPage = () => {
                     Role: role
                 });
 
-                setSuccessMessage('Użytkownik został utworzony pomyślnie!');
+                setSuccessMessage(t('Użytkownik został utworzony pomyślnie!'));
                 setTimeout(() => {
                     navigate('/admin/users');
                 }, 2000);
@@ -187,7 +189,7 @@ const EditUserPage = () => {
                 await blockUser(id);
             }
 
-            setSuccessMessage('Zmiany zostały zapisane pomyślnie!');
+            setSuccessMessage(t('Zmiany zostały zapisane pomyślnie!'));
             setHasChanges(false);
             
             setUser(prevUser => ({
@@ -219,12 +221,12 @@ const EditUserPage = () => {
 
     const breadcrumbItems = isNewUser
         ? [
-            { label: 'Użytkownicy', onClick: () => navigate('/admin/users') },
-            { label: 'Dodawanie', isActive: true }
+            { label: t('admin.users'), onClick: () => navigate('/admin/users') },
+            { label: t('Dodawanie'), isActive: true }
         ]
         : [
-            { label: 'Użytkownicy', onClick: () => navigate('/admin/users') },
-            { label: 'Edycja', isActive: false },
+            { label: t('admin.users'), onClick: () => navigate('/admin/users') },
+            { label: t('Edycja'), isActive: false },
             { label: `${firstName} ${lastName}`, isActive: true }
         ];
 
@@ -240,7 +242,7 @@ const EditUserPage = () => {
                         <span className="material-symbols-outlined">error</span>
                         <p>{error}</p>
                         <button onClick={() => navigate('/admin/users')}>
-                            Powrót do listy użytkowników
+                            {t('Powrót do listy użytkowników')}
                         </button>
                     </div>
                 ) : (
@@ -249,15 +251,15 @@ const EditUserPage = () => {
 
                         <div className="admin-users__edit-user__header">
                             <div>
-                                <h1>{isNewUser ? 'Dodawanie użytkownika' : 'Edycja użytkownika'}</h1>
-                                <p>{isNewUser ? 'Utwórz nowe konto użytkownika' : 'Zaktualizuj informacje o użytkowniku'}</p>
+                                <h1>{isNewUser ? t('admin.adding_user') : t('admin.editing_user')}</h1>
+                                <p>{isNewUser ? t('admin.create_account') : t('admin.update_user_info')}</p>
                             </div>
                             <button
                                 onClick={() => navigate('/admin/users')}
                                 className="admin-users__edit-user__back-btn"
                             >
                                 <span className="material-symbols-outlined">arrow_back</span>
-                                <span>Powrót</span>
+                                <span>{t('common.back')}</span>
                             </button>
                         </div>
 
@@ -271,12 +273,12 @@ const EditUserPage = () => {
                                     <div className="admin-users__edit-user__section">
                                         <h2 className="admin-users__edit-user__section-title">
                                             <span className="material-symbols-outlined">person</span>
-                                            Dane osobowe
+                                            {t('Dane osobowe')}
                                         </h2>
                                         
                                         <div className="admin-users__edit-user__form-grid">
                                             <FormField
-                                                label="Imię *"
+                                                label={t('user.first_name')}
                                                 name="firstName"
                                                 value={firstName}
                                                 onChange={(e) => setFirstName(e.target.value)}
@@ -285,7 +287,7 @@ const EditUserPage = () => {
                                             />
 
                                             <FormField
-                                                label="Nazwisko *"
+                                                label={t('Nazwisko *')}
                                                 name="lastName"
                                                 value={lastName}
                                                 onChange={(e) => setLastName(e.target.value)}
@@ -294,7 +296,7 @@ const EditUserPage = () => {
                                             />
 
                                             <FormField
-                                                label="Email *"
+                                                label={t('Email *')}
                                                 name="email"
                                                 type="email"
                                                 value={email}
@@ -304,12 +306,12 @@ const EditUserPage = () => {
                                             />
 
                                             <FormField
-                                                label="Nazwa użytkownika"
+                                                label={t('user.username_label')}
                                                 name="username"
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value)}
                                                 disabled={!isNewUser}
-                                                helperText={isNewUser ? 'Opcjonalnie, domyślnie email' : 'Nie można edytować nazwy użytkownika'}
+                                                helperText={isNewUser ? t('Opcjonalnie, domyślnie email') : t('Nie można edytować nazwy użytkownika')}
                                             />
                                         </div>
                                     </div>
@@ -318,7 +320,7 @@ const EditUserPage = () => {
                                     <div className="admin-users__edit-user__section">
                                         <h2 className="admin-users__edit-user__section-title">
                                             <span className="material-symbols-outlined">settings</span>
-                                            Ustawienia konta
+                                            {t('Ustawienia konta')}
                                         </h2>
                                         
                                         <div className="admin-users__edit-user__form-grid">
@@ -338,26 +340,26 @@ const EditUserPage = () => {
                                         <div className="admin-users__edit-user__section">
                                             <h2 className="admin-users__edit-user__section-title">
                                                 <span className="material-symbols-outlined">lock</span>
-                                                Hasło
+                                                {t('Hasło')}
                                             </h2>
                                             <div className="admin-users__edit-user__form-grid">
                                                 <FormField
-                                                    label="Hasło *"
+                                                    label={t('user.password')}
                                                     name="password"
                                                     type="password"
                                                     value={password}
                                                     onChange={(e) => setPassword(e.target.value)}
                                                     error={fieldErrors.password}
-                                                    placeholder="Min. 6 znaków"
+                                                    placeholder={t('auth.min_chars')}
                                                 />
                                                 <FormField
-                                                    label="Potwierdź hasło *"
+                                                    label={t('user.confirm_password')}
                                                     name="confirmPassword"
                                                     type="password"
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                                     error={fieldErrors.confirmPassword}
-                                                    placeholder="Powtórz hasło"
+                                                    placeholder={t('auth.confirm_password_placeholder')}
                                                 />
                                             </div>
                                         </div>
@@ -372,7 +374,7 @@ const EditUserPage = () => {
                                             disabled={saving}
                                         >
                                             <span className="material-symbols-outlined">close</span>
-                                            <span>Anuluj</span>
+                                            <span>{t('common.cancel')}</span>
                                         </button>
 
                                         <button
@@ -383,12 +385,12 @@ const EditUserPage = () => {
                                             {saving ? (
                                                 <>
                                                     <div className="loading-spinner__spinner"></div>
-                                                    <span>Zapisywanie...</span>
+                                                    <span>{t('common.saving')}</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <span className="material-symbols-outlined">save</span>
-                                                    <span>{isNewUser ? 'Utwórz użytkownika' : 'Zapisz zmiany'}</span>
+                                                    <span>{isNewUser ? t('admin.create_user') : t('admin.save_changes')}</span>
                                                 </>
                                             )}
                                         </button>

@@ -1,0 +1,211 @@
+CEZ 3.0 — Demo Walkthrough (Route Order)
+===========================================
+
+Present routes in this order to show the full project scope.
+
+────────────────────────────────────────────
+1. LANDING & AUTH
+────────────────────────────────────────────
+
+  /           Landing page — marketing hero, login/register CTA
+  /register   Registration form (first name, last name, email, username, password)
+  /login      Login form — email/username + password, "Forgot password?" link
+  /reset-password  Reset flow with token from email
+
+────────────────────────────────────────────
+2. STUDENT FLOW (log in as Student)
+────────────────────────────────────────────
+
+  /            Dashboard
+               - "Welcome back, {name}"
+               - Upcoming events card (with dates/times)
+               - Recent announcements card
+               - Course cards (clickable → /courses/:id)
+               - Nearest assignments
+
+  /courses     All courses grid
+               - Search/filter bar
+               - Course cards with status badge, instructor, dates
+               - No "Create course" button (hidden for Student)
+
+  /courses/:id Course details
+               - Course header (name, description)
+               - Course info panel: dates, instructor, status badge, participant count
+               - Participants list with avatars
+               - My grades table (Student-only section)
+
+  /courses/:id/structure  Course structure (view-only)
+               - Module accordion list
+               - Expand/collapse modules to see lessons
+               - No add/edit/delete buttons (hidden for Student)
+
+  /courses/:cId/lessons/:lId  Lesson view
+               - Rich text content with bold rendering
+               - Attachment cards (Video/Pdf/Image/Link) with type icons
+               - "Mark as complete" button
+
+  /calendar    Calendar page
+               - Month grid view with event dots
+               - Click day → event list for that day
+               - No "Add event" button (hidden for Student)
+
+  /assignments Assignment list
+               - Filter tabs: All / Quiz / Test / Homework
+               - Each task card shows type icon, title, course, due date
+               - "Start" button on active assignments → quiz or homework
+
+  /assignments/:id/quiz  Quiz solver
+               - Question navigation (prev/next)
+               - Answered counter (X / Y)
+               - Select answer per question
+               - "Finish quiz" → results summary (points earned / max)
+
+  /assignments/:id/homework  Homework submit
+               - Text area for description
+               - File attachment upload
+               - Submit button
+
+  /grades      My grades
+               - Grouped by course
+               - Each row: assignment name, score, mark, date
+
+  /forum       Forum thread list
+               - Search bar
+               - "New thread" button → modal with title + content
+               - Pinned threads appear first
+
+  /forum/:id   Forum thread detail
+               - Thread title + content
+               - Replies with author avatar, timestamp, teacher badge
+               - Reply form at bottom
+               - No "Close thread" button (hidden for Student)
+
+  /messages    Messages / conversations
+               - Left sidebar: conversation list with last message preview
+               - Right pane: active conversation thread
+               - "New conversation" button → modal with user search + type select
+
+────────────────────────────────────────────
+3. TEACHER FLOW (log in as Teacher)
+────────────────────────────────────────────
+
+  /            Dashboard now shows "Add event" button
+
+  /courses     "Create course" button appears in header
+
+  /courses/create  Course creation form
+               - Name, description, start/end dates
+               - Password protection toggle
+               - Capacity field
+
+  /courses/:id/structure  Module management (edit mode)
+               - "Add module" button
+               - Edit / delete buttons on each module
+               - Module accordion still expandable
+
+  /calendar    "Add event" button appears
+               - Click event → edit/delete buttons
+
+  /events/create   Create event form (title, dates, time, course, location, description)
+
+  /events/edit/:id  Edit event form (pre-filled)
+
+  /assignments  "New assignment" + "To grade" links appear
+               - Each task card shows "Results" link (instead of "Start")
+
+  /assignments/create  Assignment creation form
+               - Title, type (Quiz/Test/Homework), course selector
+               - Question builder for quiz type
+
+  /assignments/:id/results  Student results table
+               - Student name, email, score, status (Completed / In progress)
+
+  /assignments/ungraded  Grade submissions
+               - Submission cards with student info, submitted text, attachment
+               - Grade button grid (2, 3, 3+, 4, 4+, 5, 5!)
+               - Feedback textarea
+               - "Save" button per submission
+
+  /grades/course  Gradebook
+               - Course selector dropdown
+               - Full student grade table for selected course
+
+  /forum/:id   "Close thread" button visible
+               - Teacher's replies marked with "Teacher reply" badge
+
+  /announcements/create  Create announcement
+               - Course selector, title, content, publish/optional calendar event
+
+  /announcements/:id  Edit/delete buttons visible
+               - Same for /announcements/:id/edit
+
+────────────────────────────────────────────
+4. ADMIN FLOW (log in as Admin)
+────────────────────────────────────────────
+
+  /courses/:id    "Edit course" button appears
+  /courses/:id/edit  Edit course form (pre-filled, all fields editable)
+
+  /admin          Admin login page (separate login flow, checks Admin role)
+  /admin/users    User management
+                  - Stats cards (total, active, admins, teachers)
+                  - Searchable user table (ID, name, email, role, status, created date)
+                  - Edit / delete action buttons per row (disabled for other admins)
+
+  /admin/users/edit/:id  Edit user form
+                  - First name, last name, email, username, role, password
+                  - Profile preview card
+                  - Blocks editing other admin accounts
+
+────────────────────────────────────────────
+KEY UI FEATURES TO HIGHLIGHT
+────────────────────────────────────────────
+
+  • Role-adaptive UI — every page adjusts based on user.role
+  • i18n (Polish/English) — LanguageSwitcher in header flips all labels
+  • Reusable Spinner component — centered loading state on every page
+  • Modal component with stopPropagation guard — click-outside to close
+  • StatusBadge component — color-coded (active/upcoming/ended)
+  • CourseCard with status badge, dates, instructor, participant count
+  • Form validation on all create/edit forms
+  • Error boundaries on critical pages
+
+────────────────────────────────────────────
+ROLE ACCESS MATRIX
+────────────────────────────────────────────
+
+  Route                          Student  Teacher  Admin
+  ─────────────────────────────────────────────────────
+  /                              ✔        ✔        ✔
+  /login /register /reset-pw     ✔        ✔        ✔
+  /courses                       ✔        ✔        ✔
+  /courses/create                         ✔        ✔
+  /courses/:id                   ✔        ✔        ✔
+  /courses/:id/edit                        ✔        ✔
+  /courses/:id/structure          view    modify   view
+  /courses/:cId/lessons/:lId     ✔        ✔        ✔
+  /calendar                       view   create   create
+  /events/create                          ✔        ✔
+  /events/edit/:id                        ✔        ✔
+  /assignments                   ✔        ✔        ✔
+  /assignments/create                     ✔        ✔
+  /assignments/ungraded                    ✔        ✔
+  /assignments/:id/results                 ✔        ✔
+  /assignments/:id/quiz           ✔        ✔        ✔
+  /assignments/:id/homework       ✔        ✔        ✔
+  /grades                        ✔        ✔        ✔
+  /grades/course                           ✔        ✔
+  /messages                      ✔        ✔        ✔
+  /forum                         ✔        ✔        ✔
+  /forum/:id                     ✔        ✔        ✔
+  /announcements/create                    ✔        ✔
+  /announcements/:id              view   manage  manage
+  /announcements/:id/edit                  ✔        ✔
+  /admin                                   ✔        ✔
+  /admin/users                                      ✔
+  /admin/users/edit/:id                               ✔
+
+  view    = page accessible, modification tools hidden
+  manage  = can edit/delete
+  ✔       = full access
+  blank   = no access (UI-gated or route-guarded)

@@ -50,7 +50,7 @@ public class DeleteThreadCommandHandler(ILogger<DeleteThreadCommandHandler> logg
             throw new BadRequestException("Invalid UserId format.");
         }
 
-        if (!thread.AuthorId.Equals(authorId) || currentUser.role == UserRoles.Admin.ToString())
+        if (!thread.AuthorId.Equals(authorId) && currentUser.role != UserRoles.Admin.ToString())
         {
             _logger.LogWarning("Unauthorized attempt to close thread with ThreadId: by UserId: ");
             throw new UnauthorizedException("Only the thread author can close the thread.");

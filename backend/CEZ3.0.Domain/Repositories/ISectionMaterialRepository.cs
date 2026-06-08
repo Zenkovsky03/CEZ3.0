@@ -7,6 +7,7 @@ public interface ISectionMaterialRepository
 {
     Task<SectionMaterial?> GetByIdAsync(ObjectId id);
     Task<SectionMaterial?> GetNewestByCourseSectionId(ObjectId courseSectionId);
+    Task<List<SectionMaterial>> GetBySectionIdAsync(ObjectId sectionId);
     Task AddAsync(SectionMaterial material);
     Task UpdateAsync(SectionMaterial material);
     Task DeleteAsync(SectionMaterial material);

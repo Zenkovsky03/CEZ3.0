@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Header from '../Header';
+import Spinner from '../Spinner';
 import { getMyGrades } from '../../services/gradeService';
 import './Grades.scss';
 
 const formatDate = (iso) => {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
 };
 
 const GRADE_COLORS = {
@@ -16,6 +18,7 @@ const GRADE_COLORS = {
 };
 
 const GradesPage = () => {
+    const { t } = useTranslation();
     const [grades, setGrades] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -31,7 +34,7 @@ const GradesPage = () => {
                 setGrades(list);
             } catch (err) {
                 if (!mounted) return;
-                setError(err.message || 'Nie udało się pobrać ocen');
+                setError(err.message || t('error.load_grades'));
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -39,7 +42,7 @@ const GradesPage = () => {
 
         load();
         return () => { mounted = false; };
-    }, []);
+    }, [t]);
 
     const grouped = grades.reduce((acc, g) => {
         if (!acc[g.courseName]) acc[g.courseName] = [];
@@ -50,7 +53,7 @@ const GradesPage = () => {
     if (loading) return (
         <div className="page-wrapper-grades">
             <Header variant="dashboard" />
-            <div className="main-content"><p>Ładowanie ocen...</p></div>
+            <div className="main-content"><Spinner size="lg" /></div>
         </div>
     );
 
@@ -67,15 +70,15 @@ const GradesPage = () => {
             <div className="main-content">
                 <div className="page-header">
                     <div>
-                        <h1 className="page-title">Moje oceny</h1>
-                        <p className="page-subtitle">Historia twoich ocen z wszystkich kursów</p>
+                        <h1 className="page-title">{t('grade.title')}</h1>
+                        <p className="page-subtitle">{t('grade.subtitle')}</p>
                     </div>
                 </div>
 
                 {grades.length === 0 && (
                     <div className="empty-state">
                         <span className="material-symbols-outlined empty-icon">grade</span>
-                        <p>Nie masz jeszcze żadnych ocen.</p>
+                        <p>{t('grade.no_grades')}</p>
                     </div>
                 )}
 
@@ -84,11 +87,11 @@ const GradesPage = () => {
                         <h2 className="course-group-title">{courseName}</h2>
                         <div className="grade-table">
                             <div className="grade-table-header">
-                                <span className="col-assignment">Zadanie</span>
-                                <span className="col-score">Wynik</span>
-                                <span className="col-mark">Ocena</span>
-                                <span className="col-date">Data</span>
-                                <span className="col-feedback">Komentarz</span>
+                                <span className="col-assignment">{t('grade.assignment')}</span>
+                                <span className="col-score">{t('grade.score')}</span>
+                                <span className="col-mark">{t('grade.mark')}</span>
+                                <span className="col-date">{t('grade.date')}</span>
+                                <span className="col-feedback">{t('grade.comment')}</span>
                             </div>
                             {courseGrades.map(g => (
                                 <div key={g.id} className="grade-row">

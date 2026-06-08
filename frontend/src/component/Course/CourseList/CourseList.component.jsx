@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from '../../Header';
+import Spinner from '../../Spinner';
 import CourseListHeader from '../CourseListHeader';
 import CourseCard from '../CourseCard';
 import CourseListFilters from '../CourseListFilters';
@@ -12,13 +14,13 @@ const CourseList = ({
                         onFilterChange,
                         onCreateCourse
                     }) => {
+    const { t } = useTranslation();
     if (loading) {
         return (
             <div className="page-wrapper-course-list">
                 <Header variant="dashboard" />
                 <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <p>Ładowanie kursów...</p>
+                    <Spinner size="lg" />
                 </div>
             </div>
         );
@@ -31,7 +33,7 @@ const CourseList = ({
                 <div className="error-container">
                     <p>{error}</p>
                     <button onClick={() => window.location.reload()} className="retry-button">
-                        Spróbuj ponownie
+                        {t('common.retry')}
                     </button>
                 </div>
             </div>

@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import LoginForm from './LoginForm.component';
 import './LoginForm.scss';
 import AuthContext from '../../context/AuthContext';
 
 const LoginFormContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
     const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +39,7 @@ const LoginFormContainer = () => {
                 }
             }
         } catch (err) {
-            setError(err.message || 'Wystąpił błąd podczas logowania');
+            setError(err.message || t('auth.login_error'));
         } finally {
             setLoading(false);
         }

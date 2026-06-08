@@ -1,14 +1,17 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './RoleBadge.scss';
 
 const RoleBadge = ({ role }) => {
+    const { t } = useTranslation();
     const getRoleConfig = () => {
         const roleMap = {
-            'Student': { text: 'Student', className: 'student' },
-            'Teacher': { text: 'Nauczyciel', className: 'teacher' },
-            'Admin': { text: 'Administrator', className: 'admin' }
+            'Student': { key: 'role.student', className: 'student' },
+            'Teacher': { key: 'role.teacher', className: 'teacher' },
+            'Admin': { key: 'role.admin', className: 'admin' }
         };
-        return roleMap[role] || { text: role, className: 'default' };
+        const config = roleMap[role] || { key: null, className: 'default' };
+        return { text: config.key ? t(config.key) : role, className: config.className };
     };
 
     const config = getRoleConfig();

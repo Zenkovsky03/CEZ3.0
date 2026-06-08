@@ -1,4 +1,5 @@
 using CEZ3._0.Application.Contracts.Responses.Users;
+using CEZ3._0.Application.Grades.Query.GetCourseGrades;
 using CEZ3._0.Application.Grades.Query.GetMyGrades;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
@@ -29,6 +30,29 @@ public class GradeController(ISender sender) : ControllerBase
         catch (UnauthorizedException ex)
         {
             return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize(Roles = "Teacher,Admin")]
+    [HttpGet("course/{courseId}")]
+    public async Task<IActionResult> GetCourseGrades([FromRoute] string courseId)
+    {
+        try
+        {
+            var grades = await _sender.Send(new GetCourseGradesQuery { CourseId = courseId });
+            return Ok(grades);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
         }
     }
 }

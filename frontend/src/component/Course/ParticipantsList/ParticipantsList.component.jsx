@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ParticipantsHeader from '../ParticipantsHeader';
 import SearchBar from '../../SearchBar';
 import EmptyState from '../../EmptyState';
@@ -10,26 +11,30 @@ const ParticipantsList = ({
                               searchQuery,
                               onSearchChange,
                               onRemove,
-                              onAddClick
+                              onAddClick,
+                              userRole
                           }) => {
+    const { t } = useTranslation();
+
     return (
         <div className="participants-list">
             <ParticipantsHeader
                 count={totalCount}
                 onAddClick={onAddClick}
+                userRole={userRole}
             />
 
             <SearchBar
                 value={searchQuery}
                 onChange={onSearchChange}
-                placeholder="Szukaj uczestnika..."
+                placeholder={t('course.search_participant')}
             />
 
             {filteredParticipants.length === 0 ? (
                 <EmptyState
                     message={searchQuery
-                        ? 'Nie znaleziono uczestników'
-                        : 'Brak uczestników w kursie'
+                        ? t('course.no_participants_found')
+                        : t('course.no_participants')
                     }
                     icon="👥"
                 />
@@ -40,6 +45,7 @@ const ParticipantsList = ({
                             key={participant.id}
                             participant={participant}
                             onRemove={onRemove}
+                            userRole={userRole}
                         />
                     ))}
                 </div>

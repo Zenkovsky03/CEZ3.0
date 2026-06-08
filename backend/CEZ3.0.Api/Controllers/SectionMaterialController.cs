@@ -2,8 +2,10 @@
 using CEZ3._0.Application.SectionMaterials.Command.CreateSectionMaterial;
 using CEZ3._0.Application.SectionMaterials.Command.DeleteSectionMaterial;
 using CEZ3._0.Application.SectionMaterials.Command.EditSectionMaterial;
+using CEZ3._0.Application.SectionMaterials.Dtos;
 using CEZ3._0.Application.SectionMaterials.Query.GetCurrentSectionMaterialByCourseSectionId;
 using CEZ3._0.Application.SectionMaterials.Query.GetSectionMaterialById;
+using CEZ3._0.Application.SectionMaterials.Query.GetSectionMaterialsBySectionId;
 using CEZ3._0.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -201,6 +203,35 @@ public class SectionMaterialController : ControllerBase
         catch (NotFoundException ex)
         {
             return NotFound(new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    /// <summary>Get all materials for a section</summary>
+    /// <remarks>
+    /// Retrieves all lesson materials for the specified course section.
+    /// Roles: Admin, Teacher, Student.
+    /// </remarks>
+    /// <param name="sectionId">MongoDB ObjectId of the course section</param>
+    [Authorize]
+    [HttpGet("by-section/{sectionId}")]
+    [EndpointDescription("Gets all materials for a section. Roles = (Admin, Teacher, Student)")]
+    [ProducesResponseType(typeof(List<SectionMaterialDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetMaterialsBySection([FromRoute] string sectionId)
+    {
+        try
+        {
+            var materials = await _sender.Send(new GetSectionMaterialsBySectionIdQuery(sectionId));
+            return Ok(materials);
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
         }
     }
 }

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import './Registration.scss';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import InputField from '../InputField';
 import PasswordField from '../PasswordField';
 import Checkbox from '../Checkbox';
@@ -9,6 +10,7 @@ import AuthContext from '../../context/AuthContext';
 
 const Registration = () => {
     const { user, register } = useContext(AuthContext);
+    const { t } = useTranslation();
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -59,39 +61,39 @@ const Registration = () => {
                     {/* PageHeading */}
                     <div className="page-heading">
                         <div className="page-title-group">
-                            <p className="page-title">Utwórz konto</p>
-                            <p className="page-subtitle">Dołącz do naszej społeczności i rozpocznij naukę.</p>
+                            <p className="page-title">{t('auth.create_account')}</p>
+                            <p className="page-subtitle">{t('auth.register_subtitle')}</p>
                         </div>
                     </div>
 
                     {/* Form */}
                     <form className="form-section" onSubmit={handleSubmit}>
                         {/* Required Fields */}
-                        <InputField label="Nazwa użytkownika *" placeholder="Wpisz nazwę użytkownika" name="username" required />
-                        <InputField label="Adres e-mail *" placeholder="email@example.com" type="email" name="email" required />
+                        <InputField label={`${t('auth.username')} *`} placeholder="Wpisz nazwę użytkownika" name="username" required />
+                        <InputField label="Adres e-mail *" placeholder={t('auth.email_placeholder')} type="email" name="email" required />
 
                         {/* Optional Fields */}
                         <div className="field-group">
-                            <InputField label="Imię" placeholder="Wpisz swoje imię" name="firstName" />
+                            <InputField label="Imię" placeholder={t('auth.first_name_placeholder')} name="firstName" />
                             <InputField label="Nazwisko" placeholder="Wpisz swoje nazwisko" name="lastName" />
                         </div>
 
-                        <PasswordField label="Hasło *" placeholder="Wpisz swoje hasło" name="password" required />
-                        <PasswordField label="Potwierdź hasło *" placeholder="Potwierdź swoje hasło" confirm name="password_copy" required />
+                        <PasswordField label={`${t('auth.password')} *`} placeholder={t('auth.password_placeholder')} name="password" required />
+                        <PasswordField label="Potwierdź hasło *" placeholder={t('auth.confirm_password_placeholder')} confirm name="password_copy" required />
 
                         <div className="flex flex-col gap-4">
-                            <Checkbox name="terms" linkTo="/warunki">Warunki Użytkowania</Checkbox>
-                            <Checkbox name="privacy" linkTo="/polityka">Politykę Prywatności</Checkbox>
+                            <Checkbox name="terms" linkTo="/warunki">{t('auth.terms')}</Checkbox>
+                            <Checkbox name="privacy" linkTo="/polityka">{t('auth.privacy')}</Checkbox>
                         </div>
 
                         {/* Submit Button */}
                         {error && <div className="error-message">{error}</div>}
-                        <button className="submit-button" type="submit">Zarejestruj się</button>
+                        <button className="submit-button" type="submit">{t('auth.register')}</button>
                     </form>
                     {/* Alternative Action Link */}
                     <div className="alt-action">
                         <p>
-                            Masz już konto? <Link className="form-link" to="/login">Zaloguj się</Link>
+                            Masz już konto? <Link className="form-link" to="/login">{t('auth.login')}</Link>
                         </p>
                     </div>
                 </main>

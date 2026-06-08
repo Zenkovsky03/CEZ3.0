@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import CourseDetails from './CourseDetails.component';
 import {
@@ -11,6 +12,7 @@ import { getMyGrades } from '../../../services/gradeService';
 import './CourseDetails.scss';
 
 const CourseDetailsContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const [course, setCourse] = useState(null);
     const [participants, setParticipants] = useState([]);
@@ -35,7 +37,7 @@ const CourseDetailsContainer = () => {
                 const rawGrades = Array.isArray(gradesData) ? gradesData : gradesData?.items || gradesData?.Items || [];
                 setGrades(rawGrades);
             } catch (err) {
-                setError('Wystąpił błąd podczas ładowania danych');
+                setError(t('error.load_course'));
                 console.error('Error loading course details:', err);
             } finally {
                 setLoading(false);
@@ -43,10 +45,11 @@ const CourseDetailsContainer = () => {
         };
 
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleRemoveParticipant = async (userId) => {
-        if (!window.confirm('Czy na pewno chcesz usunąć tego uczestnika?')) {
+        if (!window.confirm(t('course.remove_participant_confirm'))) {
             return;
         }
 
@@ -55,7 +58,7 @@ const CourseDetailsContainer = () => {
             setParticipants(prev => prev.filter(p => p.id !== userId));
         } catch (error) {
             console.error('Error removing participant:', error);
-            alert('Nie udało się usunąć uczestnika');
+            alert(t('error.remove_participant'));
         }
     };
 
@@ -66,7 +69,7 @@ const CourseDetailsContainer = () => {
             setParticipants(Array.isArray(participantsData) ? participantsData : []);
         } catch (error) {
             console.error('Error adding participant:', error);
-            alert('Nie udało się dodać uczestnika');
+            alert(t('error.add_participant'));
         }
     };
 

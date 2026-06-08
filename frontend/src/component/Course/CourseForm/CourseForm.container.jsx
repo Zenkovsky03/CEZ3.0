@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import Spinner from '../../Spinner';
 import CourseForm from './CourseForm.component';
 import { createCourse, getCourseById, updateCourse } from '../../../services/courseService';
 import './CourseForm.scss';
 
 const CourseFormContainer = ({ isEditMode = false }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { id } = useParams();
     const [showPassword, setShowPassword] = useState(false);
@@ -33,8 +36,8 @@ const CourseFormContainer = ({ isEditMode = false }) => {
             setFormData({
                 name: data.name,
                 description: data.description,
-                startDate: data.startDate.split('T')[0],
-                endDate: data.endDate.split('T')[0],
+                startDate: (data.startDate || '').split('T')[0],
+                endDate: (data.endDate || '').split('T')[0],
                 archived: data.archived,
                 isPasswordProtected: data.isPasswordProtected,
                 password: ''
@@ -87,14 +90,14 @@ const CourseFormContainer = ({ isEditMode = false }) => {
             navigate('/courses');
         } catch (error) {
             console.error('Error saving course:', error);
-            alert(error?.payload?.title || error?.message || 'Nie udało się zapisać kursu');
+            alert(error?.payload?.title || error?.message || t('Nie udało się zapisać kursu'));
         } finally {
             setLoading(false);
         }
     };
 
     if (loading && isEditMode) {
-        return <div>Ładowanie...</div>;
+        return <Spinner />;
     }
 
     return (

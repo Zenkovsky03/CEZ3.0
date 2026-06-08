@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getResetToken, resetPassword } from '../../services/authService';
 import './ResetPassword.scss';
 
 const ResetPassword = () => {
+    const { t } = useTranslation();
     const [step, setStep] = useState(1);
     const [username, setUsername] = useState('');
     const [resetToken, setResetToken] = useState('');
@@ -23,7 +25,7 @@ const ResetPassword = () => {
             setResetToken(result?.resetToken || result?.token || '');
             setStep(2);
         } catch (err) {
-            setError(err.message || 'Nie udało się wygenerować tokena resetującego');
+            setError(err.message || t('auth.reset_token_error'));
         } finally {
             setLoading(false);
         }
@@ -42,7 +44,7 @@ const ResetPassword = () => {
             });
             setDone(true);
         } catch (err) {
-            setError(err.message || 'Nie udało się zresetować hasła');
+            setError(err.message || t('auth.reset_password_error'));
         } finally {
             setLoading(false);
         }
@@ -64,24 +66,20 @@ const ResetPassword = () => {
                                     <div className="reset-icon-wrap">
                                         <span className="material-symbols-outlined">lock_reset</span>
                                     </div>
-                                    <h1 className="reset-title">Resetuj hasło</h1>
-                                    <p className="reset-subtitle">
-                                        Podaj nazwę użytkownika powiązaną z Twoim kontem. Wyślemy Ci token do zresetowania hasła.
-                                    </p>
+                                    <h1 className="reset-title">{t('auth.reset_password')}</h1>
+                                    <p className="reset-subtitle">{t('auth.reset_subtitle')}</p>
                                 </>
                             ) : (
                                 <>
                                     <div className="reset-icon-wrap">
                                         <span className="material-symbols-outlined">password</span>
                                     </div>
-                                    <h1 className="reset-title">Nowe hasło</h1>
-                                    <p className="reset-subtitle">
-                                        Ustaw nowe hasło dla konta <strong>{username}</strong>.
-                                    </p>
+                                    <h1 className="reset-title">{t('auth.new_password')}</h1>
+                                    <p className="reset-subtitle" dangerouslySetInnerHTML={{ __html: t('auth.new_password_for', { username }) }} />
                                     {resetToken && (
                                         <div className="reset-token-display">
                                             <span className="material-symbols-outlined">vpn_key</span>
-                                            <span>Token: {resetToken}</span>
+                                            <span>{t('auth.token_display', { token: resetToken })}</span>
                                         </div>
                                     )}
                                 </>
@@ -93,48 +91,48 @@ const ResetPassword = () => {
                         {step === 1 ? (
                             <form className="reset-form" onSubmit={handleEmailSubmit}>
                                 <div className="form-group">
-                                    <label htmlFor="username" className="form-label">Nazwa użytkownika</label>
+                                    <label htmlFor="username" className="form-label">{t('auth.username')}</label>
                                     <div className="input-wrap">
                                         <span className="material-symbols-outlined input-icon">person</span>
-                                        <input id="username" type="text" className="form-input" placeholder="Twoja nazwa użytkownika" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                                        <input id="username" type="text" className="form-input" placeholder={t('auth.username_placeholder')} value={username} onChange={(e) => setUsername(e.target.value)} required />
                                     </div>
                                 </div>
                                 <button type="submit" className="btn-primary" disabled={!username.trim() || loading}>
-                                    {loading ? 'Wysyłanie...' : 'Wyślij token resetujący'}
+                                    {loading ? t('auth.sending_token') : t('auth.send_token')}
                                 </button>
                                 <Link to="/login" className="back-to-login">
                                     <span className="material-symbols-outlined">arrow_back</span>
-                                    Wróć do logowania
+                                    {t('auth.back_to_login')}
                                 </Link>
                             </form>
                         ) : (
                             <form className="reset-form" onSubmit={handlePasswordSubmit}>
                                 <div className="form-group">
-                                    <label htmlFor="token" className="form-label">Token resetujący</label>
+                                    <label htmlFor="token" className="form-label">{t('auth.reset_token')}</label>
                                     <div className="input-wrap">
                                         <span className="material-symbols-outlined input-icon">vpn_key</span>
-                                        <input id="token" type="text" className="form-input" placeholder="Token z emaila" value={resetToken} onChange={(e) => setResetToken(e.target.value)} required />
+                                        <input id="token" type="text" className="form-input" placeholder={t('auth.token_placeholder')} value={resetToken} onChange={(e) => setResetToken(e.target.value)} required />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="password" className="form-label">Nowe hasło</label>
+                                    <label htmlFor="password" className="form-label">{t('auth.new_password')}</label>
                                     <div className="input-wrap">
                                         <span className="material-symbols-outlined input-icon">lock</span>
-                                        <input id="password" type="password" className="form-input" placeholder="Minimum 8 znaków" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                        <input id="password" type="password" className="form-input" placeholder={t('auth.min_chars_8')} value={password} onChange={(e) => setPassword(e.target.value)} required />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="confirm" className="form-label">Powtórz hasło</label>
+                                    <label htmlFor="confirm" className="form-label">{t('auth.password_copy')}</label>
                                     <div className="input-wrap">
                                         <span className="material-symbols-outlined input-icon">lock</span>
-                                        <input id="confirm" type="password" className="form-input" placeholder="Powtórz nowe hasło" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+                                        <input id="confirm" type="password" className="form-input" placeholder={t('auth.confirm_password')} value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
                                     </div>
                                     {password && confirm && password !== confirm && (
-                                        <p className="input-error">Hasła nie są identyczne</p>
+                                        <p className="input-error">{t('auth.password_mismatch')}</p>
                                     )}
                                 </div>
                                 <button type="submit" className="btn-primary" disabled={!password || !confirm || password !== confirm || loading}>
-                                    {loading ? 'Zapisywanie...' : 'Ustaw nowe hasło'}
+                                    {loading ? t('auth.saving_password') : t('auth.set_new_password')}
                                 </button>
                             </form>
                         )}
@@ -144,9 +142,9 @@ const ResetPassword = () => {
                         <div className="success-icon-wrap">
                             <span className="material-symbols-outlined">check_circle</span>
                         </div>
-                        <h1 className="reset-title">Hasło zmienione!</h1>
-                        <p className="reset-subtitle">Twoje hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.</p>
-                        <Link to="/login" className="btn-primary">Przejdź do logowania</Link>
+                        <h1 className="reset-title">{t('auth.password_changed')}</h1>
+                        <p className="reset-subtitle">{t('auth.password_changed_desc')}</p>
+                        <Link to="/login" className="btn-primary">{t('auth.go_to_login')}</Link>
                     </div>
                 )}
             </div>

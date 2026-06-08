@@ -1,12 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Spinner from '../../../../Spinner';
 import '../../AdminUsersPageNew.scss';
 
 const UsersTable = ({ users, loading, onDeleteClick }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('pl-PL', {
+        return new Date(dateString).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -28,20 +31,20 @@ const UsersTable = ({ users, loading, onDeleteClick }) => {
         if (user.isBlocked) {
             return (
                 <span className="admin-users__badge admin-users__badge--blocked">
-                    Zablokowany
+                    {t('admin.status_blocked')}
                 </span>
             );
         }
         if (user.isActive) {
             return (
                 <span className="admin-users__badge admin-users__badge--active">
-                    Aktywny
+                    {t('admin.status_active')}
                 </span>
             );
         }
         return (
             <span className="admin-users__badge admin-users__badge--inactive">
-                Nieaktywny
+                {t('admin.status_inactive')}
             </span>
         );
     };
@@ -50,8 +53,7 @@ const UsersTable = ({ users, loading, onDeleteClick }) => {
         return (
             <div className="admin-users__table-container">
                 <div className="admin-users__loading">
-                    <div className="admin-users__loading-spinner"></div>
-                    <p>Ładowanie użytkowników...</p>
+                    <Spinner size="lg" />
                 </div>
             </div>
         );
@@ -63,13 +65,13 @@ const UsersTable = ({ users, loading, onDeleteClick }) => {
                 <table className="admin-users__table">
                     <thead className="admin-users__table-head">
                         <tr>
-                            <th className="admin-users__table-th">Użytkownik</th>
-                            <th className="admin-users__table-th">Email</th>
-                            <th className="admin-users__table-th">Rola</th>
-                            <th className="admin-users__table-th">Status</th>
-                            <th className="admin-users__table-th">Data utworzenia</th>
+                            <th className="admin-users__table-th">{t('admin.users_column_user')}</th>
+                            <th className="admin-users__table-th">{t('admin.users_column_email')}</th>
+                            <th className="admin-users__table-th">{t('admin.users_column_role')}</th>
+                            <th className="admin-users__table-th">{t('admin.users_column_status')}</th>
+                            <th className="admin-users__table-th">{t('admin.users_column_created')}</th>
                             <th className="admin-users__table-th admin-users__table-th--actions">
-                                Akcje
+                                {t('admin.users_column_actions')}
                             </th>
                         </tr>
                     </thead>
@@ -113,7 +115,7 @@ const UsersTable = ({ users, loading, onDeleteClick }) => {
                                                     ? 'admin-users__action-btn--disabled' 
                                                     : 'admin-users__action-btn--edit'
                                             }`}
-                                            title={user.role === 'Admin' ? 'Nie można edytować admina' : 'Edytuj'}
+                                            title={user.role === 'Admin' ? t('admin.cannot_edit_admin') : t('common.edit')}
                                             onClick={() => user.role !== 'Admin' && navigate(`/admin/users/edit/${user.id}`)}
                                             disabled={user.role === 'Admin'}
                                         >
@@ -125,7 +127,7 @@ const UsersTable = ({ users, loading, onDeleteClick }) => {
                                                     ? 'admin-users__action-btn--disabled' 
                                                     : 'admin-users__action-btn--delete'
                                             }`}
-                                            title={user.role === 'Admin' ? 'Nie można usunąć admina' : 'Usuń'}
+                                            title={user.role === 'Admin' ? t('admin.cannot_delete_admin') : t('common.delete')}
                                             onClick={() => user.role !== 'Admin' && onDeleteClick(user)}
                                             disabled={user.role === 'Admin'}
                                         >

@@ -6,6 +6,30 @@
     flex-direction: column;
 }
 
+.lesson-back-row {
+    max-width: 1200px;
+    width: 100%;
+    margin: 1rem auto 0;
+    padding: 0 1.5rem;
+}
+
+.lesson-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(58 124 165);
+    text-decoration: none;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.75; }
+
+    .material-symbols-outlined {
+        font-size: 1.1rem;
+    }
+}
+
 .lesson-layout {
     flex: 1;
     display: grid;

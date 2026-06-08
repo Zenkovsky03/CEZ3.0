@@ -57,4 +57,17 @@ public class AnnouncementRepository : IAnnouncementRepository
                         .Where(ua => ua.UserId == userId && ua.IsActive == true)
                         .CountAsync();
     }
+
+    public async Task UpdateAsync(Announcement announcement)
+    {
+        _dbContext.Announcements.Update(announcement);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Announcement announcement)
+    {
+        announcement.IsActive = false;
+        _dbContext.Announcements.Update(announcement);
+        await _dbContext.SaveChangesAsync();
+    }
 }

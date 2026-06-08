@@ -37,6 +37,27 @@
         }
     }
 
+    .btn-primary {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 1.1rem;
+        background: rgb(58 124 165);
+        color: white;
+        border: 1px solid rgb(58 124 165);
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+        font-family: inherit;
+        transition: background 0.15s;
+
+        &:hover { background: rgb(48 104 145); }
+        .material-symbols-outlined { font-size: 1.1rem; }
+    }
+
     .btn-secondary {
         display: flex;
         align-items: center;

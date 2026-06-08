@@ -1,51 +1,49 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import InfoItem from '../../InfoItem';
 import StatusBadge from '../../StatusBadge';
 
-const CourseInfo = ({
-                        startDate,
-                        endDate,
-                        ownerName,
-                        participantsCount,
-                        status,
-                        isPasswordProtected
-                    }) => {
+const CourseInfo = ({ startDate, endDate, ownerName, participantsCount, status, isPasswordProtected }) => {
+    const { t } = useTranslation();
+
     return (
         <div className="course-info">
-            <h2 className="section-title">Informacje o kursie</h2>
+            <h2 className="section-title">{t('course.info')}</h2>
 
             <div className="info-main-grid">
                 <div className="info-primary">
                     <InfoItem
-                        label="Prowadzący"
+                        label={t('course.instructor')}
                         value={ownerName}
                     />
                     <InfoItem
-                        label="Liczba uczestników"
+                        label={t('course.participants_count')}
                         value={participantsCount}
                     />
                 </div>
 
                 <div className="info-dates">
                     <InfoItem
-                        label="Data rozpoczęcia"
+                        label={t('course.start_date')}
                         value={startDate}
                     />
                     <InfoItem
-                        label="Data zakończenia"
+                        label={t('course.end_date')}
                         value={endDate}
                     />
                 </div>
 
                 <div className="info-meta">
-                    <InfoItem classname="info-item-status" label="Status">
-                        <StatusBadge status={status.status} text={status.text} />
-                    </InfoItem>
+                    {status && (
+                        <InfoItem classname="info-item-status" label={t('course.status')}>
+                            <StatusBadge status={status.status} text={status.text} />
+                        </InfoItem>
+                    )}
 
                     {isPasswordProtected && (
                         <InfoItem
-                            label="Zabezpieczenie"
-                            value="🔒 Chroniony hasłem"
+                            label={t('course.protection')}
+                            value={t('course.course_with_password')}
                         />
                     )}
                 </div>

@@ -1,8 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Avatar from '../../Avatar';
 import Button from '../../Button';
 
 const UserSearchItem = ({ user, onAdd, isAlreadyAdded }) => {
+    const { t } = useTranslation();
     return (
         <div className="user-search-item">
             <Avatar
@@ -19,14 +21,14 @@ const UserSearchItem = ({ user, onAdd, isAlreadyAdded }) => {
             </div>
             <div className="user-actions">
                 {isAlreadyAdded ? (
-                    <span className="already-added">Już dodany</span>
+                    <span className="already-added">{t('admin.already_added')}</span>
                 ) : (
                     <Button
                         variant="primary"
                         size="small"
                         onClick={() => onAdd(user.id)}
                     >
-                        Dodaj
+                        {t('common.add')}
                     </Button>
                 )}
             </div>

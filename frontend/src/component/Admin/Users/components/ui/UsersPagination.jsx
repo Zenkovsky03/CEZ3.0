@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import '../../AdminUsersPageNew.scss';
 
 const UsersPagination = ({ 
@@ -43,13 +44,14 @@ const UsersPagination = ({
         return pages;
     };
 
+    const { t } = useTranslation();
     const startItem = (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
     return (
         <div className="admin-users__pagination">
             <div className="admin-users__pagination-info">
-                Wyświetlanie {startItem}-{endItem} z {totalItems} użytkowników
+                {t('admin.users_pagination', { start: startItem, end: endItem, total: totalItems })}
             </div>
             <div className="admin-users__pagination-controls">
                 <button 

@@ -1,27 +1,28 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuthContext from '../../context/AuthContext';
 import Header from '../Header';
+import Spinner from '../Spinner';
 import { getNearestAssignments } from '../../services/assignmentService';
 import { getCourses } from '../../services/courseService';
 import './AssignmentsList.scss';
 
 const TYPE_ICONS = { Quiz: 'quiz', Test: 'assignment', Homework: 'edit_document' };
-const TYPE_LABELS = { Quiz: 'Quiz', Test: 'Test', Homework: 'Praca domowa' };
-const FILTERS = ['Wszystkie', 'Quiz', 'Test', 'Praca domowa'];
 
 const formatDate = (iso) => {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
 };
 
 const AssignmentsList = () => {
+    const { t } = useTranslation();
     const { user } = useContext(AuthContext);
     const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeFilter, setActiveFilter] = useState('Wszystkie');
+    const [activeFilter, setActiveFilter] = useState('all');
 
     useEffect(() => {
         let mounted = true;
@@ -70,7 +71,7 @@ const AssignmentsList = () => {
                 setAssignments(items);
             } catch (err) {
                 if (!mounted) return;
-                setError(err.message || 'Nie udało się pobrać zadań');
+                setError(err.message || t('error.load_assignments'));
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -78,16 +79,16 @@ const AssignmentsList = () => {
 
         load();
         return () => { mounted = false; };
-    }, []);
+    }, [t]);
 
     const filtered = assignments.filter(a =>
-        activeFilter === 'Wszystkie' || TYPE_LABELS[a.type] === activeFilter
+        activeFilter === 'all' || a.type === activeFilter
     );
 
     if (loading) return (
         <div className="page-wrapper-assignments">
             <Header variant="dashboard" />
-            <div className="main-content"><p>Ładowanie zadań...</p></div>
+            <div className="main-content"><Spinner size="lg" /></div>
         </div>
     );
 
@@ -104,27 +105,33 @@ const AssignmentsList = () => {
             <div className="main-content">
                 <div className="page-header">
                     <div className="page-header-text">
-                        <h1 className="page-title">Zadania</h1>
-                        <p className="page-subtitle">Twoje aktywne i zakończone zadania</p>
+                        <h1 className="page-title">{t('assignment.title')}</h1>
+                        <p className="page-subtitle">{t('assignment.active_completed')}</p>
                     </div>
                     {user?.role !== 'Student' && (
-                        <Link to="/assignments/ungraded" className="btn-secondary">
-                            <span className="material-symbols-outlined">grading</span>
-                            Do oceniania
-                        </Link>
+                        <>
+                            <Link to="/assignments/create" className="btn-primary">
+                                <span className="material-symbols-outlined">add</span>
+                                {t('assignment.new')}
+                            </Link>
+                            <Link to="/assignments/ungraded" className="btn-secondary">
+                                <span className="material-symbols-outlined">grading</span>
+                                {t('assignment.to_grade')}
+                            </Link>
+                        </>
                     )}
                 </div>
 
                 <div className="filter-tabs">
-                    {FILTERS.map(f => (
+                    {['all', 'Quiz', 'Test', 'Homework'].map(f => (
                         <button key={f} className={`filter-tab ${activeFilter === f ? 'active' : ''}`} onClick={() => setActiveFilter(f)}>
-                            {f}
+                            {f === 'all' ? t('common.all') : t(`assignment.type_${f.toLowerCase()}`)}
                         </button>
                     ))}
                 </div>
 
                 <div className="assignments-list">
-                    {filtered.length === 0 && <p>Brak zadań w tej kategorii.</p>}
+                    {filtered.length === 0 && <p>{t('assignment.no_tasks')}</p>}
                     {filtered.map(a => (
                         <div key={a.id} className="assignment-card">
                             <div className={`assignment-icon type-${(a.type || 'quiz').toLowerCase()}`}>
@@ -133,18 +140,20 @@ const AssignmentsList = () => {
                             <div className="assignment-info">
                                 <h3 className="assignment-title">{a.title}</h3>
                                 <div className="assignment-meta">
-                                    <span className="type-chip">{TYPE_LABELS[a.type] || a.type}</span>
+                                    <span className="type-chip">{t(`assignment.type_${(a.type || 'quiz').toLowerCase()}`)}</span>
                                     {a.course && <><span>{a.course}</span><span>·</span></>}
-                                    {a.dueDate && <span>Termin: {formatDate(a.dueDate)}</span>}
+                                    {a.dueDate && <span>{t('assignment.due')}: {formatDate(a.dueDate)}</span>}
                                 </div>
                             </div>
                             <div className="assignment-right">
                                 <span className={`status-badge ${a.status === 'active' ? 'status-active' : 'status-done'}`}>
-                                    {a.status === 'active' ? 'Aktywne' : 'Ukończone'}{a.score ? ` · ${a.score}` : ''}
+                                    {a.status === 'active' ? t('assignment.in_progress') : t('assignment.completed')}{a.score ? ` · ${a.score}` : ''}
                                 </span>
-                                {a.status === 'active' && (
-                                    <Link to={`/assignments/${a.id}/quiz`} className="btn-start">Rozpocznij</Link>
-                                )}
+                                {user?.role !== 'Student' ? (
+                                    <Link to={`/assignments/${a.id}/results`} className="btn-start">{t('assignment.results')}</Link>
+                                ) : a.status === 'active' ? (
+                                    <Link to={`/assignments/${a.id}/quiz`} className="btn-start">{t('assignment.start')}</Link>
+                                ) : null}
                             </div>
                         </div>
                     ))}

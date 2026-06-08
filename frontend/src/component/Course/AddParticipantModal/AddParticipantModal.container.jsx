@@ -13,6 +13,40 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         existingIdsRef.current = (existingParticipants || []).map(p => p.id);
     }, [existingParticipants]);
 
+    const searchUsers = useCallback(async (query) => {
+        try {
+            setLoading(true);
+
+            const roles = ['Student', 'Teacher'];
+            const results = await Promise.allSettled(
+                roles.map(r => getUsersByRole(r))
+            );
+            const users = results
+                .filter(r => r.status === 'fulfilled')
+                .flatMap(r => r.value);
+            const lowerQuery = query.toLowerCase();
+            const existingIds = existingIdsRef.current;
+            const filtered = (Array.isArray(users) ? users : []).filter(user => {
+                const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                const username = (user.username || '').toLowerCase();
+
+                return fullName.includes(lowerQuery) ||
+                    email.includes(lowerQuery) ||
+                    username.includes(lowerQuery);
+            }).filter(
+                user => !existingIds.includes(user.id)
+            );
+
+            setSearchResults(filtered);
+        } catch (error) {
+            console.error('Error searching users:', error);
+            setSearchResults([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // Debounce search
     useEffect(() => {
         if (!searchQuery || searchQuery.length < 2) {
@@ -35,41 +69,7 @@ const AddParticipantModalContainer = ({ isOpen, onClose, onAdd, existingParticip
         }
     }, [isOpen]);
 
-    const searchUsers = useCallback(async (query) => {
-        try {
-            setLoading(true);
-
-            const roles = ['Student', 'Teacher'];
-            const results = await Promise.allSettled(
-                roles.map(r => getUsersByRole(r))
-            );
-            const users = results
-                .filter(r => r.status === 'fulfilled')
-                .flatMap(r => r.value);
-            const lowerQuery = query.toLowerCase();
-            const existingIds = existingIdsRef.current;
-            const filtered = (Array.isArray(users) ? users : []).filter(user => {
-                const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-                const email = (user.email || '').toLowerCase();
-                const username = (user.username || '').toLowerCase();
-
-                return fullName.includes(lowerQuery) ||
-                    email.includes(lowerQuery) ||
-                    username.includes(lowerQuery);
-            }).filter(
-                user => !existingIds.includes(user.id)
-            );
-
-            setSearchResults(filtered);
-        } catch (error) {
-            console.error('Error searching users:', error);
-            setSearchResults([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const existingParticipantIds = existingParticipants.map(p => p.id);
+    const existingParticipantIds = (existingParticipants || []).map(p => p.id);
 
     return (
         <AddParticipantModal

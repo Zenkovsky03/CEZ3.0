@@ -52,9 +52,9 @@ public class DeleteThreadReplayCommandHandler(ILogger<DeleteThreadReplayCommandH
             throw new BadRequestException("Invalid UserId format.");
         }
 
-        if (threadReplay.AuthorId.Equals(authorId) || currentUser.role == UserRoles.Admin.ToString())
+        if (!threadReplay.AuthorId.Equals(authorId) && currentUser.role != UserRoles.Admin.ToString())
         {
-            new ForbiddenException("You do not have permission to delete this thread replay.");
+            throw new ForbiddenException("You do not have permission to delete this thread replay.");
         }
 
         threadReplay.IsActive = false;

@@ -1,5 +1,6 @@
 // CourseStructure/CourseStructure.container.jsx
 import React, { useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import AuthContext from '../../../context/AuthContext';
 import CourseStructure from './CourseStructure.component';
@@ -10,9 +11,36 @@ import {
     getCourseById,
     getCourseSections
 } from '../../../services/courseService';
+import { getMaterialsBySection } from '../../../services/sectionMaterialService';
+import { getAssignmentsByCourse } from '../../../services/assignmentService';
 import './CourseStructure.scss';
 
+const enrichSectionsWithItems = async (sections, courseId) => {
+    if (!sections.length) return sections;
+
+    const [materialsBySection, assignments] = await Promise.all([
+        Promise.all(sections.map(s => getMaterialsBySection(s.id).catch(() => []))),
+        getAssignmentsByCourse(courseId).catch(() => [])
+    ]);
+
+    const assignmentsBySectionId = {};
+    if (Array.isArray(assignments)) {
+        assignments.forEach(a => {
+            const sid = typeof a.sectionId === 'string' ? a.sectionId : (a.sectionId?.toString?.() || '');
+            if (!assignmentsBySectionId[sid]) assignmentsBySectionId[sid] = [];
+            assignmentsBySectionId[sid].push({ ...a, itemType: 'assignment' });
+        });
+    }
+
+    return sections.map((section, i) => ({
+        ...section,
+        materials: Array.isArray(materialsBySection[i]) ? materialsBySection[i] : [],
+        assignments: assignmentsBySectionId[section.id] || []
+    }));
+};
+
 const CourseStructureContainer = () => {
+    const { t } = useTranslation();
     const { user } = useContext(AuthContext);
     const { id } = useParams();
     const [course, setCourse] = useState(null);
@@ -35,10 +63,11 @@ const CourseStructureContainer = () => {
                     getCourseSections(id)
                 ]);
 
+                const rawSections = Array.isArray(sectionsData) ? sectionsData : [];
                 setCourse(courseData || null);
-                setSections(Array.isArray(sectionsData) ? sectionsData : []);
+                setSections(await enrichSectionsWithItems(rawSections, id));
             } catch (err) {
-                setError('Wystąpił błąd podczas ładowania struktury kursu');
+                setError(t('error.load_course_structure'));
                 console.error('Error loading course structure:', err);
             } finally {
                 setLoading(false);
@@ -46,6 +75,7 @@ const CourseStructureContainer = () => {
         };
 
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleAddModule = () => {
@@ -59,16 +89,17 @@ const CourseStructureContainer = () => {
     };
 
     const handleDeleteModule = async (moduleId) => {
-        if (!window.confirm('Czy na pewno chcesz usunąć ten moduł?')) {
+        if (!window.confirm(t('course.module_delete_confirm'))) {
             return;
         }
 
         try {
             await deleteCourseSection(moduleId);
-            setSections(prev => prev.filter(s => s.id !== moduleId));
+            const remaining = sections.filter(s => s.id !== moduleId);
+            setSections(await enrichSectionsWithItems(remaining, id));
         } catch (error) {
             console.error('Error deleting module:', error);
-            alert('Nie udało się usunąć modułu');
+            alert(t('error.delete_module'));
         }
     };
 
@@ -90,9 +121,23 @@ const CourseStructureContainer = () => {
             setNewModuleTitle('');
         } catch (createError) {
             console.error('Error creating module:', createError);
-            alert('Nie udało się utworzyć modułu');
+            alert(t('error.create_module'));
         } finally {
             setAddModuleLoading(false);
+        }
+    };
+
+    const handleRefresh = async () => {
+        try {
+            const [courseData, sectionsData] = await Promise.all([
+                getCourseById(id),
+                getCourseSections(id)
+            ]);
+            const rawSections = Array.isArray(sectionsData) ? sectionsData : [];
+            setCourse(courseData || null);
+            setSections(await enrichSectionsWithItems(rawSections, id));
+        } catch (err) {
+            console.error('Error refreshing course data:', err);
         }
     };
 
@@ -108,6 +153,8 @@ const CourseStructureContainer = () => {
                 onAddModule={canModify ? handleAddModule : undefined}
                 onEditModule={canModify ? handleEditModule : undefined}
                 onDeleteModule={canModify ? handleDeleteModule : undefined}
+                onRefresh={canModify ? handleRefresh : undefined}
+                canModify={canModify}
             />
             <AddModuleModal
                 isOpen={isAddModalOpen}

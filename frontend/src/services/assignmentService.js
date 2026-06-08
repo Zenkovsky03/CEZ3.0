@@ -35,3 +35,12 @@ export const gradeHomework = (attemptId, payload) =>
 
 export const getUngradedHomeworks = () =>
     request('/api/assignments/ungraded');
+
+export const createAssignment = (payload) =>
+    request('/api/assignments', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+export const getAssignmentsByCourse = (courseId) =>
+    request(`/api/assignments/course/${courseId}`);

@@ -1,6 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Header from '../../Header';
+import Spinner from '../../Spinner';
 import { getLessonById, getLessonAttachments, markLessonComplete } from '../../../services/sectionMaterialService';
 import './LessonView.scss';
 
@@ -27,6 +29,7 @@ const getAttachmentStyle = (type) => {
 };
 
 const LessonView = () => {
+    const { t } = useTranslation();
     const { cId, lId } = useParams();
     const [lesson, setLesson] = useState(null);
     const [attachments, setAttachments] = useState([]);
@@ -50,7 +53,7 @@ const LessonView = () => {
                 if (lessonData.status === 'fulfilled') {
                     setLesson(lessonData.value);
                 } else {
-                    setError('Nie udało się pobrać lekcji');
+                    setError(t('lesson.load_error'));
                 }
 
                 if (attachmentsData.status === 'fulfilled') {
@@ -59,7 +62,7 @@ const LessonView = () => {
                 }
             } catch (err) {
                 if (!mounted) return;
-                setError(err.message || 'Nie udało się pobrać lekcji');
+                setError(err.message || t('lesson.load_error'));
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -67,7 +70,7 @@ const LessonView = () => {
 
         load();
         return () => { mounted = false; };
-    }, [lId]);
+    }, [lId, t]);
 
     const handleComplete = async () => {
         try {
@@ -84,13 +87,25 @@ const LessonView = () => {
     if (loading) return (
         <div className="page-wrapper-lesson">
             <Header variant="dashboard" />
-            <div className="lesson-layout"><p>Ładowanie lekcji...</p></div>
+            <div className="lesson-back-row">
+                <Link to={`/courses/${cId}/structure`} className="lesson-back-link">
+                    <span className="material-symbols-outlined">arrow_back</span>
+                    {t('course.back_to_structure')}
+                </Link>
+            </div>
+            <div className="lesson-layout"><Spinner size="lg" /></div>
         </div>
     );
 
     if (error) return (
         <div className="page-wrapper-lesson">
             <Header variant="dashboard" />
+            <div className="lesson-back-row">
+                <Link to={`/courses/${cId}/structure`} className="lesson-back-link">
+                    <span className="material-symbols-outlined">arrow_back</span>
+                    {t('course.back_to_structure')}
+                </Link>
+            </div>
             <div className="lesson-layout"><p className="error-message">{error}</p></div>
         </div>
     );
@@ -102,6 +117,12 @@ const LessonView = () => {
     return (
         <div className="page-wrapper-lesson">
             <Header variant="dashboard" />
+            <div className="lesson-back-row">
+                <Link to={`/courses/${cId}/structure`} className="lesson-back-link">
+                    <span className="material-symbols-outlined">arrow_back</span>
+                    {t('course.back_to_structure')}
+                </Link>
+            </div>
             <div className="lesson-layout">
                 <aside className="lesson-sidebar">
                     {lesson.sectionName && (
@@ -118,7 +139,7 @@ const LessonView = () => {
                 <div className="lesson-main">
                     <div className="lesson-breadcrumb">
                         <Link to={`/courses/${cId}`}>
-                            {lesson.courseName || 'Kurs'}
+                            {lesson.courseName || t('nav.courses')}
                         </Link>
                         <span className="material-symbols-outlined">chevron_right</span>
                         <span>{lesson.sectionName || ''}</span>
@@ -129,7 +150,7 @@ const LessonView = () => {
                             <h1 className="lesson-title">{lesson.title}</h1>
                             {lesson.updatedAt && (
                                 <p className="lesson-updated">
-                                    Ostatnia aktualizacja: {new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(lesson.updatedAt))}
+                                    {t('lesson.updated', { date: new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(lesson.updatedAt)) })}
                                 </p>
                             )}
                         </div>
@@ -154,7 +175,7 @@ const LessonView = () => {
                             <div className="attachments-section">
                                 <h3 className="attachments-title">
                                     <span className="material-symbols-outlined">attach_file</span>
-                                    Materiały do lekcji
+                                    {t('lesson.materials_title')}
                                 </h3>
                                 <div className="attachments-grid">
                                     {attachments.map(att => {
@@ -181,7 +202,7 @@ const LessonView = () => {
                                 <span className="material-symbols-outlined">
                                     {completed ? 'check_circle' : 'radio_button_unchecked'}
                                 </span>
-                                {completed ? 'Lekcja ukończona' : 'Oznacz jako ukończoną'}
+                                {completed ? t('lesson.completed') : t('lesson.mark_complete')}
                             </button>
                         </div>
                     </div>

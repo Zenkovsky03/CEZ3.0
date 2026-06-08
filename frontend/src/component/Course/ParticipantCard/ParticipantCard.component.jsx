@@ -1,9 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Avatar from '../../Avatar';
 import RoleBadge from '../../RoleBadge';
 import Button from '../../Button';
 
-const ParticipantCard = ({ participant, formattedDate, onRemove }) => {
+const ParticipantCard = ({ participant, formattedDate, onRemove, userRole }) => {
+    const { t } = useTranslation();
+    const canManage = userRole === 'Admin' || userRole === 'Teacher';
     return (
         <div className="participant-card">
             <div className="participant-card-header">
@@ -30,20 +33,22 @@ const ParticipantCard = ({ participant, formattedDate, onRemove }) => {
                 {formattedDate && (
                     <div className="participant-detail">
                         <span className="detail-icon">📅</span>
-                        <span className="enrollment-date">Dołączył {formattedDate}</span>
+                        <span className="enrollment-date">{t('course.enrolled_date', { date: formattedDate })}</span>
                     </div>
                 )}
             </div>
 
-            <div className="participant-card-footer">
-                <Button
-                    variant="secondary"
-                    size="small"
-                    onClick={onRemove}
-                >
-                    Usuń
-                </Button>
-            </div>
+            {canManage && (
+                <div className="participant-card-footer">
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={onRemove}
+                    >
+                        {t('common.delete')}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

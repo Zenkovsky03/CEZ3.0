@@ -10,4 +10,6 @@ public interface IAnnouncementRepository
     public Task<Announcement?> GetById(ObjectId announcementId);
     public Task<List<Announcement>> GetAnnouncementsAsync(int pageNumber, int pageSize, ObjectId userId);
     public Task<int> GetTotalAnnouncementsCountAsync(ObjectId userId);
+    public Task UpdateAsync(Announcement announcement);
+    public Task DeleteAsync(Announcement announcement);
 }

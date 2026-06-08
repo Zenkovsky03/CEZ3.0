@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../../Modal';
 import SearchBar from '../../SearchBar';
 import EmptyState from '../../EmptyState';
@@ -14,26 +15,27 @@ const AddParticipantModal = ({
                                  loading,
                                  existingParticipantIds
                              }) => {
+    const { t } = useTranslation();
     const isAlreadyParticipant = (userId) => {
-        return existingParticipantIds.includes(userId);
+        return (existingParticipantIds || []).includes(userId);
     };
 
     const renderContent = () => {
         if (loading) {
-            return <EmptyState message="Wyszukiwanie..." />;
+            return <EmptyState message={t('add_participant.searching')} />;
         }
 
         if (!searchQuery || searchQuery.length < 2) {
             return (
                 <EmptyState
-                    message="Wpisz minimum 2 znaki, aby wyszukać użytkownika"
+                    message={t('add_participant.min_chars')}
                     icon="⌨️"
                 />
             );
         }
 
         if (searchResults.length === 0) {
-            return <EmptyState message="Nie znaleziono użytkowników" icon="🔍" />;
+            return <EmptyState message={t('add_participant.not_found')} icon="🔍" />;
         }
 
         return (
@@ -51,12 +53,12 @@ const AddParticipantModal = ({
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Dodaj uczestnika" size="medium">
+        <Modal isOpen={isOpen} onClose={onClose} title={t('add_participant.title')} size="medium">
             <div className="add-participant-modal">
                 <SearchBar
                     value={searchQuery}
                     onChange={onSearchChange}
-                    placeholder="Szukaj po email lub nazwie użytkownika..."
+                    placeholder={t('add_participant.search_placeholder')}
                 />
                 {renderContent()}
             </div>

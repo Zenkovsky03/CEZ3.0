@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SearchBar from "../../SearchBar/SearchBar.component.jsx";
 import './CourseListFilters.scss';
 
@@ -6,6 +7,8 @@ const CourseListFilters = ({
                                filters = { searchTerm: '', sortBy: 'name', filterByStatus: 'all' },
                                onFilterChange = () => {}
                            }) => {
+    const { t } = useTranslation();
+
     const handleSearchChange = (value) => {
         onFilterChange({ searchTerm: value });
     };
@@ -23,36 +26,36 @@ const CourseListFilters = ({
             <SearchBar
                 value={filters.searchTerm}
                 onChange={handleSearchChange}
-                placeholder="Szukaj kursów..."
+                placeholder={t('course.search_placeholder')}
             />
 
             <div className="filter-controls">
                 <div className="filter-group">
-                    <label htmlFor="status-filter">Status:</label>
+                    <label htmlFor="status-filter">{t('Status:')}</label>
                     <select
                         id="status-filter"
                         value={filters.filterByStatus}
                         onChange={handleStatusChange}
                         className="filter-select"
                     >
-                        <option value="all">Wszystkie</option>
-                        <option value="active">Aktywne</option>
-                        <option value="upcoming">Nadchodzące</option>
-                        <option value="completed">Zakończone</option>
+                        <option value="all">{t('common.all')}</option>
+                        <option value="active">{t('Aktywne')}</option>
+                        <option value="upcoming">{t('Nadchodzące')}</option>
+                        <option value="completed">{t('Zakończone')}</option>
                     </select>
                 </div>
 
                 <div className="filter-group">
-                    <label htmlFor="sort-filter">Sortuj:</label>
+                    <label htmlFor="sort-filter">{t('Sortuj:')}</label>
                     <select
                         id="sort-filter"
                         value={filters.sortBy}
                         onChange={handleSortChange}
                         className="filter-select"
                     >
-                        <option value="name">Nazwa</option>
-                        <option value="startDate">Data rozpoczęcia</option>
-                        <option value="participants">Liczba uczestników</option>
+                        <option value="name">{t('Nazwa')}</option>
+                        <option value="startDate">{t('Data rozpoczęcia')}</option>
+                        <option value="participants">{t('Liczba uczestników')}</option>
                     </select>
                 </div>
             </div>

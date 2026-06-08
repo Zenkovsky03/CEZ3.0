@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Header';
 import { createEvent } from '../../services/eventService';
@@ -6,6 +7,7 @@ import { getCourses } from '../../services/courseService';
 import './CreateEvent.scss';
 
 const CreateEvent = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [courses, setCourses] = useState([]);
     const [form, setForm] = useState({
@@ -51,7 +53,7 @@ const CreateEvent = () => {
             });
             setSubmitted(true);
         } catch (err) {
-            setError(err.message || 'Nie udało się utworzyć wydarzenia');
+            setError(err.message || t('error.create_event'));
         } finally {
             setSaving(false);
         }
@@ -66,15 +68,15 @@ const CreateEvent = () => {
                 <div className="main-content">
                     <div className="success-card">
                         <span className="material-symbols-outlined success-icon">event_available</span>
-                        <h2>Wydarzenie zostało dodane!</h2>
-                        <p>Wydarzenie "<strong>{form.title}</strong>" pojawiło się w kalendarzu.</p>
+                        <h2>{t('calendar.event_created')}</h2>
+                        <p>{t('announcement.event_created_in_calendar', { title: form.title })}</p>
                         <div className="success-actions">
                             <button className="btn-secondary" onClick={() => { setSubmitted(false); setForm({ title: '', description: '', courseId: '', startDate: '', startTime: '', endDate: '', endTime: '', location: '' }); }}>
-                                Dodaj kolejne
+                                {t('calendar.add_another')}
                             </button>
                             <Link to="/calendar" className="btn-primary">
                                 <span className="material-symbols-outlined">calendar_month</span>
-                                Przejdź do kalendarza
+                                {t('calendar.go_to_calendar')}
                             </Link>
                         </div>
                     </div>
@@ -89,7 +91,7 @@ const CreateEvent = () => {
             <div className="main-content">
                 <Link to="/calendar" className="back-link">
                     <span className="material-symbols-outlined">arrow_back</span>
-                    Kalendarz
+                    {t('nav.calendar')}
                 </Link>
 
                 <div className="form-card">
@@ -98,8 +100,8 @@ const CreateEvent = () => {
                             <span className="material-symbols-outlined">event</span>
                         </div>
                         <div>
-                            <h1 className="form-card-title">Nowe wydarzenie</h1>
-                            <p className="form-card-subtitle">Dodaj wydarzenie do kalendarza kursu lub ogólnego</p>
+                            <h1 className="form-card-title">{t('calendar.event_create')}</h1>
+                            <p className="form-card-subtitle">{t('calendar.event_create_subtitle')}</p>
                         </div>
                     </div>
 
@@ -107,37 +109,37 @@ const CreateEvent = () => {
 
                     <form className="event-form" onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label className="form-label" htmlFor="title">Tytuł wydarzenia</label>
-                            <input id="title" name="title" type="text" className="form-input" placeholder="np. Wykład – Moduł 4" value={form.title} onChange={handleChange} required />
+                            <label className="form-label" htmlFor="title">{t('calendar.event_title')}</label>
+                            <input id="title" name="title" type="text" className="form-input" placeholder={t('calendar.event_title_placeholder')} value={form.title} onChange={handleChange} required />
                         </div>
 
                         <div className="form-row">
                             <div className="form-group flex-1">
-                                <label className="form-label" htmlFor="startDate">Data rozpoczęcia</label>
+                                <label className="form-label" htmlFor="startDate">{t('calendar.start_date')}</label>
                                 <input id="startDate" name="startDate" type="date" className="form-input" value={form.startDate} onChange={handleChange} required />
                             </div>
                             <div className="form-group flex-1">
-                                <label className="form-label" htmlFor="startTime">Godzina rozpoczęcia</label>
+                                <label className="form-label" htmlFor="startTime">{t('calendar.start_time')}</label>
                                 <input id="startTime" name="startTime" type="time" className="form-input" value={form.startTime} onChange={handleChange} required />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="form-group flex-1">
-                                <label className="form-label" htmlFor="endDate">Data zakończenia</label>
+                                <label className="form-label" htmlFor="endDate">{t('calendar.end_date')}</label>
                                 <input id="endDate" name="endDate" type="date" className="form-input" value={form.endDate} onChange={handleChange} required />
                             </div>
                             <div className="form-group flex-1">
-                                <label className="form-label" htmlFor="endTime">Godzina zakończenia</label>
+                                <label className="form-label" htmlFor="endTime">{t('calendar.end_time')}</label>
                                 <input id="endTime" name="endTime" type="time" className="form-input" value={form.endTime} onChange={handleChange} required />
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="courseId">Powiązany kurs (opcjonalnie)</label>
+                            <label className="form-label" htmlFor="courseId">{t('calendar.course_select')}</label>
                             <div className="select-wrap">
                                 <select id="courseId" name="courseId" className="form-select" value={form.courseId} onChange={handleChange}>
-                                    <option value="">Brak (wydarzenie ogólne)</option>
+                                    <option value="">{t('calendar.no_course')}</option>
                                     {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                                 <span className="material-symbols-outlined select-icon">expand_more</span>
@@ -145,20 +147,20 @@ const CreateEvent = () => {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="location">Miejsce / link (opcjonalnie)</label>
-                            <input id="location" name="location" type="text" className="form-input" placeholder="np. Sala 204 lub link do Teams" value={form.location} onChange={handleChange} />
+                            <label className="form-label" htmlFor="location">{t('calendar.location')}</label>
+                            <input id="location" name="location" type="text" className="form-input" placeholder={t('calendar.location_placeholder')} value={form.location} onChange={handleChange} />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="description">Opis (opcjonalnie)</label>
-                            <textarea id="description" name="description" className="form-textarea" placeholder="Dodatkowe informacje o wydarzeniu..." rows={4} value={form.description} onChange={handleChange} />
+                            <label className="form-label" htmlFor="description">{t('calendar.description')}</label>
+                            <textarea id="description" name="description" className="form-textarea" placeholder={t('calendar.description_placeholder')} rows={4} value={form.description} onChange={handleChange} />
                         </div>
 
                         <div className="form-actions">
-                            <button type="button" className="btn-secondary" onClick={() => navigate('/calendar')}>Anuluj</button>
+                            <button type="button" className="btn-secondary" onClick={() => navigate('/calendar')}>{t('common.cancel')}</button>
                             <button type="submit" className="btn-primary" disabled={!isValid || saving}>
                                 <span className="material-symbols-outlined">event</span>
-                                {saving ? 'Dodawanie...' : 'Dodaj wydarzenie'}
+                                {saving ? t('calendar.adding') : t('calendar.add_event_btn')}
                             </button>
                         </div>
                     </form>

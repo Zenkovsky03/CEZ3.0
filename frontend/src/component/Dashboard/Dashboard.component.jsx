@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuthContext from '../../context/AuthContext';
 import Footer from '../Footer';
 import Header from '../Header';
+import Spinner from '../Spinner';
 import { getAnnouncements } from '../../services/announcementService';
 import { getUserEvents } from '../../services/eventService';
 import { getCourses, getNearestAssignments } from '../../services/courseService';
@@ -11,27 +13,28 @@ import './Dashboard.scss';
 const formatEventDate = (startTime, endTime) => {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return 'Termin nieznany';
-    const dateFormatter = new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const timeFormatter = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' });
-    return `Termin: ${dateFormatter.format(startDate)}, ${timeFormatter.format(startDate)}-${timeFormatter.format(endDate)}`;
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return '';
+    const dateFormatter = new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const timeFormatter = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
+    return `${dateFormatter.format(startDate)}, ${timeFormatter.format(startDate)}-${timeFormatter.format(endDate)}`;
 };
 
 const formatDate = (iso) => {
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return '';
-    return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
 };
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
+    const { t } = useTranslation();
     const [events, setEvents] = useState([]);
     const [announcements, setAnnouncements] = useState([]);
     const [courses, setCourses] = useState([]);
     const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const userName = user?.username || 'Użytkowniku';
+    const userName = user?.username || t('auth.default_user');
 
     useEffect(() => {
         let mounted = true;
@@ -79,7 +82,7 @@ const Dashboard = () => {
                 <div className="dashboard-container">
                     <main className="dashboard-main">
                         <Header variant="dashboard" />
-                        <div className="dashboard-content"><p>Ładowanie...</p></div>
+                        <div className="dashboard-content"><Spinner size="lg" /></div>
                     </main>
                     <Footer />
                 </div>
@@ -95,22 +98,22 @@ const Dashboard = () => {
                     <div className="dashboard-content">
                         <div className="content-header">
                             <div className="welcome-section">
-                                <h1 className="welcome-title">Witaj z powrotem, {userName}!</h1>
-                                <p className="welcome-subtitle">Sprawdźmy, co nowego u Ciebie.</p>
+                                <h1 className="welcome-title">{t('dashboard.welcome_back', { userName })}</h1>
+                                <p className="welcome-subtitle">{t('common.welcome')}</p>
                             </div>
                         </div>
 
                         <div className="dashboard-grid">
                             <section className="dashboard-section">
-                                <h2 className="section-title">Moje kursy</h2>
+                                <h2 className="section-title">{t('dashboard.my_courses')}</h2>
                                 <div className="courses-grid">
-                                    {courses.length === 0 && <p>Nie masz jeszcze żadnych kursów.</p>}
+                                    {courses.length === 0 && <p>{t('course.no_courses')}</p>}
                                     {courses.slice(0, 4).map(course => (
                                         <Link key={course.id} to={`/courses/${course.id}`} className="course-card">
                                             <h3 className="course-name">{course.name}</h3>
                                             {course.owner && (
                                                 <p className="course-instructor">
-                                                    Prowadzący: {course.owner.firstName} {course.owner.lastName}
+                                                    {t('course.instructor')}: {course.owner.firstName} {course.owner.lastName}
                                                 </p>
                                             )}
                                             {course.description && (
@@ -119,23 +122,23 @@ const Dashboard = () => {
                                         </Link>
                                     ))}
                                     {courses.length > 4 && (
-                                        <Link to="/courses" className="see-all-link">Zobacz wszystkie kursy</Link>
+                                        <Link to="/courses" className="see-all-link">{t('course.see_all')}</Link>
                                     )}
                                 </div>
                             </section>
 
                             <section className="dashboard-section">
                                 <div className="section-header">
-                                    <h2 className="section-title">Nadchodzące wydarzenia</h2>
+                                    <h2 className="section-title">{t('calendar.upcoming')}</h2>
                                     {(user?.role === 'Admin' || user?.role === 'Teacher') && (
                                         <Link to="/events/create" className="section-action">
                                             <span className="material-symbols-outlined">add</span>
-                                            Dodaj wydarzenie
+                                            {t('dashboard.add_event')}
                                         </Link>
                                     )}
                                 </div>
                                 <div className="events-card">
-                                    {upcomingEvents.length === 0 && <p className="dashboard-feedback">Brak nadchodzących wydarzeń.</p>}
+                                    {upcomingEvents.length === 0 && <p className="dashboard-feedback">{t('calendar.no_upcoming')}</p>}
                                     {upcomingEvents.map(eventItem => (
                                         <div key={eventItem.id} className="event-item">
                                             <div className="event-icon primary">
@@ -154,16 +157,16 @@ const Dashboard = () => {
 
                             <section className="dashboard-section">
                                 <div className="section-header">
-                                    <h2 className="section-title">Ostatnie ogłoszenia</h2>
+                                    <h2 className="section-title">{t('announcement.recent')}</h2>
                                     {user?.role === 'Admin' && (
                                         <Link to="/announcements/create" className="section-action">
                                             <span className="material-symbols-outlined">add</span>
-                                            Dodaj ogłoszenie
+                                            {t('dashboard.add_announcement')}
                                         </Link>
                                     )}
                                 </div>
                                 <div className="announcements-card">
-                                    {announcements.length === 0 && <p className="dashboard-feedback">Brak nowych ogłoszeń.</p>}
+                                    {announcements.length === 0 && <p className="dashboard-feedback">{t('announcement.no_new')}</p>}
                                     {announcements.map(announcement => (
                                         <div key={announcement.id} className="announcement-item">
                                             <p className="announcement-date">{formatDate(announcement.createdAt)}</p>
@@ -176,13 +179,13 @@ const Dashboard = () => {
 
                             <section className="dashboard-section">
                                 <div className="section-header">
-                                    <h2 className="section-title">Najbliższe zadania</h2>
+                                    <h2 className="section-title">{t('assignment.upcoming')}</h2>
                                     <Link to="/assignments" className="section-action">
-                                        Zobacz wszystkie
+                                        {t('common.see_all')}
                                     </Link>
                                 </div>
                                 <div className="assignments-card">
-                                    {assignments.length === 0 && <p className="dashboard-feedback">Brak najbliższych zadań.</p>}
+                                    {assignments.length === 0 && <p className="dashboard-feedback">{t('assignment.no_upcoming')}</p>}
                                     {assignments.map(a => (
                                         <Link key={a.id || a.assignmentId} to={`/assignments/${a.id}/quiz`} className="assignment-item">
                                             <span className="material-symbols-outlined assignment-item-icon">

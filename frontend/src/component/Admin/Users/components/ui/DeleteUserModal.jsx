@@ -1,5 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import '../../AdminUsersPageNew.scss';
 
 const DeleteUserModal = ({ 
@@ -10,6 +11,7 @@ const DeleteUserModal = ({
     deleting, 
     error 
 }) => {
+    const { t } = useTranslation();
     if (!show) return null;
 
     return createPortal(
@@ -17,10 +19,9 @@ const DeleteUserModal = ({
             <div className="delete-modal__backdrop" onClick={onCancel}></div>
             <div className="delete-modal__content">
                 <div className="delete-modal__body">
-                    <h2 className="delete-modal__title">Potwierdzenie usunięcia</h2>
+                    <h2 className="delete-modal__title">{t('common.confirm_delete')}</h2>
                     <p className="delete-modal__message">
-                        Czy na pewno chcesz usunąć użytkownika <span className="delete-modal__user-name">{user?.firstName} {user?.lastName}</span>? 
-                        To działanie jest nieodwracalne.
+                        {t('admin.delete_confirm_message', { name: `${user?.firstName} ${user?.lastName}` })} {t('common.irreversible')}
                     </p>
                     {error && (
                         <div className="delete-modal__error">
@@ -33,7 +34,7 @@ const DeleteUserModal = ({
                             className="delete-modal__btn delete-modal__btn--cancel"
                             disabled={deleting}
                         >
-                            Anuluj
+                            {t('common.cancel')}
                         </button>
                         <button
                             onClick={onConfirm}
@@ -43,10 +44,10 @@ const DeleteUserModal = ({
                             {deleting ? (
                                 <>
                                     <div className="delete-modal__btn-spinner"></div>
-                                    <span>Usuwanie...</span>
+                                    <span>{t('delete.loading')}</span>
                                 </>
                             ) : (
-                                'Usuń użytkownika'
+                                t('admin.delete_user_btn')
                             )}
                         </button>
                     </div>

@@ -51,5 +51,12 @@ namespace CEZ3._0.Infrastructure.Repositories
                 .OrderByDescending(sm => sm.CreatedAt)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<SectionMaterial>> GetBySectionIdAsync(ObjectId sectionId)
+        {
+            return await _dbContext.SectionMaterials
+                .Where(sm => sm.SectionId == sectionId)
+                .ToListAsync();
+        }
     }
 }

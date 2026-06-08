@@ -1,9 +1,15 @@
 // LessonItem/LessonItem.component.jsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './LessonItem.scss';
 
-const LessonItem = ({ item, index }) => {
+const LessonItem = ({ item, index, onClick }) => {
+    const { t } = useTranslation();
     const isAssignment = item.itemType === 'assignment';
+
+    const handleClick = () => {
+        onClick?.(item);
+    };
 
     const getIcon = () => {
         if (isAssignment) {
@@ -60,27 +66,28 @@ const LessonItem = ({ item, index }) => {
 
     const getTypeLabel = () => {
         if (isAssignment) {
-            return 'Zadanie';
+            return t('lesson.type_assignment');
         }
 
         switch (item.materialType) {
             case 'video':
-                return 'Wideo';
+                return t('lesson.type_video');
             case 'text':
-                return 'Materiał tekstowy';
+                return t('lesson.type_text');
             case 'quiz':
-                return 'Quiz';
+                return t('lesson.type_quiz');
             case 'pdf':
-                return 'PDF';
+                return t('lesson.type_pdf');
             default:
-                return 'Materiał';
+                return t('lesson.type_material');
         }
     };
 
-    const formatDueDate = (dateString) => {
+    const formatDate = (dateString) => {
         if (!dateString) return null;
         const date = new Date(dateString);
-        return date.toLocaleDateString('pl-PL', {
+        if (isNaN(date.getTime())) return null;
+        return date.toLocaleDateString(undefined, {
             day: 'numeric',
             month: 'long',
             year: 'numeric'
@@ -88,7 +95,7 @@ const LessonItem = ({ item, index }) => {
     };
 
     return (
-        <div className={`lesson-item ${isAssignment ? 'assignment' : 'material'}`}>
+        <div className={`lesson-item ${isAssignment ? 'assignment' : 'material'}`} onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') handleClick(); }}>
             <div className="lesson-number">
                 {index}
             </div>
@@ -101,12 +108,12 @@ const LessonItem = ({ item, index }) => {
                     <span className="lesson-type">{getTypeLabel()}</span>
                     {isAssignment && item.maxPoint && (
                         <span className="lesson-points">
-                            Max punktów: {item.maxPoint}
+                            {t('lesson.max_points', { points: item.maxPoint })}
                         </span>
                     )}
                     {isAssignment && item.dueDate && (
                         <span className="lesson-due-date">
-                            Termin: {formatDueDate(item.dueDate)}
+                            {t('lesson.due_date', { date: formatDate(item.dueDate) })}
                         </span>
                     )}
                 </div>

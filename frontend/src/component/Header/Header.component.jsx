@@ -1,17 +1,20 @@
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuthContext from '../../context/AuthContext';
 import Avatar from '../Avatar';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
 import Logo from '../Logo';
 
 const navigationItems = [
-    { key: 'dashboard', label: 'Pulpit', to: '/', icon: 'dashboard', exact: true, roles: null },
-    { key: 'courses', label: 'Wszystkie kursy', to: '/courses', icon: 'library_books', roles: null },
-    { key: 'assignments', label: 'Zadania', to: '/assignments', icon: 'assignment', roles: null },
-    { key: 'grades', label: 'Oceny', to: '/grades', icon: 'grade', roles: null },
-    { key: 'calendar', label: 'Kalendarz', to: '/calendar', icon: 'calendar_today', roles: null },
-    { key: 'messages', label: 'Wiadomości', to: '/messages', icon: 'chat_bubble', roles: null },
-    { key: 'forum', label: 'Forum', to: '/forum', icon: 'forum', roles: null }
+    { key: 'dashboard', labelKey: 'nav.dashboard', to: '/', icon: 'dashboard', exact: true, roles: null },
+    { key: 'courses', labelKey: 'nav.courses', to: '/courses', icon: 'library_books', roles: null },
+    { key: 'assignments', labelKey: 'nav.assignments', to: '/assignments', icon: 'assignment', roles: null },
+    { key: 'grades', labelKey: 'nav.grades', to: '/grades', icon: 'grade', roles: null },
+    { key: 'calendar', labelKey: 'nav.calendar', to: '/calendar', icon: 'calendar_today', roles: null },
+    { key: 'messages', labelKey: 'nav.messages', to: '/messages', icon: 'chat_bubble', roles: null },
+    { key: 'forum', labelKey: 'nav.forum', to: '/forum', icon: 'forum', roles: null },
+    { key: 'gradebook', labelKey: 'nav.gradebook', to: '/grades/course', icon: 'book', roles: ['Teacher', 'Admin'] }
 ];
 
 const isActiveLink = (pathname, item) => {
@@ -25,6 +28,7 @@ const isActiveLink = (pathname, item) => {
 const Header = ({ variant = 'simple' }) => {
     const location = useLocation();
     const { user, logout } = useContext(AuthContext);
+    const { t } = useTranslation();
 
     const visibleItems = navigationItems.filter(item => {
         if (!item.roles) return true;
@@ -38,17 +42,18 @@ const Header = ({ variant = 'simple' }) => {
                     <Logo size="small" />
                     <div className="header-actions">
                         <div className="search-group">
-                            <button className="icon-button" type="button" aria-label="Szukaj">
+                            <button className="icon-button" type="button" aria-label={t('header.search_aria')}>
                                 <span className="material-symbols-outlined">search</span>
                             </button>
-                            <input className="search-input" placeholder="Szukaj..." aria-label="Szukaj" />
+                            <input className="search-input" placeholder={t('header.search')} aria-label={t('header.search_aria')} />
                         </div>
-                        <button className="icon-button" type="button" aria-label="Powiadomienia">
+                        <button className="icon-button" type="button" aria-label={t('header.notifications_aria')}>
                             <span className="material-symbols-outlined">notifications</span>
                         </button>
-                        <button className="icon-button" type="button" aria-label="Wiadomości">
+                        <button className="icon-button" type="button" aria-label={t('header.messages_aria')}>
                             <span className="material-symbols-outlined">chat_bubble</span>
                         </button>
+                        <LanguageSwitcher />
                         <div className="user-dropdown">
                             <Avatar
                                 firstName={user?.firstName}
@@ -57,7 +62,7 @@ const Header = ({ variant = 'simple' }) => {
                                 size="small"
                             />
                             <div className="dropdown-content">
-                                <button type="button" onClick={logout}>Wyloguj się</button>
+                                <button type="button" onClick={logout}>{t('header.logout')}</button>
                             </div>
                         </div>
                     </div>
@@ -70,7 +75,7 @@ const Header = ({ variant = 'simple' }) => {
                             to={item.to}
                         >
                             <span className="material-symbols-outlined">{item.icon}</span>
-                            {item.label}
+                            {t(item.labelKey)}
                         </Link>
                     ))}
                 </nav>

@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AdminLoginForm } from './Users/components/ui';
 import AuthContext from '../../context/AuthContext';
 
 const AdminLoginPage = () => {
     const navigate = useNavigate();
     const { login, logout } = useContext(AuthContext);
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [loginData, setLoginData] = useState({ username: '', password: '' });
@@ -28,15 +30,15 @@ const AdminLoginPage = () => {
                     ? userRole.includes('Admin')
                     : userRole === 'Admin';
 
-                if (!isAdmin) {
+                    if (!isAdmin) {
                     logout();
-                    throw new Error('Brak uprawnień administratora');
+                    throw new Error(t('common.no_permissions'));
                 }
 
                 navigate('/admin/users');
             }
         } catch (err) {
-            setError(err.message || 'Wystąpił błąd podczas logowania');
+            setError(err.message || t('common.error_something_wrong'));
         } finally {
             setLoading(false);
         }

@@ -1,20 +1,23 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AuthContext from '../../context/AuthContext';
 import Header from '../Header';
+import Spinner from '../Spinner';
 import { getConversations, getConversationById, sendMessage } from '../../services/conversationService';
+import NewConversationModal from './NewConversationModal';
 import './MessagesPage.scss';
 
 const STATUS_LABELS = {
-    Open: { label: 'Otwarta', cls: 'status-open' },
-    AwaitingTeacherResponse: { label: 'Oczekuje', cls: 'status-waiting' },
-    AwaitingStudentResponse: { label: 'Oczekuje', cls: 'status-waiting' },
-    Closed: { label: 'Zamknięta', cls: 'status-closed' },
+    Open: { label: 'messages.status_open', cls: 'status-open' },
+    AwaitingTeacherResponse: { label: 'messages.status_awaiting', cls: 'status-waiting' },
+    AwaitingStudentResponse: { label: 'messages.status_awaiting', cls: 'status-waiting' },
+    Closed: { label: 'messages.status_closed', cls: 'status-closed' },
 };
 
 const formatTime = (iso) => {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' }).format(d);
+    return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(d);
 };
 
 const formatDate = (iso) => {
@@ -22,16 +25,18 @@ const formatDate = (iso) => {
     if (Number.isNaN(d.getTime())) return '';
     const now = new Date();
     if (d.toDateString() === now.toDateString()) return formatTime(iso);
-    return new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit' }).format(d);
+    return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit' }).format(d);
 };
 
 const MessagesPage = () => {
+    const { t } = useTranslation();
     const { user } = useContext(AuthContext);
     const [conversations, setConversations] = useState([]);
     const [activeConvId, setActiveConvId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
+    const [showNewConv, setShowNewConv] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -100,7 +105,7 @@ const MessagesPage = () => {
     if (loading) return (
         <div className="page-wrapper-messages">
             <Header variant="dashboard" />
-            <div className="messages-layout"><p>Ładowanie wiadomości...</p></div>
+            <div className="messages-layout"><Spinner size="lg" /></div>
         </div>
     );
 
@@ -110,10 +115,13 @@ const MessagesPage = () => {
             <div className="messages-layout">
                 <aside className="conversations-sidebar">
                     <div className="sidebar-header">
-                        <h2 className="sidebar-title">Wiadomości</h2>
+                        <h2 className="sidebar-title">{t('messages.title')}</h2>
+                        <button className="btn-new-conv" onClick={() => setShowNewConv(true)} title={t('messages.new_conversation')}>
+                            <span className="material-symbols-outlined">add</span>
+                        </button>
                     </div>
                     <div className="conv-list">
-                        {conversations.length === 0 && <p className="conv-empty">Brak konwersacji.</p>}
+                        {conversations.length === 0 && <p className="conv-empty">{t('messages.no_conversations')}</p>}
                         {conversations.map(c => (
                             <button
                                 key={c.id}
@@ -125,7 +133,7 @@ const MessagesPage = () => {
                                 </div>
                                 <div className="conv-info">
                                     <div className="conv-name-row">
-                                        <span className="conv-name">{[c.otherPersonFirstName, c.otherPersonLastName].filter(Boolean).join(' ') || [c.otherPerson?.firstName, c.otherPerson?.lastName].filter(Boolean).join(' ') || c.participantName || 'Nieznany'}</span>
+                                        <span className="conv-name">{[c.otherPersonFirstName, c.otherPersonLastName].filter(Boolean).join(' ') || [c.otherPerson?.firstName, c.otherPerson?.lastName].filter(Boolean).join(' ') || c.participantName || t('common.unknown')}</span>
                                         <span className="conv-time">{c.lastMessageAt ? formatDate(c.lastMessageAt) : ''}</span>
                                     </div>
                                     <div className="conv-preview-row">
@@ -147,10 +155,10 @@ const MessagesPage = () => {
                                     </div>
                                     <div>
                                         <p className="chat-name">
-                                            {[activeConv.otherPersonFirstName, activeConv.otherPersonLastName].filter(Boolean).join(' ') || [activeConv.otherPerson?.firstName, activeConv.otherPerson?.lastName].filter(Boolean).join(' ') || activeConv.participantName || 'Nieznany'}
+                                            {[activeConv.otherPersonFirstName, activeConv.otherPersonLastName].filter(Boolean).join(' ') || [activeConv.otherPerson?.firstName, activeConv.otherPerson?.lastName].filter(Boolean).join(' ') || activeConv.participantName || t('common.unknown')}
                                         </p>
                                         <span className={`chat-status ${STATUS_LABELS[activeConv.status]?.cls || ''}`}>
-                                            {STATUS_LABELS[activeConv.status]?.label || activeConv.status}
+                                            {STATUS_LABELS[activeConv.status]?.label ? t(STATUS_LABELS[activeConv.status].label) : activeConv.status}
                                         </span>
                                     </div>
                                 </div>
@@ -160,7 +168,7 @@ const MessagesPage = () => {
                                 {messages.length === 0 ? (
                                     <div className="messages-empty">
                                         <span className="material-symbols-outlined">chat</span>
-                                        <p>Brak wiadomości. Rozpocznij rozmowę!</p>
+                                        <p>{t('messages.no_messages')}</p>
                                     </div>
                                 ) : messages.map(m => (
                                     <div key={m.id} className={`message-bubble ${m.sender === 'me' || m.senderId === user?.id ? 'mine' : 'theirs'}`}>
@@ -177,14 +185,14 @@ const MessagesPage = () => {
                                 {activeConv.status === 'Closed' ? (
                                     <div className="closed-notice">
                                         <span className="material-symbols-outlined">lock</span>
-                                        Rozmowa jest zamknięta
+                                        {t('messages.conversation_closed')}
                                     </div>
                                 ) : (
                                     <>
                                         <input
                                             type="text"
                                             className="message-input"
-                                            placeholder="Napisz wiadomość..."
+                                            placeholder={t('messages.message_placeholder')}
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                         />
@@ -198,11 +206,22 @@ const MessagesPage = () => {
                     ) : (
                         <div className="no-conv-selected">
                             <span className="material-symbols-outlined">chat</span>
-                            <p>Wybierz rozmowę z listy</p>
+                            <p>{t('messages.select_chat')}</p>
                         </div>
                     )}
                 </div>
             </div>
+            <NewConversationModal
+                isOpen={showNewConv}
+                onClose={() => setShowNewConv(false)}
+                onCreated={(convId) => {
+                    setActiveConvId(convId);
+                    getConversations().then(data => {
+                        const list = Array.isArray(data) ? data : [];
+                        setConversations(list);
+                    }).catch(() => {});
+                }}
+            />
         </div>
     );
 };

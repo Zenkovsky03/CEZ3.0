@@ -1,8 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import CourseForm from '../CourseForm/index.jsx';
 
 const CourseCreate = ({ isEditMode = false }) => {
+    const { t } = useTranslation();
     return (
         <div className="page-wrapper-course">
             <div className="page-container">
@@ -25,7 +27,7 @@ const CourseCreate = ({ isEditMode = false }) => {
 
                         <p className="back-link-text">
                             <Link className="link" to="/courses">
-                                ← Powrót do listy kursów
+                                ← {t('course.back_to_courses')}
                             </Link>
                         </p>
                     </div>

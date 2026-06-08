@@ -3,14 +3,14 @@ import ParticipantsList from './ParticipantsList.component';
 import AddParticipantModal from '../AddParticipantModal';
 import './ParticipantsList.scss';
 
-const ParticipantsListContainer = ({ participants, onRemove, onAdd }) => {
+const ParticipantsListContainer = ({ participants, onRemove, onAdd, userRole }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const filterParticipants = () => {
-        return participants.filter(participant => {
-            const fullName = `${participant.firstName} ${participant.lastName}`.toLowerCase();
-            const email = participant.email.toLowerCase();
+        return (participants || []).filter(participant => {
+            const fullName = `${participant.firstName || ''} ${participant.lastName || ''}`.toLowerCase();
+            const email = (participant.email || '').toLowerCase();
             const query = searchQuery.toLowerCase();
 
             return fullName.includes(query) || email.includes(query);
@@ -36,11 +36,12 @@ const ParticipantsListContainer = ({ participants, onRemove, onAdd }) => {
         <>
             <ParticipantsList
                 filteredParticipants={filteredParticipants}
-                totalCount={participants.length}
+                totalCount={(participants || []).length}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 onRemove={onRemove}
                 onAddClick={handleAddClick}
+                userRole={userRole}
             />
 
             <AddParticipantModal

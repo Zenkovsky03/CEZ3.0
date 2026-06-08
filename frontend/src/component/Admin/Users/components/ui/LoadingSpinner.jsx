@@ -1,11 +1,10 @@
 import React from 'react';
-import '../../AdminUsersPageNew.scss';
+import Spinner from '../../../../Spinner';
 
-const LoadingSpinner = ({ message = 'Ładowanie...' }) => {
+const LoadingSpinner = () => {
     return (
         <div className="admin-users__loading">
-            <div className="admin-users__loading-spinner"></div>
-            {message && <p className="admin-users__loading-text">{message}</p>}
+            <Spinner size="lg" />
         </div>
     );
 };

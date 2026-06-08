@@ -11,3 +11,12 @@ export const createAnnouncement = (payload) =>
         method: 'POST',
         body: JSON.stringify(payload)
     });
+
+export const updateAnnouncement = (id, payload) =>
+    request(`/api/announcements/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+    });
+
+export const deleteAnnouncement = (id) =>
+    request(`/api/announcements/${id}`, { method: 'DELETE' });

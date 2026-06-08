@@ -1,6 +1,8 @@
 ﻿using CEZ3._0.Application.Contracts.Responses.Events;
 using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Application.Events.Command.CreateEvent;
+using CEZ3._0.Application.Events.Command.DeleteEvent;
+using CEZ3._0.Application.Events.Command.UpdateEvent;
 using CEZ3._0.Application.Events.Query.GetEventById;
 using CEZ3._0.Application.Events.Query.GetEventsForUser;
 using CEZ3._0.Domain.Exceptions;
@@ -118,6 +120,53 @@ public class EventController : ControllerBase
         catch (UnauthorizedException ex)
         {
             return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateEvent([FromRoute] string id, [FromBody] UpdateEventCommand command)
+    {
+        try
+        {
+            command.Id = id;
+            await _sender.Send(command);
+            return Ok(new { Message = "Event updated successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteEvent([FromRoute] string id)
+    {
+        try
+        {
+            await _sender.Send(new DeleteEventCommand { Id = id });
+            return Ok(new { Message = "Event deleted successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ErrorResponse { Message = ex.Message });
         }
     }
 }

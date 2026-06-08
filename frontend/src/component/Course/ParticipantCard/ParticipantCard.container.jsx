@@ -2,11 +2,11 @@ import React from 'react';
 import ParticipantCard from './ParticipantCard.component';
 import './ParticipantCard.scss';
 
-const ParticipantCardContainer = ({ participant, onRemove }) => {
+const ParticipantCardContainer = ({ participant, onRemove, userRole }) => {
     const formatDate = (dateString) => {
         if (!dateString) return null;
         const date = new Date(dateString);
-        return date.toLocaleDateString('pl-PL', {
+        return date.toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
@@ -24,6 +24,7 @@ const ParticipantCardContainer = ({ participant, onRemove }) => {
             participant={participant}
             formattedDate={formattedDate}
             onRemove={handleRemove}
+            userRole={userRole}
         />
     );
 };

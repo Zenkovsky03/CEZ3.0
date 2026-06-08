@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../Layout/AdminLayout';
 import { getUsers, getAllUsers, deleteUser } from '../../../services/userService';
@@ -12,6 +13,7 @@ import {
 import './AdminUsersPageNew.scss';
 
 const AdminUsersPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -48,7 +50,7 @@ const AdminUsersPage = () => {
                     setTotalPages(data.totalPage || 0);
                     setTotalUsers(data.totalItemCount || 0);
                 } else {
-                    setError(usersData.reason?.message || 'Nie udało się pobrać użytkowników');
+                    setError(usersData.reason?.message || t('admin.failed_load_users'));
                 }
 
                 if (allUsersData.status === 'fulfilled') {
@@ -61,14 +63,14 @@ const AdminUsersPage = () => {
                     });
                 }
             } catch {
-                setError('Wystąpił błąd podczas ładowania danych');
+                setError(t('admin.failed_load_data'));
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, [pageNumber, pageSize]);
+    }, [pageNumber, pageSize, t]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -136,7 +138,7 @@ const AdminUsersPage = () => {
                 });
             }
         } catch (err) {
-            setDeleteError(err.message || 'Nie udało się usunąć użytkownika');
+            setDeleteError(err.message || t('admin.failed_delete_user'));
         } finally {
             setDeleting(false);
         }
@@ -147,15 +149,15 @@ const AdminUsersPage = () => {
             {/* Page Header */}
             <div className="admin-users__header">
                 <div>
-                    <h1>Użytkownicy</h1>
-                    <p>Zarządzaj wszystkimi użytkownikami platformy</p>
+                    <h1>{t('admin.users')}</h1>
+                    <p>{t('admin.manage_users')}</p>
                 </div>
                 <button
                     onClick={() => navigate('/admin/users/edit/new')}
                     className="admin-users__btn admin-users__btn--primary"
                 >
                     <span className="material-symbols-outlined">add_circle</span>
-                    <span>Dodaj użytkownika</span>
+                    <span>{t('admin.add_user')}</span>
                 </button>
             </div>
 

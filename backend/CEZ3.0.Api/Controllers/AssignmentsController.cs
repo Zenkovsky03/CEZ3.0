@@ -6,6 +6,7 @@ using CEZ3._0.Application.Assignments.Command.StartAssignment;
 using CEZ3._0.Application.Assignments.Command.SubmitHomework;
 using CEZ3._0.Application.Assignments.Dtos;
 using CEZ3._0.Application.Assignments.Query.GetAssignmentResults;
+using CEZ3._0.Application.Assignments.Query.GetAssignmentsByCourse;
 using CEZ3._0.Application.Assignments.Query.GetNearestAssignments;
 using CEZ3._0.Application.Assignments.Query.GetQuiz;
 using CEZ3._0.Application.Assignments.Query.GetUngradedHomework;
@@ -290,6 +291,32 @@ public class AssignmentsController(ISender mediator) : ControllerBase
         try
         {
             var result = await mediator.Send(new GetNearestAssignmentsQuery());
+            return Ok(result);
+        }
+        catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }
+        catch (UnauthorizedException ex) { return Unauthorized(new ErrorResponse { Message = ex.Message }); }
+    }
+
+    /// <summary>Get all assignments for a course</summary>
+    /// <remarks>
+    /// Returns all assignments belonging to the specified course.
+    /// Roles: Admin, Teacher, Student.
+    ///
+    ///     GET /api/assignments/course/64b1f0e2c3a4e512345abcde
+    ///
+    /// </remarks>
+    /// <param name="courseId">MongoDB ObjectId of the course</param>
+    [HttpGet("course/{courseId}")]
+    [Authorize]
+    [EndpointDescription("Gets all assignments for a course. Roles = (Admin, Teacher, Student)")]
+    [ProducesResponseType(typeof(List<AssignmentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAssignmentsByCourse(string courseId)
+    {
+        try
+        {
+            var result = await mediator.Send(new GetAssignmentsByCourseQuery(courseId));
             return Ok(result);
         }
         catch (BadRequestException ex) { return BadRequest(new ErrorResponse { Message = ex.Message }); }

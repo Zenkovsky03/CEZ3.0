@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from '../../Header';
+import Spinner from '../../Spinner';
 import CourseStructureHeader from '../CourseStructureHeader';
 import ModuleList from '../ModuleList';
 import './CourseStructure.scss';
@@ -9,17 +11,19 @@ const CourseStructure = ({
                              sections = [],
                              loading,
                              error,
-                             onAddModule,
-                             onEditModule,
-                             onDeleteModule
-                         }) => {
+                              onAddModule,
+                              onEditModule,
+                              onDeleteModule,
+                              onRefresh,
+                              canModify
+                          }) => {
+    const { t } = useTranslation();
     if (loading) {
         return (
             <div className="page-wrapper-course-structure">
                 <Header variant="dashboard" />
                 <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <p>Ładowanie struktury kursu...</p>
+                    <Spinner size="lg" />
                 </div>
             </div>
         );
@@ -32,7 +36,7 @@ const CourseStructure = ({
                 <div className="error-container">
                     <p>{error}</p>
                     <button onClick={() => window.location.reload()} className="retry-button">
-                        Spróbuj ponownie
+                        {t('common.retry')}
                     </button>
                 </div>
             </div>
@@ -52,11 +56,11 @@ const CourseStructure = ({
                 {sections.length === 0 ? (
                     <div className="empty-state">
                         <div className="empty-state-content">
-                            <h3>Brak modułów</h3>
-                            <p>Ten kurs nie ma jeszcze żadnych modułów. Dodaj pierwszy moduł, aby rozpocząć.</p>
+                            <h3>{t('course.no_modules')}</h3>
+                            <p>{t('course.no_modules_desc')}</p>
                             {onAddModule && (
                                 <button onClick={onAddModule} className="add-module-button">
-                                    Dodaj pierwszy moduł
+                                    {t('course.module_add_first')}
                                 </button>
                             )}
                         </div>
@@ -64,8 +68,11 @@ const CourseStructure = ({
                 ) : (
                     <ModuleList
                         sections={sections}
+                        courseId={course?.id}
                         onEditModule={onEditModule}
                         onDeleteModule={onDeleteModule}
+                        onRefresh={onRefresh}
+                        canModify={canModify}
                     />
                 )}
             </div>

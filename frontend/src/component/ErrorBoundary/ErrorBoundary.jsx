@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../i18n/i18n';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -19,15 +20,15 @@ class ErrorBoundary extends React.Component {
             return (
                 <div className="error-boundary">
                     <div className="error-boundary-content">
-                        <h1>Coś poszło nie tak</h1>
-                        <p>Wystąpił nieoczekiwany błąd. Spróbuj odświeżyć stronę.</p>
+                        <h1>{i18n.t('common.error_something_wrong')}</h1>
+                        <p>{i18n.t('common.error_unexpected')}</p>
                         <button
                             onClick={() => {
                                 this.setState({ hasError: false, error: null });
                                 window.location.reload();
                             }}
                         >
-                            Odśwież stronę
+                            {i18n.t('error.refresh_page')}
                         </button>
                     </div>
                 </div>

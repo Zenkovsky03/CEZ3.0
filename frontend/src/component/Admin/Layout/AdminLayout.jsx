@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './AdminLayout.scss';
 import AuthContext from '../../../context/AuthContext';
 
 const AdminLayout = ({ children, onLogout }) => {
     const location = useLocation();
+    const { t } = useTranslation();
     const { user } = useContext(AuthContext);
 
     const displayName = user
@@ -13,7 +15,7 @@ const AdminLayout = ({ children, onLogout }) => {
     const displayEmail = user?.email || '';
 
     const navItems = [
-        { name: 'Użytkownicy', icon: 'group', path: '/admin/users' },
+        { name: t('admin.nav_users'), icon: 'group', path: '/admin/users' },
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -66,14 +68,14 @@ const AdminLayout = ({ children, onLogout }) => {
                     <div className="admin-layout__user-actions">
                         <button className="admin-layout__user-btn admin-layout__user-btn--settings">
                             <span className="material-symbols-outlined">settings</span>
-                            <span>Ustawienia</span>
+                            <span>{t('admin.settings')}</span>
                         </button>
                         <button 
                             onClick={onLogout}
                             className="admin-layout__user-btn admin-layout__user-btn--logout"
                         >
                             <span className="material-symbols-outlined">logout</span>
-                            <span>Wyloguj</span>
+                            <span>{t('admin.logout')}</span>
                         </button>
                     </div>
                 </div>
@@ -84,13 +86,13 @@ const AdminLayout = ({ children, onLogout }) => {
                 {/* Top Bar */}
                 <header className="admin-layout__header">
                     <div className="admin-layout__header-content">
-                        <h2>Panel Administracyjny</h2>
+                        <h2>{t('admin.panel_heading')}</h2>
                         <div className="admin-layout__header-actions">
                             {/* Search */}
                             <div className="admin-layout__search">
                                 <input
                                     type="text"
-                                    placeholder="Szukaj użytkownika, kursu..."
+                                    placeholder={t('admin.search_placeholder')}
                                 />
                                 <span className="material-symbols-outlined">
                                     search

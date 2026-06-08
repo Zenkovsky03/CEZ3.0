@@ -11,3 +11,12 @@ export const createEvent = (payload) =>
         method: 'POST',
         body: JSON.stringify(payload)
     });
+
+export const updateEvent = (id, payload) =>
+    request(`/api/events/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+    });
+
+export const deleteEvent = (id) =>
+    request(`/api/events/${id}`, { method: 'DELETE' });

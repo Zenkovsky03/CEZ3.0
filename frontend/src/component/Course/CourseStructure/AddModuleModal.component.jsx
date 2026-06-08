@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../../Modal';
 import Button from '../../Button';
 import './AddModuleModal.scss';
@@ -13,6 +14,8 @@ const AddModuleModal = ({
     onOrderIndexChange,
     loading
 }) => {
+    const { t } = useTranslation();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -27,22 +30,22 @@ const AddModuleModal = ({
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Dodaj moduł" size="small">
+        <Modal isOpen={isOpen} onClose={onClose} title={t('course.module_add')} size="small">
             <form className="add-module-modal" onSubmit={handleSubmit}>
                 <label className="field-label">
-                    <p className="input-label-text">Nazwa modułu</p>
+                    <p className="input-label-text">{t('course.module_name')}</p>
                     <input
                         className="form-input"
                         type="text"
                         value={title}
                         onChange={(e) => onTitleChange(e.target.value)}
-                        placeholder="Np. Wprowadzenie"
+                        placeholder={t('Np. Wprowadzenie')}
                         required
                     />
                 </label>
 
                 <label className="field-label">
-                    <p className="input-label-text">Kolejność</p>
+                    <p className="input-label-text">{t('course.module_order')}</p>
                     <input
                         className="form-input"
                         type="number"
@@ -59,10 +62,10 @@ const AddModuleModal = ({
                         onClick={onClose}
                         disabled={loading}
                     >
-                        Anuluj
+                        {t('common.cancel')}
                     </Button>
                     <Button type="submit" variant="primary" disabled={loading}>
-                        {loading ? 'Zapisywanie...' : 'Dodaj moduł'}
+                        {loading ? t('common.saving') : t('course.module_add')}
                     </Button>
                 </div>
             </form>

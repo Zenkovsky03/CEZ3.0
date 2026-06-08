@@ -1,17 +1,20 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import './CourseStructureHeader.scss';
 import BackLink from "../../BackLink";
 
 const CourseStructureHeader = ({ courseName, courseId, onAddModule }) => {
+    const { t } = useTranslation();
+
     return (
         <div className="course-structure-header">
             <BackLink to="/courses">
-                Powrót do listy kursów
+                {t('course.back_to_courses')}
             </BackLink>
             <div className="header-content">
                 <div className="header-text">
-                    <h1>Struktura kursu</h1>
+                    <h1>{t('course.structure')}</h1>
                     {courseName && (
                         <p className="course-name">{courseName}</p>
                     )}
@@ -19,7 +22,7 @@ const CourseStructureHeader = ({ courseName, courseId, onAddModule }) => {
                 <div className="header-actions">
 
                     <Link to={`/courses/${courseId}`} className="back-to-details-btn">
-                        Szczegóły kursu
+                        {t('course.details')}
                     </Link>
                     {onAddModule && (
                         <button
@@ -27,7 +30,7 @@ const CourseStructureHeader = ({ courseName, courseId, onAddModule }) => {
                             className="add-module-btn"
                         >
                             <span className="btn-icon">+</span>
-                            Dodaj moduł
+                            {t('course.module_add')}
                         </button>
                     )}
                 </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Header';
 import { createAnnouncement } from '../../services/announcementService';
@@ -6,6 +7,7 @@ import { getCourses } from '../../services/courseService';
 import './Announcements.scss';
 
 const CreateAnnouncement = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [courses, setCourses] = useState([]);
     const [form, setForm] = useState({ title: '', courseId: '', content: '' });
@@ -37,7 +39,7 @@ const CreateAnnouncement = () => {
             });
             setSubmitted(true);
         } catch (err) {
-            setError(err.message || 'Nie udało się utworzyć ogłoszenia');
+            setError(err.message || t('error.create_announcement'));
         } finally {
             setSaving(false);
         }
@@ -52,13 +54,13 @@ const CreateAnnouncement = () => {
                 <div className="main-content">
                     <div className="success-card">
                         <span className="material-symbols-outlined success-icon">check_circle</span>
-                        <h2>Ogłoszenie zostało opublikowane!</h2>
-                        <p>Studenci zapisani na kurs zostaną poinformowani o nowym ogłoszeniu.</p>
+                        <h2>{t('announcement.published')}</h2>
+                        <p>{t('announcement.course_info')}</p>
                         <div className="success-actions">
                             <button className="btn-secondary" onClick={() => { setSubmitted(false); setForm({ title: '', courseId: '', content: '' }); }}>
-                                Utwórz kolejne
+                                {t('announcement.create_another')}
                             </button>
-                            <Link to="/courses" className="btn-primary">Wróć do kursów</Link>
+                            <Link to="/courses" className="btn-primary">{t('course.back_to_courses')}</Link>
                         </div>
                     </div>
                 </div>
@@ -73,7 +75,7 @@ const CreateAnnouncement = () => {
                 <div className="page-header-row">
                     <Link to="/courses" className="back-link">
                         <span className="material-symbols-outlined">arrow_back</span>
-                        Kursy
+                        {t('course.back_to_courses')}
                     </Link>
                 </div>
 
@@ -83,8 +85,8 @@ const CreateAnnouncement = () => {
                             <span className="material-symbols-outlined">campaign</span>
                         </div>
                         <div>
-                            <h1 className="form-card-title">Nowe ogłoszenie</h1>
-                            <p className="form-card-subtitle">Ogłoszenie zostanie wysłane do wszystkich studentów na wybranym kursie</p>
+                            <h1 className="form-card-title">{t('announcement.create')}</h1>
+                            <p className="form-card-subtitle">{t('announcement.create_subtitle')}</p>
                         </div>
                     </div>
 
@@ -92,12 +94,12 @@ const CreateAnnouncement = () => {
 
                     <form className="ann-form" onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label className="form-label" htmlFor="title">Tytuł ogłoszenia</label>
-                            <input id="title" name="title" type="text" className="form-input" placeholder="np. Zmiana terminu wykładu" value={form.title} onChange={handleChange} required />
+                            <label className="form-label" htmlFor="title">{t('announcement.title_label')}</label>
+                            <input id="title" name="title" type="text" className="form-input" placeholder={t('announcement.title_placeholder')} value={form.title} onChange={handleChange} required />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="courseId">Kurs (opcjonalnie)</label>
+                            <label className="form-label" htmlFor="courseId">{t('announcement.course_required')}</label>
                             <div className="select-wrap">
                                 <select id="courseId" name="courseId" className="form-select" value={form.courseId} onChange={handleChange}>
                                     <option value="">-- Wszystkie kursy --</option>
@@ -110,15 +112,15 @@ const CreateAnnouncement = () => {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="content">Treść ogłoszenia</label>
-                            <textarea id="content" name="content" className="form-textarea" placeholder="Napisz treść ogłoszenia..." rows={8} value={form.content} onChange={handleChange} required />
+                            <label className="form-label" htmlFor="content">{t('announcement.content_label')}</label>
+                            <textarea id="content" name="content" className="form-textarea" placeholder={t('announcement.content_placeholder')} rows={8} value={form.content} onChange={handleChange} required />
                         </div>
 
                         <div className="form-actions">
-                            <button type="button" className="btn-secondary" onClick={() => navigate('/courses')}>Anuluj</button>
+                            <button type="button" className="btn-secondary" onClick={() => navigate('/courses')}>{t('common.cancel')}</button>
                             <button type="submit" className="btn-primary" disabled={!isValid || saving}>
                                 <span className="material-symbols-outlined">send</span>
-                                {saving ? 'Publikowanie...' : 'Opublikuj ogłoszenie'}
+                                {saving ? t('announcement.publishing') : t('announcement.publish')}
                             </button>
                         </div>
                     </form>

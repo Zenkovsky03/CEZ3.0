@@ -1,6 +1,8 @@
 ﻿using CEZ3._0.Application.Announcements.Command.CreateAnnouncement;
+using CEZ3._0.Application.Announcements.Command.DeleteAnnouncement;
 using CEZ3._0.Application.Announcements.Command.Query.GetAllAnnouncements;
 using CEZ3._0.Application.Announcements.Command.Query.GetAnnouncementById;
+using CEZ3._0.Application.Announcements.Command.UpdateAnnouncement;
 using CEZ3._0.Application.Contracts.Responses.Announcement;
 using CEZ3._0.Application.Contracts.Responses.Users;
 using CEZ3._0.Domain.Exceptions;
@@ -134,6 +136,83 @@ public class AnnouncementController : ControllerBase
         catch (UnauthorizedException ex)
         {
             return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    /// <summary>Update an announcement</summary>
+    /// <remarks>
+    /// Updates the title and content of an existing announcement.
+    /// Only Admin and Teacher roles are authorized.
+    ///
+    ///     PUT /api/announcements/{id}
+    ///     {
+    ///         "title": "Updated Title",
+    ///         "content": "Updated content"
+    ///     }
+    ///
+    /// </remarks>
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateAnnouncement(string id, [FromBody] UpdateAnnouncementCommand request)
+    {
+        try
+        {
+            request.Id = id;
+            await _sender.Send(request);
+            return Ok(new { Message = "Announcement updated successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
+        }
+    }
+
+    /// <summary>Delete an announcement (soft delete)</summary>
+    /// <remarks>
+    /// Soft-deletes an announcement by setting IsActive to false.
+    /// Only Admin and Teacher roles are authorized.
+    ///
+    ///     DELETE /api/announcements/{id}
+    ///
+    /// </remarks>
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteAnnouncement(string id)
+    {
+        try
+        {
+            await _sender.Send(new DeleteAnnouncementCommand { Id = id });
+            return Ok(new { Message = "Announcement deleted successfully." });
+        }
+        catch (BadRequestException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message });
+        }
+        catch (UnauthorizedException ex)
+        {
+            return Unauthorized(new ErrorResponse { Message = ex.Message });
+        }
+        catch (ForbiddenException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ErrorResponse { Message = ex.Message });
         }
     }
 }

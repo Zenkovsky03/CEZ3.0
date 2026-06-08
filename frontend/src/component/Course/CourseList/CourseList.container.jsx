@@ -43,8 +43,8 @@ const CourseListContainer = () => {
         if (filters.searchTerm) {
             const searchLower = filters.searchTerm.toLowerCase();
             filtered = filtered.filter(course =>
-                course.name.toLowerCase().includes(searchLower) ||
-                course.description.toLowerCase().includes(searchLower)
+                (course.name || '').toLowerCase().includes(searchLower) ||
+                (course.description || '').toLowerCase().includes(searchLower)
             );
         }
 

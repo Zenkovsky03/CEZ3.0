@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import './Landing.scss';
 import Background from '../Background';
 import Feature from '../Feature';
 
 const Landing = () => {
-   return (
+    const { t } = useTranslation();
+    return (
         <>
             <Background />
             <div className="page-wrapper">
@@ -11,39 +13,38 @@ const Landing = () => {
                     <div className="info-panel">
                         <div className="info-header">
                         <span className="material-symbols-outlined info-icon">school</span>
-                        <h1 className="info-title">CEZ 3.0</h1>
+                        <h1 className="info-title">{t('app.name')}</h1>
                         </div>
-                        <p className="info-subtitle">Twoje centrum wiedzy i rozwoju. Odkryj nowoczesne narzędzia do nauki, które pomogą Ci
-                        osiągnąć sukces akademicki.</p>
+                        <p className="info-subtitle">{t('Twoje centrum wiedzy i rozwoju. Odkryj nowoczesne narzędzia do nauki, które pomogą Ci osiągnąć sukces akademicki.')}</p>
 
                         <div className="features-list">
                             <Feature
                                 icon="auto_stories"
-                                title="Materiały dydaktyczne"
-                                description="Dostęp do szerokiej bazy wykładów, notatek i zadań."
+                                title={t('course.materials')}
+                                description={t('Dostęp do szerokiej bazy wykładów, notatek i zadań.')}
                             />
                             <Feature
                                 icon="groups"
-                                title="Współpraca w grupach"
-                                description="Pracuj nad projektami ze swoimi kolegami w czasie rzeczywistym."
+                                title={t('course.collaboration')}
+                                description={t('Pracuj nad projektami ze swoimi kolegami w czasie rzeczywistym.')}
                             />
                             <Feature
                                 icon="calendar_month"
-                                title="Terminarz i powiadomienia"
-                                description="Śledź ważne terminy i nigdy nie przegap żadnego zadania."
+                                title={t('Terminarz i powiadomienia')}
+                                description={t('Śledź ważne terminy i nigdy nie przegap żadnego zadania.')}
                             />
                         </div>
                     </div>
 
                     <div className="action-panel">
                         <div className="action-content">
-                        <h2 className="action-title">Witamy!</h2>
-                        <p className="action-subtitle">Zaloguj się, aby kontynuować naukę, bądź zarejestruj się, żeby rozpocząć.</p>
+                        <h2 className="action-title">{t('Witamy!')}</h2>
+                        <p className="action-subtitle">{t('auth.login_alt')}</p>
                         <div className="button-group">
-                            <a className="button primary-button" href="/login">Zaloguj się</a>
-                            <a className="button secondary-button" href="/register">Zarejestruj się</a>
+                            <a className="button primary-button" href="/login">{t('auth.login')}</a>
+                            <a className="button secondary-button" href="/register">{t('auth.register')}</a>
                         </div>
-                        <p className="terms-text">Kontynuując, akceptujesz nasz <a className="terms-link" href="#">Regulamin</a> oraz <a className="terms-link" href="#">Politykę Prywatności</a>.</p>
+                        <p className="terms-text">{t('auth.terms_agree')} <a className="terms-link" href="#">{t('auth.terms')}</a> oraz <a className="terms-link" href="#">{t('auth.privacy')}</a>.</p>
                         </div>
                     </div>
                 </main>

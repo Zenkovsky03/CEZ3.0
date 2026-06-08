@@ -36,6 +36,11 @@ namespace CEZ3._0.Infrastructure.Repositories
             return await _dbContext.Grades.Where(g => g.AssignmentId == assignmentId).ToListAsync();
         }
 
+        public async Task<List<Grade>> GetByAssignmentIdsAsync(List<ObjectId> assignmentIds)
+        {
+            return await _dbContext.Grades.Where(g => assignmentIds.Contains(g.AssignmentId)).ToListAsync();
+        }
+
         public async Task<bool> ExistsAsync(ObjectId assignmentId, ObjectId userId)
         {
             return await _dbContext.Grades

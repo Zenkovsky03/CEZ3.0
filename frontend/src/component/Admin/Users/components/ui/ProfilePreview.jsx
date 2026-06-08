@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import '../../AdminUsersPageNew.scss';
 
 const ProfilePreview = ({ user, role, status, firstName, lastName, username }) => {
+    const { t } = useTranslation();
+
     const getRoleIcon = (role) => {
         const icons = {
             'Admin': 'admin_panel_settings',
@@ -31,15 +34,15 @@ const ProfilePreview = ({ user, role, status, firstName, lastName, username }) =
 
     const getStatusLabel = (status) => {
         const labels = {
-            'Active': 'Aktywny',
-            'Inactive': 'Nieaktywny',
-            'Blocked': 'Zablokowany'
+            'Active': t('admin.status_active'),
+            'Inactive': t('admin.status_inactive'),
+            'Blocked': t('admin.status_blocked')
         };
         return labels[status] || status;
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('pl-PL', {
+        return new Date(dateString).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -52,7 +55,7 @@ const ProfilePreview = ({ user, role, status, firstName, lastName, username }) =
         <div className="admin-users__edit-user__sidebar">
             {/* Profile Preview */}
             <div className="admin-users__edit-user__card">
-                <h3 className="admin-users__edit-user__sidebar-title">Podgląd profilu</h3>
+                <h3 className="admin-users__edit-user__sidebar-title">{t('admin.profile_preview')}</h3>
                 
                 <div className="admin-users__edit-user__profile-preview">
                     <div className="admin-users__edit-user__avatar">
@@ -83,13 +86,13 @@ const ProfilePreview = ({ user, role, status, firstName, lastName, username }) =
 
             {/* Statistics */}
             <div className="admin-users__edit-user__card">
-                <h3 className="admin-users__edit-user__sidebar-title">Statystyki</h3>
+                <h3 className="admin-users__edit-user__sidebar-title">{t('admin.statistics')}</h3>
                 
                 <div className="admin-users__edit-user__stats">
                     <div className="admin-users__edit-user__stat-item">
                         <span className="material-symbols-outlined admin-users__edit-user__stat-icon admin-users__edit-user__stat-icon--blue">calendar_today</span>
                         <div className="admin-users__edit-user__stat-content">
-                            <p className="admin-users__edit-user__stat-label">Data dołączenia</p>
+                            <p className="admin-users__edit-user__stat-label">{t('admin.enrollment_date')}</p>
                             <p className="admin-users__edit-user__stat-value">{formatDate(user.createdAt)}</p>
                         </div>
                     </div>
@@ -97,9 +100,9 @@ const ProfilePreview = ({ user, role, status, firstName, lastName, username }) =
                     <div className="admin-users__edit-user__stat-item">
                         <span className="material-symbols-outlined admin-users__edit-user__stat-icon admin-users__edit-user__stat-icon--green">verified</span>
                         <div className="admin-users__edit-user__stat-content">
-                            <p className="admin-users__edit-user__stat-label">Status weryfikacji</p>
+                            <p className="admin-users__edit-user__stat-label">{t('admin.verification_status')}</p>
                             <p className="admin-users__edit-user__stat-value">
-                                {user.isActive ? 'Zweryfikowany' : 'Niezweryfikowany'}
+                                {user.isActive ? t('admin.verified') : t('admin.unverified')}
                             </p>
                         </div>
                     </div>
@@ -107,7 +110,7 @@ const ProfilePreview = ({ user, role, status, firstName, lastName, username }) =
                     <div className="admin-users__edit-user__stat-item">
                         <span className="material-symbols-outlined admin-users__edit-user__stat-icon admin-users__edit-user__stat-icon--purple">badge</span>
                         <div className="admin-users__edit-user__stat-content">
-                            <p className="admin-users__edit-user__stat-label">ID użytkownika</p>
+                            <p className="admin-users__edit-user__stat-label">{t('admin.user_id')}</p>
                             <p className="admin-users__edit-user__stat-value admin-users__edit-user__stat-value--mono">{user.id}</p>
                         </div>
                     </div>
@@ -119,9 +122,9 @@ const ProfilePreview = ({ user, role, status, firstName, lastName, username }) =
                 <div className="admin-users__edit-user__info-content">
                     <span className="material-symbols-outlined admin-users__edit-user__info-icon">info</span>
                     <div>
-                        <p className="admin-users__edit-user__info-title">Informacja</p>
+                        <p className="admin-users__edit-user__info-title">{t('admin.info')}</p>
                         <p className="admin-users__edit-user__info-text">
-                            Zmiany w danych użytkownika zostaną zapisane natychmiast po kliknięciu przycisku "Zapisz zmiany".
+                            {t('admin.info_text')}
                         </p>
                     </div>
                 </div>

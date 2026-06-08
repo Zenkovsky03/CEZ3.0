@@ -5,7 +5,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'medium', handleBackdr
 
     return (
         <div className="modal-backdrop" onClick={handleBackdropClick}>
-            <div className={`modal-container modal-${size}`}>
+            <div className={`modal-container modal-${size}`} onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title">{title}</h2>
                     <button className="modal-close" onClick={onClose} aria-label="Zamknij">
